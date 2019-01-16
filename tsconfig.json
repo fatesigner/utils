@@ -1,0 +1,57 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "allowJs": false,
+    "allowSyntheticDefaultImports": true,
+    "checkJs": false,
+    "declaration": false,
+    "diagnostics": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true,
+    "jsx": "preserve",
+    "jsxFactory": "h",
+    "lib": [
+      "es5",
+      "es6",
+      "es2015",
+      "es2015.promise",
+      "dom"
+    ],
+    "moduleResolution": "node",
+    "noEmitOnError": true,
+    "noStrictGenericChecks": true,
+    "noImplicitAny": true,
+    "pretty": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "strict": false,
+    "strictNullChecks": false,
+    "esModuleInterop": true,
+    "rootDir": "./src",
+    "module": "ESNext",
+    "target": "ES2018",
+    "types": [
+      "jest",
+      "node"
+    ],
+    "typeRoots": [
+      "node_modules/@types",
+      "src/typings"
+    ],
+    "baseUrl": ".",
+    "paths": {
+    }
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/typings/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "src/**/*.spec.ts",
+    "src/**/*.test.ts",
+    "src/**/__tests__/*.ts"
+  ]
+}

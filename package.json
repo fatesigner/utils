@@ -1,0 +1,44 @@
+{
+  "name": "@fatesigner/utils",
+  "version": "1.0.0",
+  "description": "JavaScript工具库.",
+  "license": "MIT",
+  "keywords": [
+    "javascript",
+    "typescript",
+    "utils"
+  ],
+  "author": {
+    "name": "Jeremy Tang",
+    "email": "fatesigner@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fatesigner/utils.git"
+  },
+  "bugs": {
+    "url": "https://github.com/fatesigner/utils/issues"
+  },
+  "homepage": "https://github.com/fatesigner/utils#readme",
+  "scripts": {
+    "clean": "gulp clean --gulpfile build/gulpfile.js",
+    "build": "gulp build --gulpfile build/gulpfile.js",
+    "test": "jest",
+    "coverage": "jest --coverage"
+  },
+  "devDependencies": {
+    "@types/gulp": "3.8.36",
+    "@types/jest": "23.3.12",
+    "@types/node": "10.12.18",
+    "globby": "9.0.0",
+    "gulp": "4.0.0",
+    "jest": "23.6.0",
+    "require-dir": "1.2.0",
+    "rimraf": "2.6.3",
+    "rxjs": "6.3.3",
+    "travis": "0.1.1",
+    "ts-jest": "23.10.5",
+    "ts-node": "7.0.1",
+    "typescript": "3.2.2"
+  }
+}
