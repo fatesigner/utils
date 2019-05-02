@@ -1,6 +1,6 @@
 {
   "name": "@fatesigner/utils",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "JavaScript工具库.",
   "license": "MIT",
   "keywords": [
@@ -20,6 +20,9 @@
     "url": "https://github.com/fatesigner/utils/issues"
   },
   "homepage": "https://github.com/fatesigner/utils#readme",
+  "main": "./index.cmd.js",
+  "module": "./index.js",
+  "types": "./index.d.ts",
   "scripts": {
     "clean": "gulp clean --gulpfile build/gulpfile.js",
     "build": "gulp build --gulpfile build/gulpfile.js",
@@ -32,13 +35,18 @@
     "@types/node": "10.12.18",
     "globby": "9.0.0",
     "gulp": "4.0.0",
+    "gulp-rename": "1.4.0",
+    "gulp-typescript": "5.0.1",
     "jest": "23.6.0",
+    "merge2": "1.2.3",
     "require-dir": "1.2.0",
     "rimraf": "2.6.3",
     "rxjs": "6.3.3",
     "travis": "0.1.1",
     "ts-jest": "23.10.5",
+    "ts-loader": "5.4.4",
     "ts-node": "7.0.1",
-    "typescript": "3.2.2"
+    "typescript": "3.2.2",
+    "webpack": "4.30.0"
   }
 }
