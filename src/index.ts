@@ -577,3 +577,78 @@ export function GetParamsFromUrl(paramStr?: string): object {
   }
   return undefined;
 }
+
+type byProp<T> = (arg0: T) => string | number;
+
+/**
+ * 指定属性，为数组进行分组
+ * @param arr 数组
+ * @param by 待分组的属性
+ * @param slice 分组后的 item 默认不包含源 item 的属性，提供一个函数选择指定包含的属性
+ * @constructor
+ */
+export function GroupBy<T, T2>(
+  arr: T[],
+  by: string | byProp<T>,
+  slice?: (arg0: T) => T2
+): Array<{
+  key: string | number;
+  children: T[];
+}> {
+  const res = arr.reduce(
+    function (prev: any, cur) {
+      let key;
+      if (Object.prototype.toString.call(by) === '[object Function]') {
+        key = (by as byProp<T>)(cur);
+      } else if (Object.prototype.toString.call(by) === '[object String]') {
+        key = cur[by as keyof T];
+      } else {
+        throw new Error('GroupBy: the key for group by is not valid.');
+      }
+      let idx = -1;
+      let upd = true;
+      if (
+        Object.prototype.toString.call(key) === '[object Null]' ||
+        Object.prototype.toString.call(key) === '[object Undefined]'
+      ) {
+        if (prev.undef < 0) {
+          upd = false;
+          prev.undef = prev.arr.length;
+        }
+        idx = prev.undef;
+      } else if (
+        Object.prototype.toString.call(key) !== '[object String]' ||
+        Object.prototype.toString.call(key) !== '[object Number]'
+      ) {
+        if (!Object.prototype.hasOwnProperty.call(prev.keys, key)) {
+          upd = false;
+          prev.keys[key] = prev.arr.length;
+        }
+        idx = prev.keys[key];
+      }
+      if (idx > -1) {
+        if (upd) {
+          prev.arr[idx].children.push(cur);
+        } else {
+          let item: any = {};
+          if (slice) {
+            item = Object.assign({}, item, slice(cur));
+          }
+          if (Object.prototype.toString.call(by) === '[object String]') {
+            item[by as string] = cur[by as keyof T];
+          }
+          item.children = [cur];
+          prev.arr.push(item);
+        }
+      }
+      return prev;
+    },
+    {
+      undef: -1,
+      keys: {},
+      arr: []
+    }
+  );
+
+  return res.arr;
+}

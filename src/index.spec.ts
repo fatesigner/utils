@@ -127,3 +127,32 @@ test('## Extend', function() {
   expect(obj2.c.f).toBe(4);
   expect(obj2.c.g.h).toBe(2);
 });
+
+test('test main GroupBy', function () {
+  const arr = [
+    { parentId: '3', parentText: 'text3', id: '1', text: '1' },
+    { parentId: '1', parentText: 'text1', id: '2', text: '1' },
+    { parentId: '1', parentText: 'text1', id: '3', text: '1' },
+    { parentId: '2', parentText: 'text2', id: '4', text: '1' },
+    { parentId: '3', parentText: 'text3', id: '5', text: '1' },
+    { parentId: '3', parentText: 'text3', id: '6', text: '1' },
+    { parentId: '2', parentText: 'text2', id: '7', text: '1' },
+    { parentId: '4', parentText: 'text4', id: '8', text: '4' }
+  ];
+
+  const arrGrouped = Index.GroupBy(arr, 'parentId');
+
+  expect(arrGrouped.length).toBe(4);
+  expect(Object.prototype.hasOwnProperty.call(arrGrouped[0], 'parentId')).toBe(true);
+  expect(Object.prototype.hasOwnProperty.call(arrGrouped[0], 'parentText')).toBe(false);
+
+  const arrGrouped2 = Index.GroupBy(arr, 'parentId', (cur) => {
+    return {
+      parentText: cur.parentText
+    };
+  });
+
+  expect(arrGrouped2.length).toBe(4);
+  expect(Object.prototype.hasOwnProperty.call(arrGrouped2[0], 'parentId')).toBe(true);
+  expect(Object.prototype.hasOwnProperty.call(arrGrouped2[0], 'parentText')).toBe(true);
+});

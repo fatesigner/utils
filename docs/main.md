@@ -345,7 +345,7 @@ console.log(JSON.stringify(obj2, null, 2));
 获取指定查询字符串中的参数。
 
 ```js
-import { GetParamsFromUrl } from '@fatesigner/document';
+import { GetParamsFromUrl } from '@fatesigner/utils';
 
 /**
  * @param paramStr 查询字符串
@@ -355,4 +355,117 @@ import { GetParamsFromUrl } from '@fatesigner/document';
 console.log(GetParamsFromUrl(location.search));
 
 // 输出：{id:'123',name:'23124'}
+```
+## GroupBy
+指定属性，为数组进行分组
+
+
+```js
+import { GetParamsFromUrl } from '@fatesigner/utils';
+
+/**
+ * 指定属性，为数组进行分组
+ * @param arr 数组
+ * @param by 待分组的属性，可以为一个函数，返回决定分组的值
+ * @param slice 分组后的 item 默认不包含源 item 的属性，提供一个函数选择指定包含的属性
+ * @constructor
+ */
+declare function GroupBy<T, T2>(arr: T[], by: string | byProp<T>, select?: (arg0: T) => T2): Array<{
+    key: string | number;
+    children: T[];
+}>;
+
+const arr = [
+{ parentId: '3', id: '1', text: '1', desc: '1 desc' },
+{ parentId: '1', id: '2', text: '1', desc: '1 desc' },
+{ parentId: '1', id: '3', text: '1', desc: '1 desc' },
+{ parentId: '2', id: '4', text: '1', desc: '1 desc' },
+{ parentId: '3', id: '5', text: '1', desc: '1 desc' },
+{ parentId: '3', id: '6', text: '1', desc: '1 desc' },
+{ parentId: '2', id: '7', text: '1', desc: '1 desc' },
+{ parentId: '4', id: '8', text: '4', desc: '4 desc' }
+];
+
+console.log(GroupBy(arr, 'parentId', (cur) => {
+  return {
+    parentText: cur.parentText,
+    text: cur.text
+  };
+}));
+
+// 输出：
+[                                              
+  {                                            
+    "parentId": "3",                           
+    "parentText": "text3",                     
+    "children": [                              
+      {                                        
+        "parentId": "3",                       
+        "parentText": "text3",                 
+        "id": "1",                             
+        "text": "1"                            
+      },                                       
+      {                                        
+        "parentId": "3",                       
+        "parentText": "text3",                 
+        "id": "5",                             
+        "text": "1"                            
+      },                                       
+      {                                        
+        "parentId": "3",                       
+        "parentText": "text3",                 
+        "id": "6",                             
+        "text": "1"                            
+      }                                        
+    ]                                          
+  },                                           
+  {                                            
+    "parentId": "1",                           
+    "parentText": "text1",                     
+    "children": [                              
+      {                                        
+        "parentId": "1",                       
+        "parentText": "text1",                 
+        "id": "2",                             
+        "text": "1"                            
+      },                                       
+      {                                        
+        "parentId": "1",                       
+        "parentText": "text1",                 
+        "id": "3",                             
+        "text": "1"                            
+      }                                        
+    ]                                          
+  },                                           
+  {                                            
+    "parentId": "2",                           
+    "parentText": "text2",                     
+    "children": [                              
+      {                                        
+        "parentId": "2",                       
+        "parentText": "text2",                 
+        "id": "4",                             
+        "text": "1"                            
+      },                                       
+      {                                        
+        "parentId": "2",                       
+        "parentText": "text2",                 
+        "id": "7",                             
+        "text": "1"                            
+      }                                        
+    ]                                          
+  },                                           
+  {                                            
+    "parentId": "4",                           
+    "parentText": "text4",                     
+    "children": [                              
+      {                                        
+        "parentId": "4",                       
+        "parentText": "text4",                 
+        "id": "8",                             
+        "text": "4"                            
+      }                                        
+    ]                                          
+  }                                            
+]                                              
 ```
