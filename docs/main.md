@@ -469,3 +469,82 @@ console.log(GroupBy(arr, 'parentId', (cur) => {
   }                                            
 ]                                              
 ```
+
+## ToFixed
+替代原生 [Number.prototype.toFixed()](https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Number/toFixed) ，解决 js 精度丢失问题
+
+```js
+import { ToFixed } from '@fatesigner/utils';
+
+/**
+ * 替代原生 toFixed 函数，解决 js 精度丢失问题
+ * @param value  指定的待转换的数值
+ * @param digits 小数点后数字的个数；介于 0 到 20 （包括）之间，实现环境可能支持更大范围。如果忽略该参数，则默认为 0。
+ * @param mode   当有效位数确定后，其后多余位数的处理模式，默认为 normal，即银行家舍入法 "四舍六入五成双"，round：标准的四舍五入，increase：无论数值大小，一律进1，ignore：一律舍弃
+ * @constructor
+ */
+
+const num = 12345.6789;
+
+console.log(ToFixed(num, 2, 'normal'));
+// 输出：12345.68
+console.log(ToFixed(num, 2, 'round'));
+// 输出：12345.68
+console.log(ToFixed(num, 2, 'increase'));
+// 输出：12345.68
+console.log(ToFixed(num, 2, 'ignore'));
+// 输出：12345.67
+
+console.log(ToFixed(12345.6749, 2, 'normal'));
+// 输出：12345.67;
+console.log(ToFixed(12345.6769, 2, 'normal'));
+// 输出：12345.68;
+console.log(ToFixed(12345.6759, 2, 'normal'));
+// 输出：12345.68;
+console.log(ToFixed(12345.6659, 2, 'normal'));
+// 输出：12345.66;
+console.log(ToFixed(12345.6759, 5, 'normal'));
+// 输出：12345.6759;
+
+console.log(ToFixed(12345.6749, 2, 'round'));
+// 输出：12345.67
+console.log(ToFixed(12345.6769, 2, 'round'));
+// 输出：12345.68
+console.log(ToFixed(12345.6759, 2, 'round'));
+// 输出：12345.68
+console.log(ToFixed(12345.6659, 2, 'round'));
+// 输出：12345.67
+console.log(ToFixed(12345.6759, 5, 'round'));
+// 输出：12345.6759
+
+console.log(ToFixed(12345.6709, 2, 'increase'));
+// 输出：12345.67
+console.log(ToFixed(12345.6749, 2, 'increase'));
+// 输出：12345.68
+console.log(ToFixed(12345.6769, 2, 'increase'));
+// 输出：12345.68
+console.log(ToFixed(12345.6759, 2, 'increase'));
+// 输出：12345.68
+console.log(ToFixed(12345.6659, 2, 'increase'));
+// 输出：12345.67
+console.log(ToFixed(12345.6759, 5, 'increase'));
+// 输出：12345.6759
+
+console.log(ToFixed(12345.6709, 2, 'ignore'));
+// 输出：12345.67
+console.log(ToFixed(12345.6749, 2, 'ignore'));
+// 输出：12345.67
+console.log(ToFixed(12345.6769, 2, 'ignore'));
+// 输出：12345.67
+console.log(ToFixed(12345.6759, 2, 'ignore'));
+// 输出：12345.67
+console.log(ToFixed(12345.6659, 2, 'ignore'));
+// 输出：12345.66
+console.log(ToFixed(12345.6759, 5, 'ignore'));
+// 输出：12345.6759
+
+console.log(ToFixed(1.000000000000000000001));
+// 输出：1
+console.log(ToFixed(1.000000000000000000001, 2, 'normal'));
+// 输出：1
+```

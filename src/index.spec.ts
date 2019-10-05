@@ -156,3 +156,40 @@ test('test main GroupBy', function () {
   expect(Object.prototype.hasOwnProperty.call(arrGrouped2[0], 'parentId')).toBe(true);
   expect(Object.prototype.hasOwnProperty.call(arrGrouped2[0], 'parentText')).toBe(true);
 });
+
+test('test main Index.ToFixed', function () {
+  const num = 12345.6789;
+  expect(Index.ToFixed(num, 2, 'normal')).toBe(12345.68);
+  expect(Index.ToFixed(num, 2, 'round')).toBe(12345.68);
+  expect(Index.ToFixed(num, 2, 'increase')).toBe(12345.68);
+  expect(Index.ToFixed(num, 2, 'ignore')).toBe(12345.67);
+
+  expect(Index.ToFixed(12345.6749, 2, 'normal')).toBe(12345.67);
+  expect(Index.ToFixed(12345.6769, 2, 'normal')).toBe(12345.68);
+  expect(Index.ToFixed(12345.6759, 2, 'normal')).toBe(12345.68);
+  expect(Index.ToFixed(12345.6659, 2, 'normal')).toBe(12345.66);
+  expect(Index.ToFixed(12345.6759, 5, 'normal')).toBe(12345.6759);
+
+  expect(Index.ToFixed(12345.6749, 2, 'round')).toBe(12345.67);
+  expect(Index.ToFixed(12345.6769, 2, 'round')).toBe(12345.68);
+  expect(Index.ToFixed(12345.6759, 2, 'round')).toBe(12345.68);
+  expect(Index.ToFixed(12345.6659, 2, 'round')).toBe(12345.67);
+  expect(Index.ToFixed(12345.6759, 5, 'round')).toBe(12345.6759);
+
+  expect(Index.ToFixed(12345.6709, 2, 'increase')).toBe(12345.67);
+  expect(Index.ToFixed(12345.6749, 2, 'increase')).toBe(12345.68);
+  expect(Index.ToFixed(12345.6769, 2, 'increase')).toBe(12345.68);
+  expect(Index.ToFixed(12345.6759, 2, 'increase')).toBe(12345.68);
+  expect(Index.ToFixed(12345.6659, 2, 'increase')).toBe(12345.67);
+  expect(Index.ToFixed(12345.6759, 5, 'increase')).toBe(12345.6759);
+
+  expect(Index.ToFixed(12345.6709, 2, 'ignore')).toBe(12345.67);
+  expect(Index.ToFixed(12345.6749, 2, 'ignore')).toBe(12345.67);
+  expect(Index.ToFixed(12345.6769, 2, 'ignore')).toBe(12345.67);
+  expect(Index.ToFixed(12345.6759, 2, 'ignore')).toBe(12345.67);
+  expect(Index.ToFixed(12345.6659, 2, 'ignore')).toBe(12345.66);
+  expect(Index.ToFixed(12345.6759, 5, 'ignore')).toBe(12345.6759);
+
+  expect(Index.ToFixed(1.000000000000000000001)).toBe(1);
+  expect(Index.ToFixed(1.000000000000000000001, 2, 'normal')).toBe(1);
+});

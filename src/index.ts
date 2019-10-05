@@ -652,3 +652,59 @@ export function GroupBy<T, T2>(
 
   return res.arr;
 }
+
+/**
+ * 替代原生 toFixed 函数，解决 js 精度丢失问题
+ * @param value  指定的待转换的数值
+ * @param digits 小数点后数字的个数；介于 0 到 20 （包括）之间，实现环境可能支持更大范围。如果忽略该参数，则默认为 0。
+ * @param mode   当有效位数确定后，其后多余位数的处理模式，默认为 normal，即银行家舍入法 "四舍六入五成双"，round：标准的四舍五入，increase：无论数值大小，一律进1，ignore：一律舍弃
+ * @constructor
+ */
+export function ToFixed(
+  value: number,
+  digits = 0,
+  mode: 'ignore' | 'normal' | 'round' | 'increase' = 'normal'
+): string {
+  let carry = 0;
+
+  const str = value + '';
+  const dotIndex = str.indexOf('.');
+
+  let last = 0;
+  if (dotIndex > -1) {
+    last = parseInt(str.substr(dotIndex + digits + 1, 1)) || 0;
+  }
+
+  if (mode === 'ignore') {
+    carry = 0;
+  } else if (mode === 'round') {
+    if (last >= 5) {
+      carry = 1;
+    }
+  } else if (mode === 'increase') {
+    if (last > 0) {
+      carry = 1;
+    }
+  } else {
+    // normal
+    if (last === 5) {
+      // get before
+      const before = parseInt(str.substr(dotIndex + digits, 1));
+      // 判断前一位奇偶
+      if (before % 2) {
+        // 奇数，进
+        carry = 1;
+      } else {
+        // 偶数，舍
+        carry = 0;
+      }
+    } else if (last > 5) {
+      carry = 1;
+    }
+  }
+
+  const multiple = Math.pow(10, digits);
+  const num = Math.floor(value * multiple) + carry;
+
+  return (num / multiple) as any;
+}
