@@ -1050,6 +1050,25 @@ export function OnTransitionEnd(el: any, fun: (...args: any[]) => any) {
   });
 }
 
+/**
+ * 调用打印
+ * @param htmlStr 待打印的模板字符串
+ * @constructor
+ */
+export function Print(htmlStr: string): Promise<void> {
+  return new Promise((resolve) => {
+    const $iframe = document.createElement('iframe');
+    $iframe.style.display = 'none';
+    document.body.appendChild($iframe);
+    $iframe.contentDocument.write(htmlStr);
+    $iframe.contentDocument.close();
+    $iframe.contentWindow.print();
+    window.setTimeout(() => {
+      resolve();
+    }, 500);
+  });
+}
+
 const IS_TOUCH =
   typeof window !== 'undefined' &&
   typeof document !== 'undefined' &&
