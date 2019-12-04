@@ -548,3 +548,220 @@ console.log(ToFixed(1.000000000000000000001));
 console.log(ToFixed(1.000000000000000000001, 2, 'normal'));
 // 输出：1
 ```
+
+## BindLazyFunc 延迟函数
+场景
+> 对于异步函数，在某些场景中，可能会在未初始化前被执行，这时运行会报告 undefined 错误，从而影响后续的程序运行。
+
+解决方案
+> 初始化前为其赋值一个挂起的 Promise，待为其初始化后，执行后返回结果，将结果 Resovle 给之前挂起的 Promise
+
+```js
+import { BindLazyFunc } from '@fatesigner/utils';
+
+/**
+ * @param target     绑定目标对象
+ * @param properties 需要绑定的方法属性名集合
+ * @constructor
+ */
+declare function BindLazyFunc<T extends Record<string, any>>(target: T, properties: string[]): T;
+
+// 先定义变量
+const target: {
+  sayHello: (name: string, words: string, num: number) => Promise<string>;
+} = {
+  sayHello: null
+};
+
+// 绑定对象的 sayHello 函数
+const targetLazy = BindLazyFunc(target, ['sayHello']);
+
+// 立即执行
+targetLazy.sayHello('tom', 'hello', 100).then((res) => {
+  console.log(res);
+  // 输出：tom hello 100
+});
+
+  // 等待 1s 后为 sayHello 赋值
+setTimeout(() => {
+  targetLazy.sayHello = (name: string, words: string, num: number) => {
+    return new Promise((resolve) => {
+      // 模拟延迟
+      setTimeout(() => {
+          resolve(`${name} ${words} ${num}`);
+        }, 3000);
+      });
+  };
+  targetLazy.sayHello('jerry1', 'hello', 200).then((res) => {
+    console.log(res);
+    // 输出：jerry1 hello 200
+  });
+}, 1000);
+```
+
+## BindPromiseQueue
+将指定的异步函数转换为队列模式。
+
+```js
+import { BindPromiseQueue } from '@fatesigner/utils';
+
+/**
+ * 将指定的异步函数转换为队列模式，即每次调用后将进行等待，直到上一次调用完毕后再执行;
+ * 类似 debounce 函数，不过执行逻辑是等待上次执行的结果，非指定时间内
+ * 当设置 cached（默认为 false） 为 true，将返回上次 promise 的结果。
+ * @param func
+ * @param cached
+ * @constructor
+ */
+declare function BindPromiseQueue<TFunc extends (...args: any[]) => Promise<any>>(func: TFunc, cached?: boolean): TFunc;
+
+// 定义延迟函数
+const promise = function (ref: { num: number }, name: string, time: number): Promise<string> {
+  return new Promise((resolve) => {
+    // 累加
+    let timer = setInterval(() => {
+      ref.num++;
+    }, 1000);
+
+    // 模拟延迟
+    setTimeout(() => {
+      ref.num++;
+      resolve(ref.num + name);
+      clearInterval(timer);
+      timer = null;
+    }, time);
+  });
+};
+
+const g = { num: 0 };
+
+// 正常执行
+promise(g, 'tom', 3000).then((res) => {
+  console.log(g.num);
+  // 输出：4
+});
+
+// 等待 1s 后再次执行，此时前一次执行还未完成
+setTimeout(() => {
+  console.log(`bind new promise`);
+  promise(g, 'jerry', 4000).then((res) => {
+    console.log(g.num);
+    // 输出：7
+  });
+}, 1000);
+
+const g2 = { num: 0 };
+const promise2 = BindPromiseQueue(promise);
+
+// 绑定后执行
+promise2(g2, 'tom', 3000).then((res) => {
+  console.log(g2.num);
+  // 输出：3
+});
+
+// 等待 1s 后再次执行，此时前一次执行还未完成
+setTimeout(() => {
+  console.log(`bind new promise`);
+  promise2(g2, 'jerry', 4000).then((res) => {
+    console.log(g2.num);
+    // 输出：7
+  });
+}, 1000);
+
+const g3 = { num: 0 };
+// 设置 cached 为 true
+const promise3 = BindPromiseQueue(promise, true);
+
+promise3(g3, 'tom', 3000).then((res) => {
+  console.log(g3.num);
+  // 输出：3
+});
+
+// 等待 1s 后再次执行，此时前一次执行还未完成
+setTimeout(() => {
+  console.log(`bind new promise`);
+  promise3(g3, 'jerry', 4000).then((res) => {
+    console.log(g3.num);
+    // 输出：3
+  });
+}, 1000);
+```
+
+## MergeProps
+合并对象，遇到数组属性覆盖。
+
+```js
+import { MergeProps } from '@fatesigner/utils';
+
+/**
+ * @param defaultProps 默认值
+ * @param props 需要覆盖的对象
+ * @param deep 是否深度合并，默认为 false
+ * @param assignment 自定义赋值操作，默认为引用或值的传递
+ * @constructor
+ */
+declare function MergeHandlers<TTarget extends Record<string, (...args: any[]) => Promise<any>>>(target: TTarget, handlers: TTarget): TTarget;
+
+const target = {
+    a: 2,
+    b: {
+      arr: [{ a: 1, b: 2 }],
+      arr2: [{ c: '312' }],
+      c: '3',
+      e: 123,
+      h: {
+        s: 111
+      }
+    },
+    c: {
+      dd: 1
+    }
+};
+
+const source = {
+    a: '3',
+    b: {
+      arr: [{ a: 3, b: 4, d: 5 }],
+      c: 1412,
+      d: 4,
+      e: {
+        f: 123,
+        g: '31'
+      }
+    }
+} as any;
+
+MergeProps(target, source, true);
+
+console.log(source);
+// 输出：
+{                  
+  "a": "3",        
+  "b": {           
+    "arr": [       
+      {            
+        "a": 3,    
+        "b": 4,    
+        "d": 5     
+      }            
+    ],             
+    "c": 1412,     
+    "d": 4,        
+    "e": {         
+      "f": 123,    
+      "g": "31"    
+    },             
+    "arr2": [      
+      {            
+        "c": "312" 
+      }            
+    ],             
+    "h": {         
+      "s": 111     
+    }              
+  },               
+  "c": {           
+    "dd": 1        
+  }                
+}                  
+```

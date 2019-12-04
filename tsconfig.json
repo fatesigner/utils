@@ -31,7 +31,7 @@
     "esModuleInterop": true,
     "rootDir": "./src",
     "module": "ESNext",
-    "target": "ES2018",
+    "target": "ES2019",
     "types": [
       "jest",
       "node"

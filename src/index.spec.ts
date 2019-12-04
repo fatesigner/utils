@@ -193,3 +193,287 @@ test('test main Index.ToFixed', function () {
   expect(Index.ToFixed(1.000000000000000000001)).toBe(1);
   expect(Index.ToFixed(1.000000000000000000001, 2, 'normal')).toBe(1);
 });
+
+jest.setTimeout(30000);
+
+test('test main BindLazyFunc', (done) => {
+  const target: {
+    sayHello: (name: string, words: string, num: number) => Promise<string>;
+  } = {
+    sayHello: null
+  };
+
+  const targetLazy = Index.BindLazyFunc(target, ['sayHello']);
+
+  // 立即执行
+  targetLazy.sayHello('tom', 'hello', 100).then((res) => {
+    expect(res).toBe('tom hello 100 3');
+  });
+
+  // 等待 3s 后设置 func
+  setTimeout(() => {
+    targetLazy.sayHello = (name: string, words: string, num: number) => {
+      return new Promise((resolve) => {
+        let i = 0;
+
+        let timer = setInterval(() => {
+          i++;
+        }, 1000);
+
+        // 模拟延迟
+        setTimeout(() => {
+          i++;
+          resolve(`${name} ${words} ${num} ${i}`);
+          clearInterval(timer);
+          timer = null;
+        }, 3000);
+      });
+    };
+    targetLazy.sayHello('jerry1', 'hello', 200);
+    targetLazy.sayHello('jerry2', 'hello', 200);
+    setTimeout(() => {
+      targetLazy.sayHello('jerry3', 'hello', 200).then((res) => {
+        expect(res).toBe('jerry3 hello 200 3');
+        done();
+      });
+    }, 12000);
+  }, 5000);
+});
+
+function BindLazyFuncTest() {
+  const target: {
+    sayHello: (name: string, words: string, num: number) => Promise<string>;
+  } = {
+    sayHello: null
+  };
+
+  const targetLazy = Index.BindLazyFunc(target, ['sayHello']);
+
+  // 保存到变量，延迟调用
+  const sayHello = targetLazy.sayHello;
+
+  // 立即执行
+  console.time('tom call completed');
+  targetLazy.sayHello('tom', 'hello', 100).then((res) => {
+    console.timeEnd('tom call completed');
+  });
+
+  // 等待 2s 后再次执行
+  setTimeout(() => {
+    console.time('tom2 call completed');
+    targetLazy.sayHello('tom2', 'hello', 100).then((res) => {
+      console.timeEnd('tom2 call completed');
+    });
+  }, 2000);
+
+  // 等待 5s 后设置 func
+  setTimeout(() => {
+    targetLazy.sayHello = (name: string, words: string, num: number) => {
+      return new Promise((resolve) => {
+        let i = 0;
+
+        let timer = setInterval(() => {
+          i++;
+        }, 1000);
+
+        // 模拟延迟
+        setTimeout(() => {
+          resolve(`${name} ${words} ${num} ${i}`);
+          clearInterval(timer);
+          timer = null;
+        }, 3000);
+      });
+    };
+
+    console.time('jerry1 call completed');
+    targetLazy.sayHello('jerry1', 'hello', 200).then((res) => {
+      console.timeEnd('jerry1 call completed');
+    });
+
+    console.time('jerry2 call completed');
+    targetLazy.sayHello('jerry2', 'hello', 200).then((res) => {
+      console.timeEnd('jerry2 call completed');
+    });
+
+    console.time('tom3 call completed');
+    sayHello('tom3', 'hello', 200).then((res) => {
+      console.timeEnd('tom3 call completed');
+    });
+
+    setTimeout(() => {
+      console.time('jerry3 call completed');
+      targetLazy.sayHello('jerry3', 'hello', 200).then((res) => {
+        console.timeEnd('jerry3 call completed');
+      });
+    }, 10000);
+  }, 5000);
+}
+
+const promise = function (ref: { num: number }, name: string, time: number): Promise<string> {
+  return new Promise((resolve) => {
+    // 累加
+    let timer = setInterval(() => {
+      ref.num++;
+    }, 1000);
+
+    // 模拟延迟
+    setTimeout(() => {
+      ref.num++;
+      resolve(ref.num + name);
+      clearInterval(timer);
+      timer = null;
+    }, time);
+  });
+};
+
+test('utils BindPromiseQueue normal', (done) => {
+  const g = { num: 0 };
+
+  promise(g, 'tom', 3000).then((res) => {
+    expect(g.num).toBe(4);
+  });
+
+  // 等待 1s 后再次执行，此时前一次执行还未完成
+  setTimeout(() => {
+    promise(g, 'jerry', 4000).then((res) => {
+      expect(g.num).toBe(7);
+      done();
+    });
+  }, 1000);
+});
+
+test('utils BindPromiseQueue', (done) => {
+  const promise_ = Index.BindPromiseQueue(promise);
+
+  const g = { num: 0 };
+
+  promise_(g, 'tom', 3000).then(() => {
+    expect(g.num).toBe(3);
+  });
+
+  // 等待 1s 后再次执行，此时前一次执行还未完成
+  setTimeout(() => {
+    promise_(g, 'jerry', 4000).then(() => {
+      expect(g.num).toBe(7);
+      done();
+    });
+  }, 1000);
+});
+
+test('utils BindPromiseQueue skipped', (done) => {
+  const promise_ = Index.BindPromiseQueue(promise, true);
+
+  const g = { num: 0 };
+
+  promise_(g, 'tom', 3000).then(() => {
+    expect(g.num).toBe(3);
+  });
+
+  // 等待 1s 后再次执行，此时前一次执行还未完成
+  setTimeout(() => {
+    promise_(g, 'jerry', 4000).then(() => {
+      expect(g.num).toBe(3);
+      done();
+    });
+  }, 1000);
+});
+
+test('utils MergeProps', (done) => {
+  const target = {
+    a: 2,
+    b: {
+      arr: [{ a: 1, b: 2 }],
+      arr2: [{ c: '312' }],
+      c: '3',
+      e: 123,
+      h: {
+        s: 111
+      }
+    },
+    c: {
+      dd: 1
+    }
+  };
+
+  const source = {
+    a: '3',
+    b: {
+      arr: [{ a: 3, b: 4, d: 5 }],
+      c: 1412,
+      d: 4,
+      e: {
+        f: 123,
+        g: '31'
+      }
+    }
+  } as any;
+
+  Index.MergeProps(target, source);
+
+  expect(source.a).toBe('3');
+  expect(source.b.arr[0].a).toBe(3);
+  expect(source.b.arr2[0].c).toBe('312');
+  expect(source.b.c).toBe(1412);
+  expect(source.b.d).toBe(4);
+  expect(source.b.h.s).toBe(111);
+
+  setTimeout(() => {
+    target.c.dd = 1234;
+    target.b.arr2[0].c = '12312';
+
+    expect(source.c.dd).toBe(1234);
+    expect(source.b.arr2[0].c).toBe('12312');
+
+    done();
+  }, 3000);
+});
+
+test('utils MergeProps deep', (done) => {
+  const target = {
+    a: 2,
+    b: {
+      arr: [{ a: 1, b: 2 }],
+      arr2: [{ c: '312' }],
+      c: '3',
+      e: 123,
+      h: {
+        s: 111
+      }
+    },
+    c: {
+      dd: 1
+    }
+  };
+
+  const source = {
+    a: '3',
+    b: {
+      arr: [{ a: 3, b: 4, d: 5 }],
+      c: 1412,
+      d: 4,
+      e: {
+        f: 123,
+        g: '31'
+      }
+    }
+  } as any;
+
+  Index.MergeProps(target, source, true);
+
+  expect(source.a).toBe('3');
+  expect(source.b.arr[0].a).toBe(3);
+  expect(source.b.arr2[0].c).toBe('312');
+  expect(source.b.c).toBe(1412);
+  expect(source.b.d).toBe(4);
+  expect(source.b.h.s).toBe(111);
+
+  setTimeout(() => {
+    target.c.dd = 1234;
+    target.b.arr2[0].c = '12312';
+
+    expect(source.c.dd).toBe(1);
+    expect(source.b.arr2[0].c).toBe('312');
+
+    done();
+  }, 3000);
+});

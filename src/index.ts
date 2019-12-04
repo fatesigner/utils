@@ -4,6 +4,8 @@
 
 import { IsArray, IsBoolean, IsFunction, IsNodeList, IsNullOrUndefined, IsNumber, IsObject } from './type-check';
 
+const cloneDeep = require('lodash/cloneDeep')
+
 /**
  * 无任何操作的 空函数
  */
@@ -707,4 +709,263 @@ export function ToFixed(
   const num = Math.floor(value * multiple) + carry;
 
   return (num / multiple) as any;
+}
+
+/**
+ * 绑定延迟函数
+ * @param target
+ * @param properties
+ * @constructor
+ */
+export function BindLazyFunc<T extends Record<string, any>>(target: T, properties: string[]): T {
+  let resolves: any[] = [];
+  const functions: any = {};
+
+  const getFunc = function (propertyKey: string) {
+    if (Object.prototype.hasOwnProperty.call(functions, propertyKey)) {
+      return functions[propertyKey];
+    }
+    return null;
+  };
+
+  const newPromise = function (propertyKey: string, ...args: any[]) {
+    const func = getFunc(propertyKey);
+    if (func) {
+      return func(...args);
+    }
+    return new Promise((resolve) => {
+      resolves.push([resolve, args]);
+    });
+  };
+
+  properties.forEach((propertyKey) => {
+    Object.defineProperty(target, propertyKey, {
+      get() {
+        const func = getFunc(propertyKey);
+        if (func) {
+          return func;
+        } else {
+          return newPromise.bind(this, propertyKey);
+        }
+      },
+      set(val) {
+        if (Object.prototype.hasOwnProperty.call(target, propertyKey) && properties.indexOf(propertyKey) > -1) {
+          functions[propertyKey as string] = val;
+          if (resolves.length) {
+            resolves.forEach(([resolve, args]) => {
+              resolve(val(...args));
+            });
+            resolves = [];
+          }
+        }
+      }
+    });
+  });
+
+  return target;
+}
+
+/**
+ * 绑定延迟函数（proxy模式）
+ * @param target
+ * @param properties
+ * @constructor
+ */
+function BindLazyFuncProxy<T extends Record<string, (...args: any[]) => Promise<any>>, TKey extends keyof T>(
+  target: T,
+  properties: TKey[]
+): T {
+  let args: any[];
+  const functions: any[] = [];
+  let promiseResolve: any;
+
+  let target_;
+
+  const revocable = Proxy.revocable(target, {
+    get(target, property: TKey) {
+      const propertyKey = property.toString();
+      if (Object.prototype.hasOwnProperty.call(target, propertyKey) && properties.indexOf(property) > -1) {
+        if (functions.indexOf(propertyKey) > -1) {
+          return target[propertyKey];
+        } else {
+          return function (...args_: any[]) {
+            return new Promise((resolve) => {
+              args = args_;
+              promiseResolve = resolve;
+            });
+          };
+        }
+      }
+    },
+    deleteProperty(): boolean {
+      return true;
+    },
+    set(target, property: TKey, value, receiver) {
+      const propertyKey = property.toString();
+      if (Object.prototype.hasOwnProperty.call(target, propertyKey) && properties.indexOf(property) > -1) {
+        /* if (
+          Object.prototype.toString.call(value) !== '[object Null]' &&
+          Object.prototype.toString.call(value) === '[object Undefined]'
+        ) {
+        } */
+
+        if (promiseResolve) {
+          promiseResolve(value(...args));
+          promiseResolve = null;
+        }
+
+        (target as any)[propertyKey] = value;
+
+        functions.push(propertyKey);
+
+        if (functions.length === properties.length) {
+          // 所绑定的属性均已执行过 set，清除 proxy
+          target_ = target;
+          // revocable.revoke();
+        }
+
+        return true;
+      } else {
+        return Reflect.set(target, property, value, receiver);
+      }
+
+      // target[property] = value;
+    }
+  });
+
+  target_ = revocable.proxy;
+
+  return target_;
+}
+
+/**
+ * 将指定的异步函数转换为队列模式，即每次调用后将进行等待，直到上一次调用完毕后再执行;
+ * 类似 debounce 函数，不过执行逻辑是等待上次执行的结果，非指定时间内
+ * 当设置 cached（默认为 false） 为 true，将返回上次 promise 的结果。
+ * @param func
+ * @param cached
+ * @constructor
+ */
+export function BindPromiseQueue<TFunc extends (...args: any[]) => Promise<any>>(func: TFunc, cached?: boolean): TFunc {
+  let promise: Promise<any>;
+  let resolved: boolean;
+
+  return function (...args: TFunc extends (...args: infer U) => any ? U : never) {
+    if (!promise || resolved) {
+      resolved = false;
+      promise = func(...args).finally(() => {
+        resolved = true;
+      });
+      return promise;
+    }
+    if (cached) {
+      return promise;
+    } else {
+      return promise.then(() => {
+        return func(...args);
+      });
+    }
+  } as any;
+}
+
+const isObject = function (val: any): boolean {
+  return Object.prototype.toString.call(val) === '[object Object]';
+};
+
+const isMergeObject = function (val: any): boolean {
+  return (
+    Object.prototype.toString.call(val) === '[object Object]' ||
+    Object.prototype.toString.call(val) === '[object Undefined]'
+  );
+};
+
+const customizer = function (obj: any, src: any) {
+  if (IsArray(src)) {
+    return src;
+  }
+};
+
+/**
+ * 合并对象，遇到数组属性覆盖
+ * @param defaultProps 默认值
+ * @param props 需要覆盖的对象
+ * @param deep 是否深度合并，默认为 false
+ * @param assignment 自定义赋值操作，默认为引用或值的传递
+ * @constructor
+ */
+export function MergeProps<T extends Record<string, any>>(
+  defaultProps: T,
+  props: T,
+  deep = false,
+  assignment = function (target: any, property: any, val: any) {
+    target[property] = val;
+  }
+): T {
+  if (!props) {
+    return defaultProps;
+  }
+
+  if (isMergeObject(defaultProps) && isMergeObject(props)) {
+    Object.keys(defaultProps).forEach(function (key) {
+      if (isMergeObject(props[key])) {
+        if (Object.prototype.hasOwnProperty.call(props, key)) {
+          MergeProps(defaultProps[key], props[key], deep);
+        } else {
+          if (isObject(defaultProps[key])) {
+            if (deep) {
+              // 深度模式，进行递归合并
+              assignment(props, key, {});
+              MergeProps(defaultProps[key], props[key], deep);
+            } else {
+              assignment(props, key, defaultProps[key]);
+            }
+          } else if (Array.isArray(defaultProps[key])) {
+            // 数组类型，将其克隆后替换
+            if (deep) {
+              assignment(props, key, cloneDeep(defaultProps[key]));
+            } else {
+              assignment(props, key, defaultProps[key]);
+            }
+          } else {
+            // 其他非引用类型的值
+            assignment(props, key, defaultProps[key]);
+          }
+        }
+      }
+    });
+  }
+
+  return props;
+}
+
+/**
+ * 合并用于 vue 绑定的 props
+ * @param vue
+ * @param defaultProps
+ * @param props
+ * @constructor
+ */
+export function MergeVueProps<T extends Record<string, any>>(vue: any, defaultProps: T, props: T): T {
+  return MergeProps(defaultProps, props, true, function (target, property, val) {
+    vue.set(target, property, val);
+  });
+}
+
+/**
+ * 合并函数
+ * @param target
+ * @param handlers
+ * @constructor
+ */
+export function MergeHandlers<TTarget extends Record<string, (...args: any[]) => Promise<any>>>(
+  target: TTarget,
+  handlers: TTarget
+): TTarget {
+  target = target || ({} as any);
+  Object.keys(handlers).forEach((key) => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    target[key] = handlers[key];
+  });
+  return target;
 }
