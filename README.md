@@ -2,14 +2,20 @@
 
 [![npm][npm-image]][npm-url]
 [![build][travis-image]][travis-url]
+[![codecov][codecov-image]][codecov-url]
 [![download][download-image]][download-url]
+[![commitizen][commitizen-image]][commitizen-url]
 
-[npm-image]: https://img.shields.io/npm/v/@fatesigner/utils.svg?color=red
+[npm-image]: https://img.shields.io/npm/v/@fatesigner/utils.svg?color=blue
 [npm-url]: https://npmjs.com/package/@fatesigner/utils
 [travis-image]: https://travis-ci.com/fatesigner/utils.svg?token=i21P7stb8bZPNjZakvsi&color=success&branch=master
 [travis-url]: https://travis-ci.com/fatesigner/utils
-[download-image]: https://img.shields.io/npm/dw/@fatesigner/utils.svg?color=green
+[codecov-image]: https://codecov.io/gh/fatesigner/utils/branch/master/graph/badge.svg
+[codecov-url]: https://codecov.io/gh/fatesigner/utils
+[download-image]: https://img.shields.io/npm/dw/@fatesigner/utils.svg
 [download-url]: https://npmjs.com/package/@fatesigner/utils
+[commitizen-image]: https://img.shields.io/badge/commitizen-friendly-green.svg
+[commitizen-url]: http://commitizen.github.io/cz-cli/
 
 JavaScript工具库.
 

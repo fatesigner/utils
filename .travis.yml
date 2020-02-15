@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-  '10'
+  '12'
 cache:
   directories:
     - node_modules
@@ -14,3 +14,6 @@ script:
   - npm run clean
   - npm run build
   - npm test
+after_success:
+  # run code coverage
+  - codecov --token=e61e7931-9aaf-416d-a198-066aea0e51e8
