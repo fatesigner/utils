@@ -969,3 +969,36 @@ export function MergeHandlers<TTarget extends Record<string, (...args: any[]) =>
   });
   return target;
 }
+
+/**
+ * 为指定字符串添加掩码，用于隐私信息显示，如身份证号码生日的数字替换为星号
+ * @param value
+ * @param mask
+ * @param start
+ * @param end
+ * @constructor
+ */
+export function AddMask(value: string, start = 0, end = 0, mask = '*') {
+  if (!value) {
+    return '';
+  }
+  const length = value.length;
+  if (!start) {
+    start = 0;
+  }
+  if (!end) {
+    end = length;
+  }
+  const startStr = value.substr(0, start);
+  const endStr = value.substr(end, value.length - 1);
+  let c = '';
+  if (length >= start) {
+    for (; start < end; start++) {
+      c += mask;
+      if (start >= length - 1) {
+        break;
+      }
+    }
+  }
+  return startStr + c + endStr;
+}

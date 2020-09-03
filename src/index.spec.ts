@@ -4,27 +4,27 @@
 
 import * as Index from './';
 
-test('## Capitalize.', function() {
+test('## Capitalize.', function () {
   expect(Index.Capitalize('capitalize')).toBe('Capitalize');
 });
 
-test('## ConvertToCDB.', function() {
+test('## ConvertToCDB.', function () {
   expect(Index.ConvertToCDB('ａｂｃｄ')).toBe('abcd');
 });
 
-test('## ConvertToDBC.', function() {
+test('## ConvertToDBC.', function () {
   expect(Index.ConvertToDBC('abcd')).toBe('ａｂｃｄ');
 });
 
-test('## ConvertBridgeStrToHump.', function() {
+test('## ConvertBridgeStrToHump.', function () {
   expect(Index.ConvertBridgeStrToHump('convert-hump-str-to-bridge')).toBe('convertHumpStrToBridge');
 });
 
-test('## ConvertHumpStrToBridge.', function() {
+test('## ConvertHumpStrToBridge.', function () {
   expect(Index.ConvertHumpStrToBridge('convertHumpStrToBridge')).toBe('convert-hump-str-to-bridge');
 });
 
-test('## ConvertToBytesUnit.', function() {
+test('## ConvertToBytesUnit.', function () {
   expect(Index.ConvertToBytesUnit(234123)).toBe('228.64kb');
   expect(Index.ConvertToBytesUnit(234123, undefined, true)).toBe('228.64KB');
   expect(Index.ConvertToBytesUnit(166018, 3, true)).toBe('162.127KB');
@@ -32,14 +32,14 @@ test('## ConvertToBytesUnit.', function() {
   expect(Index.ConvertToBytesUnit(1073741824, 4, false)).toBe('1.0000gb');
 });
 
-test('## ConvertToQueryParameters', function() {
+test('## ConvertToQueryParameters', function () {
   expect(Index.ConvertToQueryParameters({ id: 'a', username: 'user' })).toBe('id=a&username=user');
 });
 
-test('## ForEach', function() {
+test('## ForEach', function () {
   const res = Index.ForEach(
     [1, 2, 3, 4, 5, 6],
-    function(prev, cur, index) {
+    function (prev, cur, index) {
       if (index === 4) {
         // 模拟 break 退出此次循环
         return false;
@@ -58,7 +58,7 @@ test('## ForEach', function() {
       c: 'c1',
       d: 'd1'
     },
-    function(prev, cur, index, data) {
+    function (prev, cur, index, data) {
       if (index === 2) {
         // 模拟 break 退出此次循环
         return false;
@@ -70,7 +70,7 @@ test('## ForEach', function() {
   );
   expect(res2).toBe('a1b1');
 });
-test('## Clone', function() {
+test('## Clone', function () {
   const originalObject = {
     a: 1,
     b: '2',
@@ -90,7 +90,7 @@ test('## Clone', function() {
   expect(originalObject.c.f).toBe(4);
 });
 
-test('## Extend', function() {
+test('## Extend', function () {
   const originalObject = {
     a: 1,
     b: '2',
@@ -476,4 +476,8 @@ test('utils MergeProps deep', (done) => {
 
     done();
   }, 3000);
+});
+
+test('test main addMask.', function () {
+  expect(Index.AddMask('360731199001051218', 6, 14)).toBe('360731********1218');
 });
