@@ -17,3 +17,9 @@ script:
 after_success:
   # run code coverage
   - codecov --token=e61e7931-9aaf-416d-a198-066aea0e51e8
+deploy:
+  - provider: script
+    skip_cleanup: true
+    script: npx semantic-release
+    on:
+      branch: master
