@@ -765,3 +765,104 @@ console.log(source);
   }                
 }                  
 ```
+
+## ConvertModelArrToEnum
+将指定的模型集合数据转换为枚举类型。
+
+```ts
+import { ConvertModelArrToEnum } from '@fatesigner/utils';
+
+const Week = ConvertModelArrToEnum([
+ {
+   name: 'monday',
+   value: '1',
+   text: '星期一'
+ },
+ {
+   name: 'tuesday',
+   value: '2',
+   text: '星期二'
+ }
+]);
+
+console.log(Week);
+// 输出：
+{                         
+  "arr": [                
+    {                     
+      "name": "monday",   
+      "value": "1",       
+      "text": "星期一"       
+    },                    
+    {                     
+      "name": "tuesday",  
+      "value": "2",       
+      "text": "星期二"       
+    }                     
+  ],                      
+  "enum": {               
+    "monday": "1",        
+    "tuesday": "2"        
+  },                      
+  "desc": {               
+    "1": "星期一",           
+    "2": "星期二"            
+  },                      
+  "keys": [               
+    "monday",             
+    "tuesday"             
+  ],                      
+  "values": [             
+    "1",                  
+    "2"                   
+  ]                       
+}
+
+// 支持类型提示，当已知 value 的情况下，需要获取描述时，可以访问 desc 属性，这在模板绑定中很有用
+let currentDay = '1';
+console.log(Week.desc['1']);              
+```
+```html
+<template>
+  <ul>
+    <li v-for="item in items">
+      {{ Week.desc[item.value] }}：{{item.value}}
+    </li>
+  </ul>
+</template>
+```
+
+## ConvertArrToEnum
+将指定的字符串数组转换为枚举类型。
+
+```ts
+import { ConvertArrToEnum } from '@fatesigner/utils';
+
+/**
+ * @param items
+ * @param callback 指定枚举的 value，默认为键值
+ * @constructor
+ */
+
+const Week = ConvertArrToEnum(['monday', 'tuesday'] as const);
+
+console.log(Week);
+// 输出：
+{                        
+  "monday": "monday",    
+  "tuesday": "tuesday"   
+}
+
+const Week2 = ConvertArrToEnum(['monday', 'tuesday'] as const, (item) => `${item} happy`);
+
+
+console.log(Week2);
+// 输出：
+{                        
+  "monday": "monday happy",    
+  "tuesday": "tuesday happy"   
+}
+
+// 支持类型提示
+console.log(Week.monday); // monday happy      
+```

@@ -32,6 +32,9 @@
     "coverage": "jest --coverage"
   },
   "prettier": "@fatesigner/eslint-config/.prettierrc",
+  "dependencies": {
+    "@fatesigner/typed": "1.0.1"
+  },
   "devDependencies": {
     "@fatesigner/cz-customizable": "6.3.0",
     "@fatesigner/eslint-config": "1.4.0",

@@ -481,3 +481,32 @@ test('utils MergeProps deep', (done) => {
 test('test main addMask.', function () {
   expect(Index.AddMask('360731199001051218', 6, 14)).toBe('360731********1218');
 });
+
+test('test main ConvertModelArrToEnum.', function () {
+  const obj = Index.ConvertModelArrToEnum([
+    {
+      name: 'monday',
+      value: '1',
+      text: '星期一'
+    },
+    {
+      name: 'tuesday',
+      value: '2',
+      text: '星期二'
+    }
+  ]);
+
+  expect(obj.enum.monday).toBe('1');
+  expect(obj.enum.tuesday).toBe('2');
+});
+
+test('test main ConvertArrToEnum.', function () {
+  const obj = Index.ConvertArrToEnum(['monday', 'tuesday'] as const);
+
+  expect(obj.monday).toBe('monday');
+  expect(obj.tuesday).toBe('tuesday');
+  const obj2 = Index.ConvertArrToEnum(['monday', 'tuesday'] as const, (item) => `${item} happy`);
+
+  expect(obj2.monday).toBe('monday happy');
+  expect(obj2.tuesday).toBe('tuesday happy');
+});

@@ -2,9 +2,11 @@
  * index
  */
 
+import { FunctionType } from '@fatesigner/typed';
+
 import { IsArray, IsBoolean, IsFunction, IsNodeList, IsNullOrUndefined, IsNumber, IsObject } from './type-check';
 
-const cloneDeep = require('lodash/cloneDeep')
+const cloneDeep = require('lodash/cloneDeep');
 
 /**
  * 无任何操作的 空函数
@@ -18,8 +20,8 @@ export function Noop() {}
  * @param args
  * @return {Function}
  */
-export function ApplyBind(fn: Function, context: object, ...args: any[]) {
-  return function(...argsInner: any[]) {
+export function ApplyBind(fn: FunctionType, context: Record<string, any>, ...args: any[]) {
+  return function (...argsInner: any[]) {
     return fn.apply(context || this, [...args, ...argsInner]);
   };
 }
@@ -55,7 +57,7 @@ export function Debounce(
     }
   }
 
-  return function(...args: any[]) {
+  return function (...args: any[]) {
     context = this;
 
     const now = Date.now();
@@ -98,7 +100,7 @@ export function Debounce(
  * true：当调用方法时，未到达delay指定的时间间隔，则启动计时器延迟调用fn函数，
  * 若后续在既未达到delay指定的时间间隔和fn函数又未被调用的情况下调用返回值方法，则被调用请求将被忽略。
  */
-export function Throttle(fn: Function, delay: number, immediate = true, trailing = true) {
+export function Throttle(fn: FunctionType, delay: number, immediate = true, trailing = true) {
   let timer: any; // 定时器变量
   let previous = 0; // 时间戳 用于记录上次执行的时间点
   // let context; // fn函数执行的作用域
@@ -116,7 +118,7 @@ export function Throttle(fn: Function, delay: number, immediate = true, trailing
     // context = args = undefined;
   }
 
-  return function() {
+  return function () {
     // context = this;
 
     // args = arguments;
@@ -204,7 +206,7 @@ export function ConvertToDBC(str: string) {
  */
 export function ConvertBridgeStrToHump(bridge: string) {
   if (bridge) {
-    return bridge.replace(/-(\w)/g, function(all, letter) {
+    return bridge.replace(/-(\w)/g, function (all, letter) {
       return letter.toUpperCase();
     });
   }
@@ -320,7 +322,7 @@ export function ConvertBase64ToBlob(b64Data: string, contentType?: string, slice
 export function ConvertToQueryParameters(obj: any) {
   const params: any[] = [];
 
-  Object.keys(obj).forEach(key => {
+  Object.keys(obj).forEach((key) => {
     let value = obj[key];
     // 如果值为 null or undefined 则将其置空
     if (IsNullOrUndefined(value)) {
@@ -478,7 +480,7 @@ export function Extend(target: any, ...args: any[]) {
 
 function deepCloneArray(arr: any[]) {
   const clone: any[] = [];
-  arr.forEach(function(item, index) {
+  arr.forEach(function (item, index) {
     if (typeof item === 'object' && item !== null) {
       if (Array.isArray(item)) {
         clone[index] = deepCloneArray(item);
@@ -517,13 +519,13 @@ export function DeepExtend(...params: any[]) {
   let val;
   let src;
 
-  args.forEach(function(obj: any) {
+  args.forEach(function (obj: any) {
     // skip argument if isn't an object, is null, or is an array
     if (typeof obj !== 'object' || obj === null || Array.isArray(obj)) {
       return;
     }
 
-    Object.keys(obj).forEach(function(key) {
+    Object.keys(obj).forEach(function (key) {
       src = target[key]; // source value
       val = obj[key]; // new value
 
@@ -563,7 +565,7 @@ export function DeepExtend(...params: any[]) {
  * @param paramStr 查询字符串
  * @returns object 参数对象
  */
-export function GetParamsFromUrl(paramStr?: string): object {
+export function GetParamsFromUrl(paramStr?: string): Record<string, any> {
   const s = (paramStr || '').split('?');
   if (s.length) {
     paramStr = s[s.length - 1];
@@ -1001,4 +1003,74 @@ export function AddMask(value: string, start = 0, end = 0, mask = '*') {
     }
   }
   return startStr + c + endStr;
+}
+
+/**
+ * 将指定的模型集合数据转换为枚举类型
+ * @param arr
+ * @constructor
+ */
+export function ConvertModelArrToEnum<
+  T extends Readonly<Array<{ name: TName; value: TValue; text: TText } & { [key in string]: any }>>,
+  TName extends string,
+  TValue extends string | number,
+  TText extends string | number
+>(arr: T) {
+  const res: {
+    arr: T;
+    enum: {
+      [key in T[number]['name']]: T[number]['value'];
+    };
+    desc: {
+      [key in T[number]['value']]: T[number]['text'];
+    };
+    keys: T[number]['name'][];
+    values: T[number]['value'][];
+  } = {
+    arr: null,
+    enum: null,
+    desc: null,
+    keys: [],
+    values: []
+  };
+
+  res.arr = arr;
+
+  res.enum = arr.reduce((prev, cur) => {
+    prev[cur.name] = cur.value;
+    return prev;
+  }, {} as any);
+
+  res.desc = arr.reduce((prev, cur) => {
+    prev[cur.value] = cur.text;
+    return prev;
+  }, {} as any);
+
+  res.keys = arr.map((x) => x.name);
+
+  res.values = arr.map((x) => x.value);
+
+  return res;
+}
+
+/**
+ * 将指定的字符串数组转换为枚举类型
+ * @param items
+ * @param callback 指定枚举的 value，默认为键值
+ * @constructor
+ */
+export function ConvertArrToEnum<T extends readonly string[]>(
+  items: T,
+  callback?: (item: string) => string
+): {
+  [key in T[number]]: T[number];
+} {
+  return items.reduce((prev, cur) => {
+    if (callback) {
+      prev[cur] = callback(cur);
+    } else {
+      prev[cur] = cur;
+    }
+    return prev;
+  }, {} as any);
 }
