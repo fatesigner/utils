@@ -2,11 +2,10 @@
  * index
  */
 
+import { cloneDeep } from 'lodash';
 import { FunctionType } from '@fatesigner/typed';
 
 import { IsArray, IsBoolean, IsFunction, IsNodeList, IsNullOrUndefined, IsNumber, IsObject } from './type-check';
-
-const cloneDeep = require('lodash/cloneDeep');
 
 /**
  * 无任何操作的 空函数

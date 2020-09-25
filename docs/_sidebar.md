@@ -1,6 +1,5 @@
 - **开始**
 - [介绍](/)
-- [Changelog](/CHANGELOG)
 - **模块**
 - [main](/main)
 - [animation](/animation)
@@ -8,6 +7,7 @@
 - [date](/date)
 - [debug](/debug)
 - [document](/document)
+- [html-canvas](/html-canvas)
 - [random](/random)
 - [style](/style)
 - [trim](/trim)
@@ -15,5 +15,5 @@
 - [user-agent](/user-agent)
 - [validator](/validator)
 - **链接**
-- [![Github](https://icongram.jgog.in/simple/github.svg?color=808080&size=16)Github](https://github.com/fatesigner/utils)
-- [![NPM](https://icongram.jgog.in/simple/npm.svg?colored&size=16)NPM](https://npmjs.com/package/@fatesigner/utils)
+- [Github](https://github.com/fatesigner/utils)
+- [NPM](https://npmjs.com/package/@fatesigner/utils)

@@ -16,7 +16,7 @@ script:
   - npm test
 after_success:
   # run code coverage
-  - codecov --token=e61e7931-9aaf-416d-a198-066aea0e51e8
+  - codecov --token=55779405-b627-412a-879f-9b011549f1be
 deploy:
   - provider: script
     skip_cleanup: true
