@@ -56,9 +56,7 @@ export function Debounce(
     }
   }
 
-  return function (...args: any[]) {
-    context = this;
-
+  return function (...args_: any[]) {
     const now = Date.now();
     const spend = now - previous;
 
@@ -66,13 +64,15 @@ export function Debounce(
 
     if (spend >= idle && immediate) {
       // 首次调用该函数 且 immediate 为 true 则立即执行
-      result = fn.apply(context, args);
+      result = fn.apply(this, args_);
       context = args = undefined;
     } else {
       // 在 idle 指定的时间内调用该方法，则启动计时器定时调用 fn 函数
       if (timer) {
         clearTimeout(timer);
       }
+      context = this;
+      args = args_;
       timer = setTimeout(later, idle);
     }
 
