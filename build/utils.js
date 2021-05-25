@@ -1,5 +1,5 @@
 /**
- * util
+ * utils
  */
 
 exports.NODE_ENV_ENUM = {
@@ -12,7 +12,7 @@ exports.NODE_ENV_ENUM = {
  * @returns {string}
  * @constructor
  */
-exports.GetNODE_ENV = function() {
+exports.getNODE_ENV = function () {
   const env = (process.env.NODE_ENV || exports.NODE_ENV_ENUM.DEV).trim();
   for (const v in exports.NODE_ENV_ENUM) {
     if (Object.prototype.hasOwnProperty.call(exports.NODE_ENV_ENUM, v) && env === exports.NODE_ENV_ENUM[v]) {
@@ -28,9 +28,9 @@ exports.GetNODE_ENV = function() {
  * @returns {boolean}
  * @constructor
  */
-exports.IsProd = function(env = null) {
+exports.isProd = function (env = null) {
   if (!env) {
-    env = exports.GetNODE_ENV();
+    env = exports.getNODE_ENV();
   }
   return env === exports.NODE_ENV_ENUM.PROD;
 };

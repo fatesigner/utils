@@ -4,38 +4,36 @@
  * 把能够合并的动作放在一个渲染周期内完成，从而呈现出更流畅的动画效果
  */
 
-import { SupportPrefix } from './style';
+import { supportPrefix } from './style';
 
-let requestAnimationFrame: (callback: Function) => number;
-let cancelAnimationFrame: (id: number) => void;
+let _requestAnimationFrame: (callback: (...any) => any) => number;
+let _cancelAnimationFrame: (id: number) => void;
 
 const prefix = {
   '': '',
   '-moz-': 'moz',
-  '-webkit-': 'webkit',
-  '-ms-': ''
-}[SupportPrefix];
+  '-webkit-': 'webkit'
+}[supportPrefix];
 
 if (prefix) {
-  requestAnimationFrame = (this as any)[prefix + 'RequestAnimationFrame'];
-  cancelAnimationFrame =
-    (this as any)[prefix + 'CancelAnimationFrame'] || (this as any)[prefix + 'CancelRequestAnimationFrame'];
+  _requestAnimationFrame = window[prefix + 'RequestAnimationFrame'];
+  _cancelAnimationFrame = window[prefix + 'CancelAnimationFrame'] || window[prefix + 'CancelRequestAnimationFrame'];
 } else {
   let lastTime = 0;
-  requestAnimationFrame = function(callback) {
+  _requestAnimationFrame = function (callback) {
     const currTime = new Date().getTime();
     const timeToCall = Math.max(0, 16.7 - (currTime - lastTime));
-    const id: any = setTimeout(function() {
+    const id: any = setTimeout(function () {
       callback(currTime + timeToCall);
     }, timeToCall);
     lastTime = currTime + timeToCall;
     return id;
   };
-  cancelAnimationFrame = function(id) {
+  _cancelAnimationFrame = function (id) {
     clearTimeout(id);
   };
 }
 
-export const RequestAnimationFrame = requestAnimationFrame;
+export const requestAnimationFrame = _requestAnimationFrame;
 
-export const CancelAnimationFrame = cancelAnimationFrame;
+export const cancelAnimationFrame = _cancelAnimationFrame;

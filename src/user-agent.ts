@@ -14,9 +14,8 @@ export const UserAgent = _userAgent;
 /**
  * core 内核
  */
-export const BrowserCore = {
-  Trident:
-    UserAgent.indexOf('Trident') > -1 || UserAgent.indexOf('NET CLR') > -1,
+export const browserCore = {
+  Trident: UserAgent.indexOf('Trident') > -1 || UserAgent.indexOf('NET CLR') > -1,
   Presto: UserAgent.indexOf('Presto') > -1,
   WebKit: UserAgent.indexOf('AppleWebKit') > -1,
   Gecko: UserAgent.indexOf('Gecko/') > -1
@@ -25,7 +24,7 @@ export const BrowserCore = {
 /**
  * browser 浏览器
  */
-export const BrowserClient = {
+export const browserClient = {
   Safari: UserAgent.indexOf('Safari') > -1,
   Chrome: UserAgent.indexOf('Chrome') > -1 || UserAgent.indexOf('CriOS') > -1,
   // eslint-disable-next-line
@@ -42,8 +41,7 @@ export const BrowserClient = {
   UC: UserAgent.indexOf('UC') > -1 || UserAgent.indexOf(' UBrowser') > -1,
   QQBrowser: UserAgent.indexOf('QQBrowser') > -1,
   QQ: UserAgent.indexOf('QQ/') > -1,
-  Baidu:
-    UserAgent.indexOf('Baidu') > -1 || UserAgent.indexOf('BIDUBrowser') > -1,
+  Baidu: UserAgent.indexOf('Baidu') > -1 || UserAgent.indexOf('BIDUBrowser') > -1,
   Maxthon: UserAgent.indexOf('Maxthon') > -1,
   Sogou: UserAgent.indexOf('MetaSr') > -1 || UserAgent.indexOf('Sogou') > -1,
   LBBROWSER: UserAgent.indexOf('LBBROWSER') > -1,
@@ -64,7 +62,7 @@ export const BrowserClient = {
 /**
  * platform 系统或平台
  */
-export const BrowserPlatform = {
+export const browserPlatform = {
   Windows: UserAgent.indexOf('Windows') > -1,
   Linux: UserAgent.indexOf('Linux') > -1 || UserAgent.indexOf('X11') > -1,
   MacOS: UserAgent.indexOf('Macintosh') > -1,
@@ -72,11 +70,8 @@ export const BrowserPlatform = {
   Ubuntu: UserAgent.indexOf('Ubuntu') > -1,
   FreeBSD: UserAgent.indexOf('FreeBSD') > -1,
   Debian: UserAgent.indexOf('Debian') > -1,
-  WindowsPhone:
-    UserAgent.indexOf('IEMobile') > -1 ||
-    UserAgent.indexOf('Windows Phone') > -1,
-  BlackBerry:
-    UserAgent.indexOf('BlackBerry') > -1 || UserAgent.indexOf('RIM') > -1,
+  WindowsPhone: UserAgent.indexOf('IEMobile') > -1 || UserAgent.indexOf('Windows Phone') > -1,
+  BlackBerry: UserAgent.indexOf('BlackBerry') > -1 || UserAgent.indexOf('RIM') > -1,
   MeeGo: UserAgent.indexOf('MeeGo') > -1,
   Symbian: UserAgent.indexOf('Symbian') > -1,
   IOS: UserAgent.indexOf('like Mac OS X') > -1,
@@ -87,8 +82,6 @@ export const BrowserPlatform = {
 /**
  * 是否为移动端
  */
-export const IsMobile =
-  (UserAgent.indexOf('Mobi') > -1 ||
-    UserAgent.indexOf('iPh') > -1 ||
-    UserAgent.indexOf('480') > -1) &&
+export const isMobile =
+  (UserAgent.indexOf('Mobi') > -1 || UserAgent.indexOf('iPh') > -1 || UserAgent.indexOf('480') > -1) &&
   !(UserAgent.indexOf('iPad') > -1);

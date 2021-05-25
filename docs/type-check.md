@@ -8,7 +8,7 @@
  * @param {Object} obj2
  * @return {boolean} isEqual
  */
-export function IsEqual(obj1: any, obj2: any) {
+export function isEqual(obj1: any, obj2: any) {
   return (
     Object.prototype.toString.call(obj1) ===
     Object.prototype.toString.call(obj2)
@@ -19,7 +19,7 @@ export function IsEqual(obj1: any, obj2: any) {
  * 判断给定的值是否为 string类型
  * @return {boolean}
  */
-export function IsString(obj: any) {
+export function isString(obj: any) {
   return Object.prototype.toString.call(obj) === '[object String]';
 }
 
@@ -27,7 +27,7 @@ export function IsString(obj: any) {
  * 判断是否为 number类型
  * @return {boolean}
  */
-export function IsNumber(obj: any) {
+export function isNumber(obj: any) {
   return (
     Object.prototype.toString.call(obj) === '[object Number]' && !isNaN(obj)
   );
@@ -37,7 +37,7 @@ export function IsNumber(obj: any) {
  * 判断给定的值是否为 boolean类型
  * @return {boolean}
  */
-export function IsBoolean(obj) {
+export function isBoolean(obj) {
   return Object.prototype.toString.call(obj) === '[object Boolean]';
 }
 
@@ -45,7 +45,7 @@ export function IsBoolean(obj) {
  * 判断给定的值是否为 undefined
  * @return {boolean}
  */
-export function IsUndefined(obj: any) {
+export function isUndefined(obj: any) {
   return Object.prototype.toString.call(obj) === '[object Undefined]';
 }
 
@@ -53,7 +53,7 @@ export function IsUndefined(obj: any) {
  * 判断给定的值是否为 null
  * @return {boolean}
  */
-export function IsNull(obj: any) {
+export function isNull(obj: any) {
   return Object.prototype.toString.call(obj) === '[object Null]';
 }
 
@@ -61,7 +61,7 @@ export function IsNull(obj: any) {
  * 判断给定的值是否为 null or undefined
  * @return {boolean}
  */
-export function IsNullOrUndefined(obj: any) {
+export function isNullOrUndefined(obj: any) {
   return IsNull(obj) || IsUndefined(obj);
 }
 
@@ -69,7 +69,7 @@ export function IsNullOrUndefined(obj: any) {
  * 判断给定的值是否为 object对象
  * @return {boolean}
  */
-export function IsObject(obj: any) {
+export function isObject(obj: any) {
   return Object.prototype.toString.call(obj) === '[object Object]';
 }
 
@@ -77,7 +77,7 @@ export function IsObject(obj: any) {
  * 判断给定的值是否为数组
  * @return {boolean}
  */
-export function IsArray(obj: any) {
+export function isArray(obj: any) {
   return Object.prototype.toString.call(obj) === '[object Array]';
 }
 
@@ -85,7 +85,7 @@ export function IsArray(obj: any) {
  * 判断给定的值是否为 element
  * @return {boolean}
  */
-export function IsElement(obj: any) {
+export function isElement(obj: any) {
   if (typeof HTMLElement === 'object') {
     return obj instanceof HTMLElement;
   } else {
@@ -102,7 +102,7 @@ export function IsElement(obj: any) {
  * 判断给定的值是否为节点
  * @return {boolean}
  */
-export function IsNode(obj: any) {
+export function isNode(obj: any) {
   return obj instanceof Node;
 }
 
@@ -110,7 +110,7 @@ export function IsNode(obj: any) {
  * 判断给定的值是否为节点集合
  * @return {boolean}
  */
-export function IsNodeList(obj: any) {
+export function isNodeList(obj: any) {
   return Object.prototype.toString.call(obj) === '[object NodeList]';
 }
 
@@ -118,7 +118,7 @@ export function IsNodeList(obj: any) {
  * 判断给定的值是否为函数
  * @return {boolean}
  */
-export function IsFunction(obj: any) {
+export function isFunction(obj: any) {
   return Object.prototype.toString.call(obj) === '[object Function]';
 }
 ```

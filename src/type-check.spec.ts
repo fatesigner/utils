@@ -2,115 +2,111 @@
  * TypeCheck.spec
  */
 
+import { expect } from 'chai';
+
 import * as TypeCheck from './type-check';
 
-test('test TypeCheck IsEqual(obj).', function() {
-  expect(TypeCheck.IsEqual(1, 1)).toBe(true);
-  expect(TypeCheck.IsEqual(3, '3')).toBe(false);
-});
-
-test('test TypeCheck IsString(obj).', function() {
-  expect(TypeCheck.IsString('1.213')).toBe(true);
-  expect(TypeCheck.IsString(1)).toBe(false);
-  expect(TypeCheck.IsString(true)).toBe(false);
-  expect(TypeCheck.IsString(false)).toBe(false);
-  expect(TypeCheck.IsString(null)).toBe(false);
-  expect(TypeCheck.IsString(undefined)).toBe(false);
-  expect(TypeCheck.IsString(NaN)).toBe(false);
-  expect(TypeCheck.IsString([])).toBe(false);
-  expect(TypeCheck.IsString([1, 2, 3, 4, 5])).toBe(false);
-  expect(TypeCheck.IsString({ d: '1' })).toBe(false);
-});
-
-test('test TypeCheck IsNumber(obj).', function() {
-  expect(TypeCheck.IsNumber('1.213')).toBe(false);
-  expect(TypeCheck.IsNumber(1)).toBe(true);
-  expect(TypeCheck.IsNumber(1.213)).toBe(true);
-  expect(TypeCheck.IsNumber(-1.213)).toBe(true);
-  expect(TypeCheck.IsNumber(true)).toBe(false);
-  expect(TypeCheck.IsNumber(false)).toBe(false);
-  expect(TypeCheck.IsNumber(null)).toBe(false);
-  expect(TypeCheck.IsNumber(undefined)).toBe(false);
-  expect(TypeCheck.IsNumber(NaN)).toBe(false);
-  expect(TypeCheck.IsNumber([])).toBe(false);
-  expect(TypeCheck.IsNumber([1, 2, 3, 4, 5])).toBe(false);
-  expect(TypeCheck.IsNumber({ d: '1' })).toBe(false);
-});
-
-test('test TypeCheck IsBoolean(obj).', function() {
-  expect(TypeCheck.IsBoolean('1.213')).toBe(false);
-  expect(TypeCheck.IsBoolean(1)).toBe(false);
-  expect(TypeCheck.IsBoolean(true)).toBe(true);
-  expect(TypeCheck.IsBoolean(false)).toBe(true);
-  expect(TypeCheck.IsBoolean(null)).toBe(false);
-  expect(TypeCheck.IsBoolean(undefined)).toBe(false);
-  expect(TypeCheck.IsBoolean(NaN)).toBe(false);
-  expect(TypeCheck.IsBoolean([])).toBe(false);
-  expect(TypeCheck.IsBoolean([1, 2, 3, 4, 5])).toBe(false);
-  expect(TypeCheck.IsBoolean({ d: '1' })).toBe(false);
-});
-
-it('test TypeCheck IsUndefined(obj).', function() {
-  expect(TypeCheck.IsUndefined('1.213')).toBe(false);
-  expect(TypeCheck.IsUndefined(1)).toBe(false);
-  expect(TypeCheck.IsUndefined(true)).toBe(false);
-  expect(TypeCheck.IsUndefined(false)).toBe(false);
-  expect(TypeCheck.IsUndefined(null)).toBe(false);
-  expect(TypeCheck.IsUndefined(undefined)).toBe(true);
-  expect(TypeCheck.IsUndefined(NaN)).toBe(false);
-  expect(TypeCheck.IsUndefined([])).toBe(false);
-  expect(TypeCheck.IsUndefined([1, 2, 3, 4, 5])).toBe(false);
-  expect(TypeCheck.IsUndefined({ d: '1' })).toBe(false);
-});
-
-test('test TypeCheck IsNull(obj).', function() {
-  expect(TypeCheck.IsNull('1.213')).toBe(false);
-  expect(TypeCheck.IsNull(1)).toBe(false);
-  expect(TypeCheck.IsNull(true)).toBe(false);
-  expect(TypeCheck.IsNull(false)).toBe(false);
-  expect(TypeCheck.IsNull(null)).toBe(true);
-  expect(TypeCheck.IsNull(undefined)).toBe(false);
-  expect(TypeCheck.IsNull(NaN)).toBe(false);
-  expect(TypeCheck.IsNull([])).toBe(false);
-  expect(TypeCheck.IsNull([1, 2, 3, 4, 5])).toBe(false);
-  expect(TypeCheck.IsNull({})).toBe(false);
-});
-
-test('test TypeCheck IsNullOrUndefined(obj).', function() {
-  expect(TypeCheck.IsNullOrUndefined('1.213')).toBe(false);
-  expect(TypeCheck.IsNullOrUndefined(1)).toBe(false);
-  expect(TypeCheck.IsNullOrUndefined(true)).toBe(false);
-  expect(TypeCheck.IsNullOrUndefined(false)).toBe(false);
-  expect(TypeCheck.IsNullOrUndefined(null)).toBe(true);
-  expect(TypeCheck.IsNullOrUndefined(undefined)).toBe(true);
-  expect(TypeCheck.IsNullOrUndefined(NaN)).toBe(false);
-  expect(TypeCheck.IsNullOrUndefined([])).toBe(false);
-  expect(TypeCheck.IsNullOrUndefined([1, 2, 3, 4, 5])).toBe(false);
-  expect(TypeCheck.IsNullOrUndefined({ d: '1' })).toBe(false);
-});
-
-test('test TypeCheck IsObject(obj).', function() {
-  expect(TypeCheck.IsObject('1.213')).toBe(false);
-  expect(TypeCheck.IsObject(1)).toBe(false);
-  expect(TypeCheck.IsObject(true)).toBe(false);
-  expect(TypeCheck.IsObject(false)).toBe(false);
-  expect(TypeCheck.IsObject(null)).toBe(false);
-  expect(TypeCheck.IsObject(undefined)).toBe(false);
-  expect(TypeCheck.IsObject(NaN)).toBe(false);
-  expect(TypeCheck.IsObject({ d: '1' })).toBe(true);
-  expect(TypeCheck.IsObject([])).toBe(false);
-  expect(TypeCheck.IsObject([1, 2, 3, 4, 5])).toBe(false);
-});
-
-test('test TypeCheck IsArray(obj).', function() {
-  expect(TypeCheck.IsArray('1.213')).toBe(false);
-  expect(TypeCheck.IsArray(1)).toBe(false);
-  expect(TypeCheck.IsArray(true)).toBe(false);
-  expect(TypeCheck.IsArray(false)).toBe(false);
-  expect(TypeCheck.IsArray(null)).toBe(false);
-  expect(TypeCheck.IsArray(undefined)).toBe(false);
-  expect(TypeCheck.IsArray(NaN)).toBe(false);
-  expect(TypeCheck.IsArray({ d: '1' })).toBe(false);
-  expect(TypeCheck.IsArray([])).toBe(true);
-  expect(TypeCheck.IsArray([1, 2, 3, 4, 5])).toBe(true);
+describe('# test TypeCheck.', function () {
+  it('## isEqual(obj).', function () {
+    expect(TypeCheck.isEqual(1, 1)).to.be.ok;
+    expect(TypeCheck.isEqual(3, '3')).to.not.be.ok;
+  });
+  it('## isString(obj).', function () {
+    expect(TypeCheck.isString('1.213')).to.be.ok;
+    expect(TypeCheck.isString(1)).to.not.be.ok;
+    expect(TypeCheck.isString(true)).to.not.be.ok;
+    expect(TypeCheck.isString(false)).to.not.be.ok;
+    expect(TypeCheck.isString(null)).to.not.be.ok;
+    expect(TypeCheck.isString(undefined)).to.not.be.ok;
+    expect(TypeCheck.isString(NaN)).to.not.be.ok;
+    expect(TypeCheck.isString([])).to.not.be.ok;
+    expect(TypeCheck.isString([1, 2, 3, 4, 5])).to.not.be.ok;
+    expect(TypeCheck.isString({ d: '1' })).to.not.be.ok;
+  });
+  it('## isNumber(obj).', function () {
+    expect(TypeCheck.isNumber('1.213')).to.not.be.ok;
+    expect(TypeCheck.isNumber(1)).to.be.ok;
+    expect(TypeCheck.isNumber(1.213)).to.be.ok;
+    expect(TypeCheck.isNumber(-1.213)).to.be.ok;
+    expect(TypeCheck.isNumber(true)).to.not.be.ok;
+    expect(TypeCheck.isNumber(false)).to.not.be.ok;
+    expect(TypeCheck.isNumber(null)).to.not.be.ok;
+    expect(TypeCheck.isNumber(undefined)).to.not.be.ok;
+    expect(TypeCheck.isNumber(NaN)).to.not.be.ok;
+    expect(TypeCheck.isNumber([])).to.not.be.ok;
+    expect(TypeCheck.isNumber([1, 2, 3, 4, 5])).to.not.be.ok;
+    expect(TypeCheck.isNumber({ d: '1' })).to.not.be.ok;
+  });
+  it('## isBoolean(obj).', function () {
+    expect(TypeCheck.isBoolean('1.213')).to.not.be.ok;
+    expect(TypeCheck.isBoolean(1)).to.not.be.ok;
+    expect(TypeCheck.isBoolean(true)).to.be.ok;
+    expect(TypeCheck.isBoolean(false)).to.be.ok;
+    expect(TypeCheck.isBoolean(null)).to.not.be.ok;
+    expect(TypeCheck.isBoolean(undefined)).to.not.be.ok;
+    expect(TypeCheck.isBoolean(NaN)).to.not.be.ok;
+    expect(TypeCheck.isBoolean([])).to.not.be.ok;
+    expect(TypeCheck.isBoolean([1, 2, 3, 4, 5])).to.not.be.ok;
+    expect(TypeCheck.isBoolean({ d: '1' })).to.not.be.ok;
+  });
+  it('## isUndefined(obj).', function () {
+    expect(TypeCheck.isUndefined('1.213')).to.not.be.ok;
+    expect(TypeCheck.isUndefined(1)).to.not.be.ok;
+    expect(TypeCheck.isUndefined(true)).to.not.be.ok;
+    expect(TypeCheck.isUndefined(false)).to.not.be.ok;
+    expect(TypeCheck.isUndefined(null)).to.not.be.ok;
+    expect(TypeCheck.isUndefined(undefined)).to.be.ok;
+    expect(TypeCheck.isUndefined(NaN)).to.not.be.ok;
+    expect(TypeCheck.isUndefined([])).to.not.be.ok;
+    expect(TypeCheck.isUndefined([1, 2, 3, 4, 5])).to.not.be.ok;
+    expect(TypeCheck.isUndefined({ d: '1' })).to.not.be.ok;
+  });
+  it('## isNull(obj).', function () {
+    expect(TypeCheck.isNull('1.213')).to.not.be.ok;
+    expect(TypeCheck.isNull(1)).to.not.be.ok;
+    expect(TypeCheck.isNull(true)).to.not.be.ok;
+    expect(TypeCheck.isNull(false)).to.not.be.ok;
+    expect(TypeCheck.isNull(null)).to.be.ok;
+    expect(TypeCheck.isNull(undefined)).to.not.be.ok;
+    expect(TypeCheck.isNull(NaN)).to.not.be.ok;
+    expect(TypeCheck.isNull([])).to.not.be.ok;
+    expect(TypeCheck.isNull([1, 2, 3, 4, 5])).to.not.be.ok;
+    expect(TypeCheck.isNull({})).to.not.be.ok;
+  });
+  it('## isNullOrUndefined(obj).', function () {
+    expect(TypeCheck.isNullOrUndefined('1.213')).to.not.be.ok;
+    expect(TypeCheck.isNullOrUndefined(1)).to.not.be.ok;
+    expect(TypeCheck.isNullOrUndefined(true)).to.not.be.ok;
+    expect(TypeCheck.isNullOrUndefined(false)).to.not.be.ok;
+    expect(TypeCheck.isNullOrUndefined(null)).to.be.ok;
+    expect(TypeCheck.isNullOrUndefined(undefined)).to.be.ok;
+    expect(TypeCheck.isNullOrUndefined(NaN)).to.not.be.ok;
+    expect(TypeCheck.isNullOrUndefined([])).to.not.be.ok;
+    expect(TypeCheck.isNullOrUndefined([1, 2, 3, 4, 5])).to.not.be.ok;
+    expect(TypeCheck.isNullOrUndefined({ d: '1' })).to.not.be.ok;
+  });
+  it('## isObject(obj).', function () {
+    expect(TypeCheck.isObject('1.213')).to.not.be.ok;
+    expect(TypeCheck.isObject(1)).to.not.be.ok;
+    expect(TypeCheck.isObject(true)).to.not.be.ok;
+    expect(TypeCheck.isObject(false)).to.not.be.ok;
+    expect(TypeCheck.isObject(null)).to.not.be.ok;
+    expect(TypeCheck.isObject(undefined)).to.not.be.ok;
+    expect(TypeCheck.isObject(NaN)).to.not.be.ok;
+    expect(TypeCheck.isObject({ d: '1' })).be.ok;
+    expect(TypeCheck.isObject([])).to.not.be.ok;
+    expect(TypeCheck.isObject([1, 2, 3, 4, 5])).to.not.be.ok;
+  });
+  it('## isArray(obj).', function () {
+    expect(TypeCheck.isArray('1.213')).to.not.be.ok;
+    expect(TypeCheck.isArray(1)).to.not.be.ok;
+    expect(TypeCheck.isArray(true)).to.not.be.ok;
+    expect(TypeCheck.isArray(false)).to.not.be.ok;
+    expect(TypeCheck.isArray(null)).to.not.be.ok;
+    expect(TypeCheck.isArray(undefined)).to.not.be.ok;
+    expect(TypeCheck.isArray(NaN)).to.not.be.ok;
+    expect(TypeCheck.isArray({ d: '1' })).to.not.be.ok;
+    expect(TypeCheck.isArray([])).to.be.ok;
+    expect(TypeCheck.isArray([1, 2, 3, 4, 5])).to.be.ok;
+  });
 });

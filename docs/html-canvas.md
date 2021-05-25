@@ -1,21 +1,21 @@
 # html-canvas
 转换 html 为 canvas 或 image
 
-## ConvertHtmlToCanvas
+## convertHtmlToCanvas
 将指定的 HtmlElement 转换为 HTMLCanvasElement
 
 ```js
-import { ConvertHtmlToCanvas } from '@fatesigner/utils/html-canvas';
+import { convertHtmlToCanvas } from '@fatesigner/utils/html-canvas';
 
 /**
  * @param el        html 元素
  * @param options   html2canvas插件选项
  * @constructor
  */
-export declare function ConvertHtmlToCanvas(el: HTMLElement, options?: any): Promise<HTMLCanvasElement>;
+export declare function convertHtmlToCanvas(el: HTMLElement, options?: any): Promise<HTMLCanvasElement>;
 
 // 转换为 canvas 元素
-const canvas = await ConvertHtmlToCanvas(document.getElementById('app'), {
+const canvas = await convertHtmlToCanvas(document.getElementById('app'), {
   // cavas 背景色，默认为 transparent
   backgroundColor: 'blue'
 });
@@ -23,11 +23,11 @@ const canvas = await ConvertHtmlToCanvas(document.getElementById('app'), {
 document.body.appendChild(canvas);
 ```
 
-## ConvertHtmlToImage
+## convertHtmlToImage
 将指定的 HtmlElement 转换为 img element
 
 ```js
-import { ConvertHtmlToImage } from '@fatesigner/utils/html-canvas';
+import { convertHtmlToImage } from '@fatesigner/utils/html-canvas';
 
 /**
  * @param el        html 元素
@@ -37,10 +37,10 @@ import { ConvertHtmlToImage } from '@fatesigner/utils/html-canvas';
  * @param height    图片高度
  * @constructor
  */
-export declare function ConvertHtmlToImage(el: HTMLElement, type: ImageType, width?: number, height?: number): Promise<HTMLImageElement>;
+export declare function convertHtmlToImage(el: HTMLElement, type: ImageType, width?: number, height?: number): Promise<HTMLImageElement>;
 
 // 转换为 img 元素
-const img = await ConvertHtmlToImage(document.getElementById('app'), {
+const img = await convertHtmlToImage(document.getElementById('app'), {
   // cavas 背景色，默认为 transparent
   backgroundColor: 'blue'
 }, 'png', 600, 500);
@@ -48,11 +48,11 @@ const img = await ConvertHtmlToImage(document.getElementById('app'), {
 document.body.appendChild(img);
 ```
 
-## SaveHtmlAsImage
+## saveHtmlAsImage
 将指定的 HtmlElement 保存为 img 并下载
 
 ```js
-import { SaveHtmlAsImage } from '@fatesigner/utils/html-canvas';
+import { saveHtmlAsImage } from '@fatesigner/utils/html-canvas';
 
 /**
  * @param el        html 元素
@@ -63,10 +63,10 @@ import { SaveHtmlAsImage } from '@fatesigner/utils/html-canvas';
  * @param height    图片高度
  * @constructor
  */
-export declare function SaveHtmlAsImage(el: HTMLElement, type: ImageType, fileName?: string, width?: number, height?: number): Promise<void>;
+export declare function saveHtmlAsImage(el: HTMLElement, type: ImageType, fileName?: string, width?: number, height?: number): Promise<void>;
 
 // 转换为 img 并下载
-await SaveHtmlAsImage(document.getElementById('app'), {
+await saveHtmlAsImage(document.getElementById('app'), {
   // cavas 背景色，默认为 transparent
   backgroundColor: 'blue'
 }, 'png', 'image_download', 600, 500);

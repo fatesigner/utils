@@ -9,7 +9,7 @@ let Identification = '';
  * @param identification
  * @constructor
  */
-export function SetIdentification(identification: string): void {
+export function setIdentification(identification: string): void {
   Identification = identification;
 }
 

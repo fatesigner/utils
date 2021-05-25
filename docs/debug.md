@@ -1,11 +1,11 @@
 # debug
 一些用助于调试的函数
 
-## LatencyTimeLog
+## latencyTimeLog
 往指定函数切入代码，统计每次该函数执行的耗时。（借助于 aspect 函数）
 
 ```js
-import { LatencyTimeLog } from '@fatesigner/utils/debug';
+import { latencyTimeLog } from '@fatesigner/utils/debug';
 
 /**
  * @param pointcut 要切入的函数名
@@ -23,7 +23,7 @@ const obj = {
   }
 };
 
-LatencyTimeLog(
+latencyTimeLog(
   {
     target: obj,
     func: 'sync'
@@ -36,17 +36,17 @@ obj.sync();
 // 输出：_____time spend：2001
 ```
 
-## CreateInstrument
+## createInstrument
 为指定的 observable source 添加用于调试的 log 记录。
 
 ```js
-import { CreateInstrument, CreateObserver } from '@fatesigner/utils/debug';
+import { createInstrument, createObserver } from '@fatesigner/utils/debug';
 
 let source$ = of(0).pipe(delay(3000));
 
-source$ = CreateInstrument(source$);
+source$ = createInstrument(source$);
 
-source$.subscribe(CreateObserver('a'));
+source$.subscribe(createObserver('a'));
 
 // 输出：
 source: subscribing
@@ -55,17 +55,17 @@ observer a next: 0
 observer a complete
 ```
 
-## CreateObserver
+## createObserver
 创建具有指定名称的观察者。
 
 ```js
-import { CreateInstrument, CreateObserver } from '@fatesigner/utils/debug';
+import { createInstrument, createObserver } from '@fatesigner/utils/debug';
 
 let source$ = of(0).pipe(delay(3000));
 
-source$ = CreateInstrument(source$);
+source$ = createInstrument(source$);
 
-source$.subscribe(CreateObserver('c'));
+source$.subscribe(createObserver('c'));
 
 // 输出：
 source: subscribing

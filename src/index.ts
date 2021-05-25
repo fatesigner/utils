@@ -2,26 +2,64 @@
  * index
  */
 
-import { cloneDeep } from 'lodash';
-import { FunctionType } from '@fatesigner/typed';
+import { cloneDeep } from 'lodash-es';
 
-import { IsArray, IsBoolean, IsFunction, IsNodeList, IsNullOrUndefined, IsNumber, IsObject } from './type-check';
+import {
+  isArray,
+  isBoolean,
+  isFunction,
+  isNodeList,
+  isNullOrUndefined,
+  isNumber,
+  isObject,
+  isString
+} from './type-check';
 
 /**
  * 无任何操作的 空函数
  */
-export function Noop() {}
+export function noop() {}
 
 /**
  * 利用 apply 为函数绑定指定的上下文对象
  * @param {Function} fn 需要绑定的函数
  * @param {Object} context 函数执行的环境、上下文对象
- * @param args
  * @return {Function}
  */
-export function ApplyBind(fn: FunctionType, context: Record<string, any>, ...args: any[]) {
-  return function (...argsInner: any[]) {
-    return fn.apply(context || this, [...args, ...argsInner]);
+export function applyBind<T, A extends any[], R>(fn: (this: T, ...args: A) => R, context: T): (...args: A) => R;
+export function applyBind<T, A0, A extends any[], R>(
+  fn: (this: T, arg0: A0, ...args: A) => R,
+  context: T,
+  arg0: A0
+): (...args: A) => R;
+export function applyBind<T, A0, A1, A extends any[], R>(
+  fn: (this: T, arg0: A0, arg1: A1, ...args: A) => R,
+  context: T,
+  arg0: A0,
+  arg1: A1
+): (...args: A) => R;
+export function applyBind<T, A0, A1, A2, A extends any[], R>(
+  fn: (this: T, arg0: A0, arg1: A1, arg2: A2, ...args: A) => R,
+  context: T,
+  arg0: A0,
+  arg1: A1,
+  arg2: A2
+): (...args: A) => R;
+export function applyBind<T, A0, A1, A2, A3, A extends any[], R>(
+  fn: (this: T, arg0: A0, arg1: A1, arg2: A2, arg3: A3, ...args: A) => R,
+  context: T,
+  arg0: A0,
+  arg1: A1,
+  arg2: A2,
+  arg3: A3
+): (...args: A) => R;
+export function applyBind<T, AX, R>(
+  fn: (this: T, ...args: AX[]) => R,
+  context: T,
+  ...args: AX[]
+): (...args: AX[]) => R {
+  return function (...argsOri: AX[]) {
+    return fn.apply(context, [...args, ...argsOri]);
   };
 }
 
@@ -37,7 +75,7 @@ export function ApplyBind(fn: FunctionType, context: Record<string, any>, ...arg
  * @param {Function=null} alwaysDo 延迟期间仍会调用的函数 默认为空
  * @returns {Function}
  */
-export function Debounce(
+export function debounce(
   fn: (...args: any[]) => any,
   idle: number,
   immediate = true,
@@ -99,7 +137,7 @@ export function Debounce(
  * true：当调用方法时，未到达delay指定的时间间隔，则启动计时器延迟调用fn函数，
  * 若后续在既未达到delay指定的时间间隔和fn函数又未被调用的情况下调用返回值方法，则被调用请求将被忽略。
  */
-export function Throttle(fn: FunctionType, delay: number, immediate = true, trailing = true) {
+export function throttle(fn: (...args: any[]) => any, delay: number, immediate = true, trailing = true) {
   let timer: any; // 定时器变量
   let previous = 0; // 时间戳 用于记录上次执行的时间点
   // let context; // fn函数执行的作用域
@@ -153,7 +191,7 @@ export function Throttle(fn: FunctionType, delay: number, immediate = true, trai
  * @param {string} str
  * @returns {string} str
  */
-export function Capitalize(str: string) {
+export function capitalize(str: string) {
   return str.substring(0, 1).toUpperCase() + str.substring(1);
 }
 
@@ -162,7 +200,7 @@ export function Capitalize(str: string) {
  * @param {string} str
  * @returns {string} value
  */
-export function ConvertToCDB(str: string) {
+export function convertToCDB(str: string) {
   let tmp = '';
   for (let i = 0, l = str.length; i < l; i++) {
     if (str.charCodeAt(i) === 12288) {
@@ -183,7 +221,7 @@ export function ConvertToCDB(str: string) {
  * @param {string} str
  * @returns {string} value
  */
-export function ConvertToDBC(str: string) {
+export function convertToDBC(str: string) {
   let tmp = '';
   for (let i = 0, l = str.length; i < l; i++) {
     const at = str.charCodeAt(i);
@@ -203,7 +241,7 @@ export function ConvertToDBC(str: string) {
  * @param {string} bridge
  * @returns {string} hump
  */
-export function ConvertBridgeStrToHump(bridge: string) {
+export function convertBridgeStrToHump(bridge: string) {
   if (bridge) {
     return bridge.replace(/-(\w)/g, function (all, letter) {
       return letter.toUpperCase();
@@ -217,7 +255,7 @@ export function ConvertBridgeStrToHump(bridge: string) {
  * @param {string} hump
  * @returns {string} bridge
  */
-export function ConvertHumpStrToBridge(hump: string) {
+export function convertHumpStrToBridge(hump: string) {
   if (hump) {
     let s = hump.replace(/([A-Z])/g, '-$1').toLowerCase();
     if (s && s.length && s[0] === '-') {
@@ -235,7 +273,7 @@ export function ConvertHumpStrToBridge(hump: string) {
  * @param capital
  * @returns {[]} size
  */
-export function ConvertToBytesUnit(value: number, digits = 2, capital = false) {
+export function convertToBytesUnit(value: number, digits = 2, capital = false) {
   if (value == null) {
     return '0 Bytes';
   }
@@ -244,7 +282,7 @@ export function ConvertToBytesUnit(value: number, digits = 2, capital = false) {
   const index = Math.floor(Math.log(srcsize) / Math.log(1024));
   let size: any = srcsize / Math.pow(1024, index);
 
-  if (IsNumber(digits)) {
+  if (isNumber(digits)) {
     size = size.toFixed(digits);
   }
 
@@ -266,8 +304,8 @@ export function ConvertToBytesUnit(value: number, digits = 2, capital = false) {
  * @returns {File}
  * @constructor
  */
-export function ConvertBlobToFile(blob: Blob, filename: string, type?: string) {
-  return new File([blob], name, { type });
+export function convertBlobToFile(blob: Blob, filename: string, type?: string) {
+  return new File([blob], filename, { type });
 }
 
 /**
@@ -277,7 +315,7 @@ export function ConvertBlobToFile(blob: Blob, filename: string, type?: string) {
  * @param {number} sliceSize
  * @returns {Blob}
  */
-export function ConvertBase64ToBlob(b64Data: string, contentType?: string, sliceSize?: number) {
+export function convertBase64ToBlob(b64Data: string, contentType?: string, sliceSize?: number) {
   if (!b64Data) {
     return;
   }
@@ -318,13 +356,13 @@ export function ConvertBase64ToBlob(b64Data: string, contentType?: string, slice
  * @param {Object} obj - 待拼接的对象
  * @returns {string} - 拼接成的请求字符串
  */
-export function ConvertToQueryParameters(obj: any) {
+export function convertToQueryParameters(obj: any) {
   const params: any[] = [];
 
   Object.keys(obj).forEach((key) => {
     let value = obj[key];
     // 如果值为 null or undefined 则将其置空
-    if (IsNullOrUndefined(value)) {
+    if (isNullOrUndefined(value)) {
       value = '';
     }
     // 对于需要编码的文本（比如说中文）我们要进行编码
@@ -343,27 +381,27 @@ export function ConvertToQueryParameters(obj: any) {
  * reducer 不推荐设置Wie boolean 值，不然会与 break 结束循环逻辑发生冲突
  * @return {Object} reducer
  */
-export function ForEach<T extends any[] | Record<string, any>, R>(
+export function forEach<T extends any[] | Record<string, any>, R>(
   data: T,
   fn: (prev: R, cur: T extends any[] ? T[number] : keyof T, index: number, data: T) => R | boolean | void,
   reducer?: R
 ) {
-  if (IsFunction(fn)) {
-    if (IsArray(data) || IsNodeList(data)) {
+  if (isFunction(fn)) {
+    if (isArray(data) || isNodeList(data)) {
       for (let i = 0, l = data.length; i < l; i++) {
         const s = data[i as keyof T];
         const res = fn(reducer, s as any, i, data);
-        if (IsBoolean(res) && !res) {
+        if (isBoolean(res) && !res) {
           break;
         } else {
           reducer = res as R;
         }
       }
-    } else if (IsObject(data)) {
+    } else if (isObject(data)) {
       const keys = Object.keys(data);
       for (let i = 0, l = keys.length; i < l; i++) {
         const res = fn(reducer, keys[i] as any, i, data);
-        if (IsBoolean(res) && !res) {
+        if (isBoolean(res) && !res) {
           break;
         } else {
           reducer = res as R;
@@ -380,8 +418,8 @@ export function ForEach<T extends any[] | Record<string, any>, R>(
  * @param circular 检测是否存在循环引用，并自动处理其拷贝，默认为 false
  * @constructor
  */
-export function Clone(originalObject: any, circular = false) {
-  if (IsNullOrUndefined(originalObject)) {
+export function clone(originalObject: any, circular = false) {
+  if (isNullOrUndefined(originalObject)) {
     return originalObject;
   }
   let propertyIndex;
@@ -455,7 +493,7 @@ function cloneSpecificValue(val: any) {
  * Javascript 对象（object）合并
  * 利用 Object.assign()
  */
-export function Extend(target: any, ...args: any[]) {
+export function extend(target: any, ...args: any[]) {
   if (typeof Object.assign !== 'function') {
     return Object.assign(target);
   } else {
@@ -487,7 +525,7 @@ function deepCloneArray(arr: any[]) {
         clone[index] = cloneSpecificValue(item);
       } else {
         // eslint-disable-next-line @typescript-eslint/no-use-before-define
-        clone[index] = DeepExtend({}, item);
+        clone[index] = deepExtend({}, item);
       }
     } else {
       clone[index] = item;
@@ -501,7 +539,7 @@ function deepCloneArray(arr: any[]) {
  * @param params
  * @constructor
  */
-export function DeepExtend(...params: any[]) {
+export function deepExtend(...params: any[]) {
   if (params.length < 1 || typeof params[0] !== 'object') {
     return false;
   }
@@ -547,11 +585,11 @@ export function DeepExtend(...params: any[]) {
 
         // overwrite by new value if source isn't object or array
       } else if (typeof src !== 'object' || src === null || Array.isArray(src)) {
-        target[key] = DeepExtend({}, val);
+        target[key] = deepExtend({}, val);
 
         // source value and new value is objects both, extending...
       } else {
-        target[key] = DeepExtend(src, val);
+        target[key] = deepExtend(src, val);
       }
     });
   });
@@ -564,7 +602,7 @@ export function DeepExtend(...params: any[]) {
  * @param paramStr 查询字符串
  * @returns object 参数对象
  */
-export function GetParamsFromUrl(paramStr?: string): Record<string, any> {
+export function getParamsFromUrl(paramStr?: string): Record<string, any> {
   const s = (paramStr || '').split('?');
   if (s.length) {
     paramStr = s[s.length - 1];
@@ -590,7 +628,7 @@ type byProp<T> = (arg0: T) => string | number;
  * @param slice 分组后的 item 默认不包含源 item 的属性，提供一个函数选择指定包含的属性
  * @constructor
  */
-export function GroupBy<T, T2>(
+export function groupBy<T, T2>(
   arr: T[],
   by: string | byProp<T>,
   slice?: (arg0: T) => T2
@@ -601,28 +639,22 @@ export function GroupBy<T, T2>(
   const res = arr.reduce(
     function (prev: any, cur) {
       let key;
-      if (Object.prototype.toString.call(by) === '[object Function]') {
+      if (isFunction(by)) {
         key = (by as byProp<T>)(cur);
-      } else if (Object.prototype.toString.call(by) === '[object String]') {
+      } else if (isString(by)) {
         key = cur[by as keyof T];
       } else {
         throw new Error('GroupBy: the key for group by is not valid.');
       }
       let idx = -1;
       let upd = true;
-      if (
-        Object.prototype.toString.call(key) === '[object Null]' ||
-        Object.prototype.toString.call(key) === '[object Undefined]'
-      ) {
+      if (isNullOrUndefined(key)) {
         if (prev.undef < 0) {
           upd = false;
           prev.undef = prev.arr.length;
         }
         idx = prev.undef;
-      } else if (
-        Object.prototype.toString.call(key) !== '[object String]' ||
-        Object.prototype.toString.call(key) !== '[object Number]'
-      ) {
+      } else if (!isString(key) || !isNumber(key)) {
         if (!Object.prototype.hasOwnProperty.call(prev.keys, key)) {
           upd = false;
           prev.keys[key] = prev.arr.length;
@@ -637,7 +669,7 @@ export function GroupBy<T, T2>(
           if (slice) {
             item = Object.assign({}, item, slice(cur));
           }
-          if (Object.prototype.toString.call(by) === '[object String]') {
+          if (isString(by)) {
             item[by as string] = cur[by as keyof T];
           }
           item.children = [cur];
@@ -663,7 +695,7 @@ export function GroupBy<T, T2>(
  * @param mode   当有效位数确定后，其后多余位数的处理模式，默认为 normal，即银行家舍入法 "四舍六入五成双"，round：标准的四舍五入，increase：无论数值大小，一律进1，ignore：一律舍弃
  * @constructor
  */
-export function ToFixed(
+export function toFixed(
   value: number,
   digits = 0,
   mode: 'ignore' | 'normal' | 'round' | 'increase' = 'normal'
@@ -718,7 +750,7 @@ export function ToFixed(
  * @param properties
  * @constructor
  */
-export function BindLazyFunc<T extends Record<string, any>>(target: T, properties: string[]): T {
+export function bindLazyFunc<T extends Record<string, any>>(target: T, properties: string[]): T {
   let resolves: any[] = [];
   const functions: any = {};
 
@@ -772,7 +804,7 @@ export function BindLazyFunc<T extends Record<string, any>>(target: T, propertie
  * @param properties
  * @constructor
  */
-function BindLazyFuncProxy<T extends Record<string, (...args: any[]) => Promise<any>>, TKey extends keyof T>(
+function bindLazyFuncProxy<T extends Record<string, (...args: any[]) => Promise<any>>, TKey extends keyof T>(
   target: T,
   properties: TKey[]
 ): T {
@@ -783,7 +815,7 @@ function BindLazyFuncProxy<T extends Record<string, (...args: any[]) => Promise<
   let target_;
 
   const revocable = Proxy.revocable(target, {
-    get(target, property: TKey) {
+    get(target, property: any) {
       const propertyKey = property.toString();
       if (Object.prototype.hasOwnProperty.call(target, propertyKey) && properties.indexOf(property) > -1) {
         if (functions.indexOf(propertyKey) > -1) {
@@ -801,7 +833,7 @@ function BindLazyFuncProxy<T extends Record<string, (...args: any[]) => Promise<
     deleteProperty(): boolean {
       return true;
     },
-    set(target, property: TKey, value, receiver) {
+    set(target, property: any, value, receiver) {
       const propertyKey = property.toString();
       if (Object.prototype.hasOwnProperty.call(target, propertyKey) && properties.indexOf(property) > -1) {
         /* if (
@@ -847,7 +879,7 @@ function BindLazyFuncProxy<T extends Record<string, (...args: any[]) => Promise<
  * @param cached
  * @constructor
  */
-export function BindPromiseQueue<TFunc extends (...args: any[]) => Promise<any>>(func: TFunc, cached?: boolean): TFunc {
+export function bindPromiseQueue<TFunc extends (...args: any[]) => Promise<any>>(func: TFunc, cached?: boolean): TFunc {
   let promise: Promise<any>;
   let resolved: boolean;
 
@@ -869,10 +901,6 @@ export function BindPromiseQueue<TFunc extends (...args: any[]) => Promise<any>>
   } as any;
 }
 
-const isObject = function (val: any): boolean {
-  return Object.prototype.toString.call(val) === '[object Object]';
-};
-
 const isMergeObject = function (val: any): boolean {
   return (
     Object.prototype.toString.call(val) === '[object Object]' ||
@@ -881,7 +909,7 @@ const isMergeObject = function (val: any): boolean {
 };
 
 const customizer = function (obj: any, src: any) {
-  if (IsArray(src)) {
+  if (isArray(src)) {
     return src;
   }
 };
@@ -894,7 +922,7 @@ const customizer = function (obj: any, src: any) {
  * @param assignment 自定义赋值操作，默认为引用或值的传递
  * @constructor
  */
-export function MergeProps<T extends Record<string, any>>(
+export function mergeProps<T extends Record<string, any>>(
   defaultProps: T,
   props: T,
   deep = false,
@@ -910,13 +938,13 @@ export function MergeProps<T extends Record<string, any>>(
     Object.keys(defaultProps).forEach(function (key) {
       if (isMergeObject(props[key])) {
         if (Object.prototype.hasOwnProperty.call(props, key)) {
-          MergeProps(defaultProps[key], props[key], deep);
+          mergeProps(defaultProps[key], props[key], deep);
         } else {
           if (isObject(defaultProps[key])) {
             if (deep) {
               // 深度模式，进行递归合并
               assignment(props, key, {});
-              MergeProps(defaultProps[key], props[key], deep);
+              mergeProps(defaultProps[key], props[key], deep);
             } else {
               assignment(props, key, defaultProps[key]);
             }
@@ -946,8 +974,8 @@ export function MergeProps<T extends Record<string, any>>(
  * @param props
  * @constructor
  */
-export function MergeVueProps<T extends Record<string, any>>(vue: any, defaultProps: T, props: T): T {
-  return MergeProps(defaultProps, props, true, function (target, property, val) {
+export function mergeVueProps<T extends Record<string, any>>(vue: any, defaultProps: T, props: T): T {
+  return mergeProps(defaultProps, props, true, function (target, property, val) {
     vue.set(target, property, val);
   });
 }
@@ -958,7 +986,7 @@ export function MergeVueProps<T extends Record<string, any>>(vue: any, defaultPr
  * @param handlers
  * @constructor
  */
-export function MergeHandlers<TTarget extends Record<string, (...args: any[]) => Promise<any>>>(
+export function mergeHandlers<TTarget extends Record<string, (...args: any[]) => Promise<any>>>(
   target: TTarget,
   handlers: TTarget
 ): TTarget {
@@ -979,7 +1007,7 @@ export function MergeHandlers<TTarget extends Record<string, (...args: any[]) =>
  * @param end
  * @constructor
  */
-export function AddMask(value: string, start = 0, end = 0, mask = '*') {
+export function addMask(value: string, start = 0, end = 0, mask = '*') {
   if (!value) {
     return '';
   }
@@ -1009,7 +1037,7 @@ export function AddMask(value: string, start = 0, end = 0, mask = '*') {
  * @param arr
  * @constructor
  */
-export function ConvertModelArrToEnum<
+export function convertModelArrToEnum<
   T extends Readonly<Array<{ name: TName; value: TValue; text: TText } & { [key in string]: any }>>,
   TName extends string,
   TValue extends string | number,
@@ -1058,7 +1086,7 @@ export function ConvertModelArrToEnum<
  * @param callback 指定枚举的 value，默认为键值
  * @constructor
  */
-export function ConvertArrToEnum<T extends readonly string[]>(
+export function convertArrToEnum<T extends readonly string[]>(
   items: T,
   callback?: (item: string) => string
 ): {

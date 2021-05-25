@@ -3,7 +3,7 @@
  * 常用的一些验证
  */
 
-import { IsArray, IsBoolean, IsNullOrUndefined, IsString } from './type-check';
+import { isArray, isBoolean, isNullOrUndefined, isString } from './type-check';
 
 /**
  * 判断指定的值是否符合必填规则
@@ -12,13 +12,13 @@ import { IsArray, IsBoolean, IsNullOrUndefined, IsString } from './type-check';
  * @returns {boolean}
  */
 export function Required(value: any): boolean {
-  if (IsNullOrUndefined(value)) {
+  if (isNullOrUndefined(value)) {
     return false;
-  } else if (IsString(value)) {
+  } else if (isString(value)) {
     return !!value;
-  } else if (IsArray(value)) {
+  } else if (isArray(value)) {
     return !!value.length;
-  } else if (IsBoolean(value)) {
+  } else if (isBoolean(value)) {
     return !!value;
   } else {
     return true;
@@ -30,7 +30,7 @@ export function Required(value: any): boolean {
  * @param {Object} value
  * @returns {boolean}
  */
-export function IsNumber(value: any) {
+export function isNumber(value: any) {
   return !isNaN(value);
 }
 
@@ -42,8 +42,8 @@ export function IsNumber(value: any) {
  * @returns {boolean}
  */
 export function LenLimit(value: string, minLength = 0, maxLength: number) {
-  if (!IsNullOrUndefined(value)) {
-    if (IsNumber(minLength) && IsNumber(maxLength)) {
+  if (!isNullOrUndefined(value)) {
+    if (isNumber(minLength) && isNumber(maxLength)) {
       return minLength <= value.length && value.length <= maxLength;
     }
     throw new Error('LenLimit Argument Error：');
@@ -57,13 +57,13 @@ export function LenLimit(value: string, minLength = 0, maxLength: number) {
  * @param {boolean} positive 是否为正数，否则为负数
  * @returns {boolean}
  */
-export function IsInt(value: any, positive?: boolean) {
-  if (!IsNullOrUndefined(value)) {
-    if (IsNumber(value)) {
+export function isInt(value: any, positive?: boolean) {
+  if (!isNullOrUndefined(value)) {
+    if (isNumber(value)) {
       value = value.toString();
     }
-    if (IsString(value) && value.length) {
-      if (IsBoolean(positive)) {
+    if (isString(value) && value.length) {
+      if (isBoolean(positive)) {
         if (positive) {
           // 非负整数 + 0
           return /^\d+$/.test(value.toString());
@@ -87,18 +87,18 @@ export function IsInt(value: any, positive?: boolean) {
  * 判断是否为符合指定规则的 decimal
  * @param {Object} value
  * @param intLimit 整数部分位数长度限制 [minLength, maxLength]
- * @param decimalLimit 小数部分位数长度限制 [minLength, maxLength]
+ * @param dicimalLimit 小数部分位数长度限制 [minLength, maxLength]
  * @returns {boolean}
  */
-export function IsDecimal(
+export function isDecimal(
   value: string | number,
   intLimit: [number, number?] = [1],
-  decimalLimit: [number, number?] = [0]
+  dicimalLimit: [number, number?] = [0]
 ) {
-  if (!IsNullOrUndefined(value)) {
+  if (!isNullOrUndefined(value)) {
     const intLimitStr = intLimit.length > 1 ? intLimit.join(',') : intLimit[0] + ',';
-    const decimalLimitStr = decimalLimit.length > 1 ? decimalLimit.join(',') : decimalLimit[0] + ',';
-    const reg = new RegExp(`^[-]?[0-9]{${intLimitStr}}(\\.[0-9]{${decimalLimitStr}})?$`, 'gim');
+    const dicimalLimitStr = dicimalLimit.length > 1 ? dicimalLimit.join(',') : dicimalLimit[0] + ',';
+    const reg = new RegExp(`^[-]?[0-9]{${intLimitStr}}(\\.[0-9]{${dicimalLimitStr}})?$`, 'gim');
     return reg.test(value.toString());
   }
   return true;
@@ -117,7 +117,7 @@ export function IsDecimal(
  * @param {Object} value
  * @returns {boolean}
  */
-export function IsCellphone(value: string | number) {
+export function isCellphone(value: string | number) {
   if (value) {
     return /^(((13[0-9])|(14[0-9])|(15[0-9])|(16[0-9])|(17[0-9])|(18[0-9])|(19[0-9]))+\d{8})$/.test(value.toString());
   }
@@ -129,7 +129,7 @@ export function IsCellphone(value: string | number) {
  * @param {Object} value
  * @returns {boolean}
  */
-export function IsIdCard(value: string) {
+export function isIdCard(value: string) {
   if (value) {
     value = value.toString();
     return /(^[1-9]\d{5}(18|19|([23]\d))\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}[0-9Xx]$)|(^[1-9]\d{5}\d{2}((0[1-9])|(10|11|12))(([0-2][1-9])|10|20|30|31)\d{3}$)/.test(
@@ -149,7 +149,7 @@ export function IsIdCard(value: string) {
  * @param {Object} value
  * @returns {boolean}
  */
-export function IsEmail(value: string) {
+export function isEmail(value: string) {
   if (value) {
     return /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/.test(value);
   }

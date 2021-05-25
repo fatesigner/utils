@@ -3,11 +3,11 @@ AOP（切面编程）的js实现，有以下两种方式：
 - （bind）无侵入性，不改变原函数，而是创建一个新函数。
 - （inject）具有侵入性，改变了原函数，但提供了 cancel 接口可随时取消，类似 rxjs 的 unsubscribe 。
 
-## Before
+## before
 以指定的作用域执行切入的代码，之后调用目标函数。
 
 ```js
-import { BindBefore, InjectBefore } from '@fatesigner/utils/aspect';
+import { bindBefore, injectBefore } from '@fatesigner/utils/aspect';
 
 const obj = {
   // 模拟 padStar 方法
@@ -21,7 +21,7 @@ const obj = {
 };
 
 // 绑定执行前的代码 修改 replace 参数，然后将其返给原函数
-const bindBefore = BindBefore(
+const bindBefore = bindBefore(
   function(str, num, replace) {
     replace = '*';
     return [str, num, replace];
@@ -41,7 +41,7 @@ console.log(bindBefore('363300', 10, '0'));
 // 输出: ****363300
 
 // 侵入性，更改了原函数。
-const injectBefore = InjectBefore<typeof obj.padStart, typeof obj>(
+const injectBefore = injectBefore<typeof obj.padStart, typeof obj>(
   function(str, num, replace) {
     replace = '*';
     return [str, num, replace];
@@ -68,7 +68,7 @@ console.log(obj.padStart('363300', 10, '0'));
 以指定的作用域调用目标函数，之后执行切入的代码。
 
 ```js
-import { BindAfter, InjectAfter } from '@fatesigner/utils/aspect';
+import { bindAfter, injectAfter } from '@fatesigner/utils/aspect';
 
 const obj = {
   // 模拟 padStar 方法
@@ -82,7 +82,7 @@ const obj = {
 };
 
 // 绑定执行后的代码 修改结果并继续返回
-const bindAfter = BindAfter(
+const bindAfter = bindAfter(
   function(res) {
     res += '000';
     return res;
@@ -102,7 +102,7 @@ console.log(bindAfter('363', 7, '1'));
 // 输出: 1111363000
 
 // 侵入性，更改了原函数。
-const injectAfter = InjectAfter<typeof obj.padStart, typeof obj>(
+const injectAfter = injectAfter<typeof obj.padStart, typeof obj>(
   function(res) {
     res += '000';
     return res;
@@ -129,7 +129,7 @@ console.log(obj.padStart('363300', 10, '1'));
 以指定的作用域和顺序执行切入的代码和调用目标函数，该方法提供原函数，并可以自定义执行顺序。
 
 ```js
-import { BindAround } from '@fatesigner/utils/aspect';
+import { bindAround } from '@fatesigner/utils/aspect';
 
 const obj = {
   // 模拟 padStar 方法
@@ -142,7 +142,7 @@ const obj = {
   }
 };
 
-const bindAround = BindAround(
+const bindAround = bindAround(
   function(originalFunc) {
     return function(str, num, replace) {
       // 修改参数

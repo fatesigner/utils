@@ -3,7 +3,7 @@
  * 树形结构数据处理
  */
 
-import { GetGUID } from './random';
+import { getGUID } from './random';
 
 export interface IStructureTreeConfig<T> {
   idKey?: string;
@@ -40,7 +40,7 @@ export class StructureTree<
 
   addNode(node: T): T {
     return {
-      [this.config.idKey]: GetGUID(12).toLowerCase(),
+      [this.config.idKey]: getGUID(12).toLowerCase(),
       [this.config.labelKey]: '',
       [this.config.childrenKey]: [],
       ...node

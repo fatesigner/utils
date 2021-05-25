@@ -1,21 +1,21 @@
 # date
 日期类相关的操作
 
-## ConvertStrToDate
+## convertStrToDate
 将指定的 str 转换为 date
 - 将所有的'-'转为'/'，以解决IE、firefox浏览器下JS的new Date()的值为Invalid Date、NaN-NaN的问题
 
 ```js
-import { ConvertStrToDate } from '@fatesigner/utils/date';
+import { convertStrToDate } from '@fatesigner/utils/date';
 
-let date = ConvertStrToDate('2012-12-12 12:12:12');
+let date = convertStrToDate('2012-12-12 12:12:12');
 ```
 
-## DateFormat
+## dateFormat
 格式化日期
 
 ```js
-import { DateFormat } from '@fatesigner/utils/date';
+import { dateFormat } from '@fatesigner/utils/date';
 
 /**
  * 对 Date的扩展，将 Date 转化为指定格式的String * 年(y)、月(M)、日(d)、12小时(h)、24小时(H)、分(m)、秒(s)、周(E)、季度(q)
@@ -28,18 +28,18 @@ import { DateFormat } from '@fatesigner/utils/date';
  * @returns { String }
  */
 
-let dateStr = DateFormat(new Date(), 'yyyy-MM-dd hh:mm:ss');
+let dateStr = dateFormat(new Date(), 'yyyy-MM-dd hh:mm:ss');
 
 console.log(dateStr);
 
 // 输出：2006-07-02 08:09:04
 ```
 
-## GetTimeAgo
+## getTimeAgo
 获取指定当前时间与过去的一个时间的差值，然后转换为过去的一个时间的描述，可用于列表的时间显示。
 
 ```js
-import { GetTimeAgo } from '@fatesigner/utils/date';
+import { getTimeAgo } from '@fatesigner/utils/date';
 
 /**
  * @param pastTime
@@ -49,16 +49,16 @@ import { GetTimeAgo } from '@fatesigner/utils/date';
 
 const currentTime = new Date('2012-12-12 01:12:12');
 
-console.log(GetTimeAgo(new Date('2012-12-12 00:12:13'), currentTime));
+console.log(getTimeAgo(new Date('2012-12-12 00:12:13'), currentTime));
 // 输出：00:12
-console.log(GetTimeAgo(new Date('2012-12-11 23:42:13'), currentTime));
+console.log(getTimeAgo(new Date('2012-12-11 23:42:13'), currentTime));
 // 输出：昨天 23:42
-console.log(GetTimeAgo(new Date('2012-12-10 23:59:59'), currentTime));
+console.log(getTimeAgo(new Date('2012-12-10 23:59:59'), currentTime));
 // 输出：前天 23:59
-console.log(GetTimeAgo(new Date('2012-12-09 23:52:23'), currentTime));
+console.log(getTimeAgo(new Date('2012-12-09 23:52:23'), currentTime));
 // 输出：周日 23:52
-console.log(GetTimeAgo(new Date('2012-12-01 23:41:12'), currentTime));
+console.log(getTimeAgo(new Date('2012-12-01 23:41:12'), currentTime));
 // 输出：12-01 23:41
-console.log(GetTimeAgo(new Date('2011-12-21 12:42:22'), currentTime));
+console.log(getTimeAgo(new Date('2011-12-21 12:42:22'), currentTime));
 // 输出：2011-12-21 12:42
 ```

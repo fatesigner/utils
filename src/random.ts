@@ -13,8 +13,8 @@ const hexDigits = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxy
  * @param {number} length
  * @returns {string} GUID
  */
-export function GetGUID(length = 32) {
-  const s: any[] = [];
+export function getGUID(length = 32) {
+  const s = [];
   let standard = false;
 
   if (length === 32) {

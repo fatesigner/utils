@@ -2,9 +2,10 @@
  * debug
  */
 
-import { InjectAround, PointcutInjectType } from './aspect';
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
+
+import { injectAround, PointcutInjectType } from './aspect';
 
 /**
  * 往指定函数切入代码，统计每次该函数执行的耗时
@@ -12,15 +13,14 @@ import { tap } from 'rxjs/operators';
  * @param format console.log 输出格式
  * @constructor
  */
-export function LatencyTimeLog<F extends (...arg: any[]) => Promise<any>>(
+export function LatencyTimeLog<F extends (...arg: any) => Promise<any>>(
   pointcut: PointcutInjectType<any>,
   format = 'spend time：[time]'
 ) {
-  return InjectAround<F, any>(function(originFunc) {
-    return async function(...args) {
+  return injectAround<F, any>(function (originFunc) {
+    return async function (...args) {
       const timeStart = new Date().getTime();
       const res = await originFunc(args);
-      console.log(format.replace('[time]', (new Date().getTime() - timeStart).toString()));
       return res;
     } as F;
   }, pointcut);
@@ -32,11 +32,11 @@ export function LatencyTimeLog<F extends (...arg: any[]) => Promise<any>>(
  * @constructor
  */
 export function CreateInstrument<T>(source: Observable<T>) {
-  return new Observable<T>(observer => {
+  return new Observable<T>((observer) => {
     console.log('source: subscribing');
     const subscription = source
       .pipe(
-        tap(value => {
+        tap((value) => {
           console.log(`source: emit ` + JSON.stringify(value));
         })
       )
