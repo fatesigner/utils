@@ -619,7 +619,7 @@ export function getParamsFromUrl(paramStr?: string): Record<string, any> {
   return undefined;
 }
 
-type byProp<T> = (arg0: T) => string | number;
+type byProp<T> = (record: T) => string | number;
 
 /**
  * 指定属性，为数组进行分组
@@ -628,21 +628,23 @@ type byProp<T> = (arg0: T) => string | number;
  * @param slice 分组后的 item 默认不包含源 item 的属性，提供一个函数选择指定包含的属性
  * @constructor
  */
-export function groupBy<T, T2>(
-  arr: T[],
-  by: string | byProp<T>,
-  slice?: (arg0: T) => T2
-): Array<{
-  key: string | number;
-  children: T[];
-}> {
+export function groupBy<TRecord extends Record<string, any>, TSlice extends Record<string, any>>(
+  arr: TRecord[],
+  by: keyof TRecord | byProp<TRecord>,
+  slice?: (record: TRecord) => TSlice
+): Array<
+  TSlice & {
+    key: string | number;
+    children: TRecord[];
+  }
+> {
   const res = arr.reduce(
     function (prev: any, cur) {
-      let key;
+      let key: string | number;
       if (isFunction(by)) {
-        key = (by as byProp<T>)(cur);
+        key = (by as byProp<TRecord>)(cur);
       } else if (isString(by)) {
-        key = cur[by as keyof T];
+        key = cur[by as keyof TRecord];
       } else {
         throw new Error('GroupBy: the key for group by is not valid.');
       }
@@ -670,7 +672,7 @@ export function groupBy<T, T2>(
             item = Object.assign({}, item, slice(cur));
           }
           if (isString(by)) {
-            item[by as string] = cur[by as keyof T];
+            item['key'] = cur[by as keyof TRecord];
           }
           item.children = [cur];
           prev.arr.push(item);

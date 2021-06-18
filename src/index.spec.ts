@@ -5,6 +5,7 @@
 import { expect } from 'chai';
 
 import * as Index from './';
+import { groupBy } from './';
 
 describe('# test main.', function () {
   it('## capitalize.', function () {
@@ -137,5 +138,26 @@ describe('# test main.', function () {
     expect(res.dd[0]).to.equal(3);
     expect(res.dd[1]).to.equal(4);
     expect(res.dd[2]).to.equal(5);
+  });
+  it('## groupBy', function () {
+    const arr = [
+      { id: 1, name: '1', title: '1 title' },
+      { id: 3, name: '3', title: '1 3' },
+      { id: 2, name: '2', title: '1 2' },
+      { id: 2, name: '4', title: '1 4' }
+    ];
+    const arrNew = Index.groupBy(arr, 'id', (record) => {
+      return {
+        d: record.name
+      };
+    });
+
+    const item = arrNew[0];
+
+    console.log(arrNew, null, 2);
+
+    expect(arrNew.length).to.equal(3);
+    expect(arrNew[0].key).to.equal(1);
+    expect(arrNew[0].d).to.equal('1');
   });
 });
