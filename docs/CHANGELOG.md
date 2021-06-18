@@ -1,3 +1,10 @@
+## [2.0.1](https://github.com/fatesigner/utils/compare/v2.0.0...v2.0.1) (2021-06-18)
+
+
+### Bug Fixes
+
+* update groupBy. add correct type for result. ([cc8ec35](https://github.com/fatesigner/utils/commit/cc8ec35416ae5b7a1b71d1e048df03547542a373))
+
 # [2.0.0](https://github.com/fatesigner/utils/compare/v1.6.1...v2.0.0) (2021-06-18)
 
 
