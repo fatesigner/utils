@@ -1,3 +1,15 @@
+# [2.0.0](https://github.com/fatesigner/utils/compare/v1.6.1...v2.0.0) (2021-06-18)
+
+
+### Features
+
+* Update package version. ([a9505b2](https://github.com/fatesigner/utils/commit/a9505b230a4482933f6c89e166802ab2a6d4d123))
+
+
+### BREAKING CHANGES
+
+* change the function name to start with lowercase.
+
 # [2.0.0-beta.1](https://github.com/fatesigner/utils/compare/v1.6.1...v2.0.0-beta.1) (2021-05-25)
 
 
