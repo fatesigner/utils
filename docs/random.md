@@ -1,11 +1,11 @@
 # random
 随机数据生成
 
-## GetGUID
-生成GUID
+## getGUID
+生成 GUID
 
 ```js
-import { GetGUID } from '@fatesigner/utils/random';
+import { getGUID } from '@fatesigner/utils/random';
 
 /**
  * 说明：全局唯一标识符（GUID，Globally Unique Identifier）也称作 UUID(Universally Unique IDentifier)
@@ -16,7 +16,7 @@ import { GetGUID } from '@fatesigner/utils/random';
  * @returns {string} GUID
  */
 
-console.log(GetGUID(12));
+console.log(getGUID(12));
 
 // 输出：87D348FD6010
 ```

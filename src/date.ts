@@ -3,9 +3,9 @@
  */
 
 /**
- * 将str转换为date
+ * 将 str 转换为 date
  */
-export function ConvertStrToDate(dateTimeStr: string) {
+export function convertStrToDate(dateTimeStr: string) {
   if (dateTimeStr) {
     // 将所有的'-'转为'/'，以解决IE、firefox浏览器下JS的new Date()的值为Invalid Date、NaN-NaN的问题
     dateTimeStr = dateTimeStr.replace(new RegExp(/-/gm), '/');
@@ -24,8 +24,8 @@ export function ConvertStrToDate(dateTimeStr: string) {
  * 'yyyy-M-d h:m:s.S') ==> 2006-7-2 8:9:4.18
  * @returns { String }
  */
-export function DateFormat(dateTime: Date, fmt = 'yyyy-MM-dd HH:mm:ss') {
-  const o: any = {
+export function dateFormat(dateTime: Date, fmt = 'yyyy-MM-dd HH:mm:ss') {
+  const o = {
     'M+': dateTime.getMonth() + 1, // 月份
     'd+': dateTime.getDate(), // 日
     'h+': dateTime.getHours() % 12 == 0 ? 12 : dateTime.getHours() % 12, // 小时
@@ -35,8 +35,7 @@ export function DateFormat(dateTime: Date, fmt = 'yyyy-MM-dd HH:mm:ss') {
     'q+': Math.floor((dateTime.getMonth() + 3) / 3), // 季度
     S: dateTime.getMilliseconds() // 毫秒
   };
-
-  const week: any = {
+  const week = {
     '0': '日',
     '1': '一',
     '2': '二',
@@ -45,14 +44,13 @@ export function DateFormat(dateTime: Date, fmt = 'yyyy-MM-dd HH:mm:ss') {
     '5': '五',
     '6': '六'
   };
-
   if (/(y+)/.test(fmt)) {
     fmt = fmt.replace(RegExp.$1, (dateTime.getFullYear() + '').substr(4 - RegExp.$1.length));
   }
   if (/(E+)/.test(fmt)) {
     fmt = fmt.replace(
       RegExp.$1,
-      (RegExp.$1.length > 1 ? (RegExp.$1.length > 2 ? '星期' : '周') : '') + week[dateTime.getDay().toString()]
+      (RegExp.$1.length > 1 ? (RegExp.$1.length > 2 ? '星期' : '周') : '') + week[dateTime.getDay() + '']
     );
   }
   for (const k in o) {
@@ -69,7 +67,7 @@ export function DateFormat(dateTime: Date, fmt = 'yyyy-MM-dd HH:mm:ss') {
  * @param currentTime
  * @constructor
  */
-export function GetTimeAgo(pastTime: Date, currentTime: Date = null) {
+export function getTimeAgo(pastTime: Date, currentTime = null) {
   if (!currentTime) {
     currentTime = new Date();
   }
@@ -82,19 +80,19 @@ export function GetTimeAgo(pastTime: Date, currentTime: Date = null) {
 
   // 判断年份是否一致
   if (pastTime.getFullYear() !== currentTime.getFullYear()) {
-    return DateFormat(pastTime, 'yyyy-MM-dd HH:mm');
+    return dateFormat(pastTime, 'yyyy-MM-dd HH:mm');
   } else {
     // 以天为单位
     if (daysDiff > 7) {
       // 显示具体日期
-      return DateFormat(pastTime, 'MM-dd HH:mm');
+      return dateFormat(pastTime, 'MM-dd HH:mm');
     } else if (daysDiff >= 3) {
       // 显示周几
-      return DateFormat(pastTime, 'EE HH:mm');
+      return dateFormat(pastTime, 'EE HH:mm');
     } else if (daysDiff > 0) {
       if (pastTime.getDate() === currentTime.getDate()) {
         // 和 currentTime 为同一天 显示时分秒
-        return DateFormat(pastTime, 'HH:mm');
+        return dateFormat(pastTime, 'HH:mm');
       } else {
         // 获取前一天的0点
         let lastDate = new Date(currentTime.valueOf());
@@ -106,10 +104,10 @@ export function GetTimeAgo(pastTime: Date, currentTime: Date = null) {
         );
         if (pastTime.getTime() > lastDate.getTime()) {
           // 显示昨天
-          return `昨天 ${DateFormat(pastTime, 'HH:mm')}`;
+          return `昨天 ${dateFormat(pastTime, 'HH:mm')}`;
         } else {
           // 显示前天
-          return `前天 ${DateFormat(pastTime, 'HH:mm')}`;
+          return `前天 ${dateFormat(pastTime, 'HH:mm')}`;
         }
       }
     }

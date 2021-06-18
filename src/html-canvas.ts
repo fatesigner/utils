@@ -12,7 +12,7 @@ export type ImageType = 'png' | 'jpeg' | 'gif' | 'bmp';
  * @param options   html2canvas插件选项
  * @constructor
  */
-export async function ConvertHtmlToCanvas(el: HTMLElement, options?: any): Promise<HTMLCanvasElement> {
+export async function convertHtmlToCanvas(el: HTMLElement, options?: any): Promise<HTMLCanvasElement> {
   const [err, res] = await to<any>(import('html2canvas'));
 
   if (err) {
@@ -33,7 +33,7 @@ export async function ConvertHtmlToCanvas(el: HTMLElement, options?: any): Promi
  * @param height    图片高度
  * @constructor
  */
-export async function ConvertHtmlToImage(
+export async function convertHtmlToImage(
   el: HTMLElement,
   options?: any,
   type: ImageType = 'jpeg',
@@ -47,7 +47,7 @@ export async function ConvertHtmlToImage(
   } else {
     const html2canvas = res[0].default;
 
-    const [err, canvas] = await to<any>(html2canvas(el));
+    const [err, canvas] = await to<any>(html2canvas(el, options));
 
     if (err) {
       throw err;
@@ -68,7 +68,7 @@ export async function ConvertHtmlToImage(
  * @param height    图片高度
  * @constructor
  */
-export async function SaveHtmlAsImage(
+export async function saveHtmlAsImage(
   el: HTMLElement,
   options?: any,
   type: ImageType = 'jpeg',
@@ -83,7 +83,7 @@ export async function SaveHtmlAsImage(
   } else {
     const html2canvas = res[0].default;
 
-    const [err, canvas] = await to<any>(html2canvas(el));
+    const [err, canvas] = await to<any>(html2canvas(el, options));
 
     if (err) {
       throw err;

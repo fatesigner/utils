@@ -1,10 +1,11 @@
 {
   "compileOnSave": false,
   "compilerOptions": {
-    "allowJs": false,
+    "allowJs": true,
     "allowSyntheticDefaultImports": true,
     "checkJs": false,
     "declaration": false,
+    //"outDir": "bin",
     "diagnostics": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
@@ -14,9 +15,11 @@
     "lib": [
       "es5",
       "es6",
+      "es7",
       "es2015",
       "es2015.promise",
-      "dom"
+      "dom",
+      "es2019"
     ],
     "moduleResolution": "node",
     "noEmitOnError": true,
@@ -28,6 +31,7 @@
     "sourceMap": true,
     "strict": false,
     "strictNullChecks": false,
+    "strictPropertyInitialization": false,
     "esModuleInterop": true,
     "rootDir": "./src",
     "module": "ESNext",
@@ -38,17 +42,18 @@
     ],
     "typeRoots": [
       "node_modules/@types",
-      "src/typings"
+      "src/types"
     ],
     "baseUrl": ".",
     "paths": {
     }
   },
   "include": [
-    "src/**/*.ts"
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/types/**/*.d.ts"
   ],
   "exclude": [
-    "node_modules",
     "src/**/*.spec.ts",
     "src/**/*.test.ts",
     "src/**/__tests__/*.ts"

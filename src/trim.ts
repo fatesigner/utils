@@ -8,7 +8,7 @@
  * @param char 需替换的字符串 默认为空
  * @returns {*}
  */
-export function TrimStart(str: string, char = '') {
+export function trimStart(str: string, char = '') {
   if (char === '') {
     char =
       ' \n\r\t\f\x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000';
@@ -28,7 +28,7 @@ export function TrimStart(str: string, char = '') {
  * @param char 需替换的字符串 默认为空
  * @returns {*}
  */
-export function TrimEnd(str: string, char = '') {
+export function trimEnd(str: string, char = '') {
   if (char === '') {
     char =
       ' \n\r\t\f\x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000';
@@ -48,8 +48,8 @@ export function TrimEnd(str: string, char = '') {
  * @param char 需替换的字符串 默认为空
  * @returns {*}
  */
-export function Trim(str: string, char = '') {
-  str = TrimStart(str, char);
-  str = TrimEnd(str, char);
+export function trim(str: string, char = '') {
+  str = trimStart(str, char);
+  str = trimEnd(str, char);
   return str;
 }

@@ -1,25 +1,25 @@
 # user-agent
 用户代理字符串操作
 
-## UserAgent
+## userAgent
 用户代理字符串
 
 ```js
-import { UserAgent } from '@fatesigner/utils/user-agent';
+import { userAgent } from '@fatesigner/utils/user-agent';
 
-console.log(UserAgent);
+console.log(userAgent);
 
 // 输出：Mozilla/5.0 (Linux; Android 6.0; Nexus 5 Build/MRA58N) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.100 Mobile Safari/537.36
 
 ```
 
-## BrowserCore
+## browserCore
 浏览器内核
 
 ```js
-import { BrowserCore } from '@fatesigner/utils/user-agent';
+import { browserCore } from '@fatesigner/utils/user-agent';
 
-console.log(BrowserCore);
+console.log(browserCore);
 
 // 输出：
 {
@@ -30,13 +30,13 @@ console.log(BrowserCore);
 }
 ```
 
-## BrowserClient
+## browserClient
 浏览器客户端类型，可由此判断是否为微信浏览器下。
 
 ```js
-import { BrowserClient } from '@fatesigner/utils/user-agent';
+import { browserClient } from '@fatesigner/utils/user-agent';
 
-console.log(BrowserClient);
+console.log(browserClient);
 
 {
   "360": false,
@@ -73,13 +73,13 @@ console.log(BrowserClient);
 }
 ```
 
-## BrowserPlatform
+## browserPlatform
 浏览器平台
 
 ```js
-import { BrowserPlatform } from '@fatesigner/utils/user-agent';
+import { browserPlatform } from '@fatesigner/utils/user-agent';
 
-console.log(BrowserPlatform);
+console.log(browserPlatform);
 
 // 输出：
 {
@@ -100,13 +100,13 @@ console.log(BrowserPlatform);
 }
 ```
 
-## IsMobile
+## isMobile
 是否为移动端
 
 ```js
-import { IsMobile } from '@fatesigner/utils/user-agent';
+import { isMobile } from '@fatesigner/utils/user-agent';
 
-console.log(IsMobile);
+console.log(isMobile);
 
 // 输出：false
 ```

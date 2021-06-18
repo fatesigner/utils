@@ -1,11 +1,11 @@
 # trim
 trim 操作
 
-## TrimStart
+## trimStart
 从前部开始替换指定字符串为其他字符。
 
 ```js
-import { TrimStart } from '@fatesigner/utils/trim';
+import { trimStart } from '@fatesigner/utils/trim';
 
 /**
  * 清除首部空格
@@ -14,20 +14,20 @@ import { TrimStart } from '@fatesigner/utils/trim';
  * @returns {*}
  */
 
-console.log(TrimStart('    123'));
+console.log(trimStart('    123'));
 
 // 输出: 123
 
-console.log(TrimStart('ffff123', 'f'));
+console.log(trimStart('ffff123', 'f'));
 
 // 输出: 123
 ```
 
-## TrimEnd
+## trimEnd
 从尾部开始替换指定字符串为其他字符。
 
 ```js
-import { TrimEnd } from '@fatesigner/utils/trim';
+import { trimEnd } from '@fatesigner/utils/trim';
 
 /**
  * 清除尾部空格
@@ -36,20 +36,20 @@ import { TrimEnd } from '@fatesigner/utils/trim';
  * @returns {*}
  */
 
-console.log(TrimEnd('123  '));
+console.log(trimEnd('123  '));
 
 // 输出: 123
 
-console.log(TrimEnd('123ffff', 'f'));
+console.log(trimEnd('123ffff', 'f'));
 
 // 输出: 123
 ```
 
-## Trim
+## trim
 从前后开始替换指定字符串为其他字符。
 
 ```js
-import { Trim } from '@fatesigner/utils/trim';
+import { trim } from '@fatesigner/utils/trim';
 
 /**
  * 清除尾部空格
@@ -58,11 +58,11 @@ import { Trim } from '@fatesigner/utils/trim';
  * @returns {*}
  */
 
-console.log(Trim('  123  '));
+console.log(trim('  123  '));
 
 // 输出: 123
 
-console.log(Trim('ffff123ffff', 'f'));
+console.log(trim('ffff123ffff', 'f'));
 
 // 输出: 123
 ```

@@ -6,38 +6,38 @@
 const Gulp = require('gulp');
 const Path = require('path');
 const Merge = require('merge2');
-const Log = require('fancy-log');
 const Rename = require('gulp-rename');
 const Ts = require('gulp-typescript');
-const Webpack = require('webpack');
-const Globby = require('globby');
 
 Gulp.task('build', async function () {
-  const ENV = require('../env')();
+  const env = require('../env')();
 
   // build esm
-  const TsProject = Ts.createProject(Path.join(ENV.rootPath, 'tsconfig.json'), {
-    declaration: true,
-    declarationFiles: true,
-    module: 'esnext'
+  const TsProject = Ts.createProject(Path.join(env.rootPath, 'tsconfig.json'), {
+    declaration: true
   });
-  const tsResult = await Gulp.src([
-    Path.resolve(ENV.srcPath, '*.ts'),
-    '!' + Path.resolve(ENV.srcPath, '**/*.d.ts'),
-    '!' + Path.resolve(ENV.srcPath, '**/*.spec.ts')
-  ]).pipe(TsProject());
-  Merge([tsResult.dts.pipe(Gulp.dest(ENV.outputPath)), tsResult.js.pipe(Gulp.dest(ENV.outputPath))]);
+  const tsResult = await Gulp.src(
+    [
+      Path.join(env.srcPath, '*.ts'),
+      '!' + Path.join(env.srcPath, 'types.ts'),
+      '!' + Path.join(env.srcPath, '**/*.d.ts'),
+      '!' + Path.join(env.srcPath, '**/*.spec.ts')
+    ],
+    {
+      allowEmpty: true
+    }
+  ).pipe(TsProject());
+  Merge([tsResult.dts.pipe(Gulp.dest(env.outputPath)), tsResult.js.pipe(Gulp.dest(env.outputPath))]);
 
   // build command.js
-  const TsProjectCMD = Ts.createProject(Path.join(ENV.rootPath, 'tsconfig.json'), {
+  const TsProjectCMD = Ts.createProject(Path.join(env.rootPath, 'tsconfig.json'), {
     declarationFiles: false,
     module: 'commonjs'
   });
   const tsResultCMD = await Gulp.src([
-    Path.resolve(ENV.srcPath, '*.ts'),
-    '!' + Path.resolve(ENV.srcPath, '**/*.d.ts'),
-    '!' + Path.resolve(ENV.srcPath, '**/*.spec.ts'),
-    '!' + Path.resolve(ENV.srcPath, '**/*.test.ts')
+    Path.resolve(env.srcPath, '*.ts'),
+    '!' + Path.resolve(env.srcPath, '**/*.d.ts'),
+    '!' + Path.resolve(env.srcPath, '**/*.spec.ts')
   ]).pipe(TsProjectCMD());
   Merge([
     tsResultCMD.js
@@ -46,73 +46,20 @@ Gulp.task('build', async function () {
           path.basename += '.cmd';
         })
       )
-      .pipe(Gulp.dest(ENV.outputPath))
+      .pipe(Gulp.dest(env.outputPath))
   ]);
-
-  // build umd.js
-  const files = Globby.sync([
-    Path.resolve(ENV.srcPath, '*.ts').replace(/\\/g, '/'),
-    '!' + Path.resolve(ENV.srcPath, '**/*.d.ts').replace(/\\/g, '/'),
-    '!' + Path.resolve(ENV.srcPath, '**/*.spec.ts').replace(/\\/g, '/'),
-    '!' + Path.resolve(ENV.srcPath, '**/*.test.ts').replace(/\\/g, '/')
-  ]);
-  await Promise.all(
-    files.map((file) => {
-      const filename = Path.basename(file).replace(Path.extname(file), '');
-      return runWebpack(
-        {
-          entry: file,
-          amd: false,
-          mode: 'production',
-          context: ENV.srcPath,
-          output: {
-            path: ENV.outputPath,
-            chunkFilename: `${filename}.chunk[id].umd.js`,
-            filename: `${filename}.umd.js`,
-            library: `Utils_${filename.replace(/-/g, '_')}`,
-            libraryTarget: 'umd'
-          },
-          module: {
-            rules: [{ test: /\.ts?$/, loader: 'ts-loader' }]
-          },
-          resolve: {
-            extensions: ['.js', '.jsx', '.ts', '.tsx', '.json', '.css', '.scss']
-          }
-        },
-        true
-      );
-    })
-  );
 
   // copy other files to output
-  await Gulp.src([Path.resolve(ENV.srcPath, '**/*'), '!' + Path.resolve(ENV.srcPath, '**/*.ts')], {
-    base: Path.resolve(ENV.srcPath)
-  }).pipe(Gulp.dest(ENV.outputPath));
+  await Gulp.src([Path.join(env.srcPath, '**/*'), '!' + Path.join(env.srcPath, '**/*.ts')]).pipe(
+    Gulp.dest(env.outputPath)
+  );
 
-  // copy typings
-  await Gulp.src([Path.resolve(ENV.srcPath, 'typings', '**/*'), Path.resolve(ENV.srcPath, '**/*.d.ts')], {
-    base: Path.resolve(ENV.srcPath)
-  }).pipe(Gulp.dest(ENV.outputPath));
+  // copy type.ts
+  await Gulp.src([Path.join(env.srcPath, 'types/**/*.ts')], {
+    allowEmpty: true,
+    base: env.srcPath
+  }).pipe(Gulp.dest(env.outputPath));
 
   // copy npm publish files to output
-  await Gulp.src(['package.json', 'README.md'].map((x) => Path.join(ENV.rootPath, x))).pipe(Gulp.dest(ENV.outputPath));
+  await Gulp.src(['package.json', 'README.md'].map((x) => Path.join(env.rootPath, x))).pipe(Gulp.dest(env.outputPath));
 });
-
-function runWebpack(options, isLog = false) {
-  return new Promise(function (resolve, reject) {
-    Webpack(options, (err, stats) => {
-      if (err || (stats && stats.compilation && stats.compilation.errors && stats.compilation.errors.length)) {
-        if (!err) {
-          err = stats.compilation.errors[0];
-        }
-        reject(err);
-        // throw new PluginError('webpack', err);
-      } else {
-        if (isLog) {
-          Log('[webpack]', stats.toString({ colors: true }));
-        }
-        resolve(stats);
-      }
-    });
-  });
-}

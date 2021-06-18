@@ -1,51 +1,51 @@
 # validator
 各类验证函数
 
-## Required
+## required
 判断指定的值是否符合必填规则。
 
 ```js
-import { Required } from '@fatesigner/utils/validator';
+import { required } from '@fatesigner/utils/validator';
 
-console.log(Required([]));
+console.log(required([]));
 
 // 输出: false
 ```
 
-## IsNumber
+## isNumber
 判断是否为数字。
 
 ```js
-import { IsNumber } from '@fatesigner/utils/validator';
+import { isNumber } from '@fatesigner/utils/validator';
 
-console.log(IsNumber(12));
+console.log(isNumber(12));
 // 输出: true
-console.log(IsNumber('12'));
+console.log(isNumber('12'));
 // 输出: true
-console.log(IsNumber('12d'));
+console.log(isNumber('12d'));
 // 输出: false
 ```
 
-## LenLimit
+## lenLimit
 判断指定的字符串长度是否符合给定的范围。
 
 ```js
-import { LenLimit } from '@fatesigner/utils/validator';
+import { lenLimit } from '@fatesigner/utils/validator';
 
-console.log(LenLimit('1234567',3, 10));
+console.log(lenLimit('1234567',3, 10));
 
 // 输出: true
 
-console.log(LenLimit('1234567',3, 5));
+console.log(lenLimit('1234567',3, 5));
 
 // 输出: false
 ```
 
-## IsInt
+## isInt
 判断是否为整数。
 
 ```js
-import { IsInt } from '@fatesigner/utils/validator';
+import { isInt } from '@fatesigner/utils/validator';
 
 /**
  * @param {Object} value
@@ -53,27 +53,27 @@ import { IsInt } from '@fatesigner/utils/validator';
  * @returns {boolean}
  */
 
-console.log(IsInt(12));
+console.log(isInt(12));
 // 输出: true
-console.log(IsInt('12', true));
+console.log(isInt('12', true));
 // 输出: true
-console.log(IsInt('12d', true));
+console.log(isInt('12d', true));
 // 输出: false
-console.log(IsInt(-12));
+console.log(isInt(-12));
 // 输出: true
-console.log(IsInt('12', false));
+console.log(isInt('12', false));
 // 输出: false
-console.log(IsInt('12d', false));
+console.log(isInt('12d', false));
 // 输出: false
-console.log(IsInt('-12', false));
+console.log(isInt('-12', false));
 // 输出: true
 ```
 
-## IsDecimal
+## isDecimal
 判断给定的值是否为符合指定规则的 decimal 格式
 
 ```js
-import { IsDecimal } from '@fatesigner/utils/validator';
+import { isDecimal } from '@fatesigner/utils/validator';
 
 /**
  * @param {Object} value
@@ -82,39 +82,39 @@ import { IsDecimal } from '@fatesigner/utils/validator';
  * @returns {boolean}
  */
 
-console.log(IsDecimal(231));
+console.log(isDecimal(231));
 // 输出: true
-console.log(IsDecimal(-231));
+console.log(isDecimal(-231));
 // 输出: true
-console.log(IsDecimal('--231'));
+console.log(isDecimal('--231'));
 // 输出: false
-console.log(IsDecimal('2d'));
+console.log(isDecimal('2d'));
 // 输出: false
-console.log(IsDecimal('-2dda'));
+console.log(isDecimal('-2dda'));
 // 输出: false
-console.log(IsDecimal('134', [1, 3], [2]));
+console.log(isDecimal('134', [1, 3], [2]));
 // 输出: true
-console.log(IsDecimal('1342', [1, 3], [2]));
+console.log(isDecimal('1342', [1, 3], [2]));
 // 输出: false
-console.log(IsDecimal('134', [2, 3], [2]));
+console.log(isDecimal('134', [2, 3], [2]));
 // 输出: true
-console.log(IsDecimal('1', [2, 3], [2]));
+console.log(isDecimal('1', [2, 3], [2]));
 // 输出: false
-console.log(IsDecimal('13', [1, 18], [0, 2]));
+console.log(isDecimal('13', [1, 18], [0, 2]));
 // 输出: true
-console.log(IsDecimal('13', [1, 18], [0, 2]));
+console.log(isDecimal('13', [1, 18], [0, 2]));
 // 输出: true
-console.log(IsDecimal('13.33', [1, 18], [2, 2]));
+console.log(isDecimal('13.33', [1, 18], [2, 2]));
 // 输出: true
-console.log(IsDecimal('13.3334', [1, 18], [2, 2]));
+console.log(isDecimal('13.3334', [1, 18], [2, 2]));
 // 输出: false
 ```
 
-## IsCellphone
+## isCellphone
 验证手机号
 
 ```js
-import { IsCellphone } from '@fatesigner/utils/validator';
+import { isCellphone } from '@fatesigner/utils/validator';
 
 /**
  * 11位
@@ -148,7 +148,7 @@ nums.forEach(num => {
       .replace('0.', '')
       .substr(0, 8)
       .toString();
-  console.log(rdm + '：valid ' + Validator.IsCellphone(rdm));
+  console.log(rdm + '：valid ' + Validator.isCellphone(rdm));
 });
 
 // 输出: 
@@ -169,29 +169,29 @@ nums.forEach(num => {
 ...
 ```
 
-## IsIdCard
+## isIdCard
 验证身份证号码，简单版本，验证15或18位
 
 ```js
-import { IsIdCard } from '@fatesigner/utils/validator';
+import { isIdCard } from '@fatesigner/utils/validator';
 
-console.log(IsIdCard('360731199601021245'));
+console.log(isIdCard('360731199601021245'));
 // 输出: true
-console.log(IsIdCard('60731199601021245'));
+console.log(isIdCard('60731199601021245'));
 // 输出: false
-console.log(IsIdCard('3607311996010212451'));
+console.log(isIdCard('3607311996010212451'));
 // 输出: false
-console.log(IsIdCard('360731850213582'));
+console.log(isIdCard('360731850213582'));
 // 输出: true
-console.log(IsIdCard('36073119960102124X'));
+console.log(isIdCard('36073119960102124X'));
 // 输出: true
 ```
 
-## IsEmail
+## isEmail
 验证邮箱号码
 
 ```js
-import { IsEmail } from '@fatesigner/utils/validator';
+import { isEmail } from '@fatesigner/utils/validator';
 
 /**
  * 1.邮箱以a-z、A-Z、0-9开头，最小长度为1.
@@ -203,21 +203,21 @@ import { IsEmail } from '@fatesigner/utils/validator';
  * @returns {boolean}
  */
 
-console.log(IsEmail('123123@gmail.com'));
+console.log(isEmail('123123@gmail.com'));
 // 输出: true
-console.log(IsEmail('123123.com'));
+console.log(isEmail('123123.com'));
 // 输出: false
-console.log(IsEmail('@gmail.com'));
+console.log(isEmail('@gmail.com'));
 // 输出: false
-console.log(IsEmail('dasda@gmail.'));
+console.log(isEmail('dasda@gmail.'));
 // 输出: false
 ```
 
-## Password
+## password
 验证密码，至少同时包含数字和字母
 
 ```js
-import { Password } from '@fatesigner/utils/validator';
+import { password } from '@fatesigner/utils/validator';
 
 /**
  * @param {string} value
@@ -226,20 +226,20 @@ import { Password } from '@fatesigner/utils/validator';
  * @returns {boolean}
  */
 
-console.log(Password('12345'));
+console.log(password('12345'));
 // 输出: false
-console.log(Password('1234545123412345123'));
+console.log(password('1234545123412345123'));
 // 输出: false
-console.log(Password('123456'));
+console.log(password('123456'));
 // 输出: false
-console.log(Password('asdsaf'));
+console.log(password('asdsaf'));
 // 输出: false
-console.log(Password('123456csd', 20, 23));
+console.log(password('123456csd', 20, 23));
 // 输出: false
-console.log(Password('123456csd', 6, 12));
+console.log(password('123456csd', 6, 12));
 // 输出: true
-console.log(Password('1234#$.12dqwe56csd'));
+console.log(password('1234#$.12dqwe56csd'));
 // 输出: true
-console.log(Password('1234#$.12dqwe56csdgasdasdasdasda'));
+console.log(password('1234#$.12dqwe56csdgasdasdasdasda'));
 // 输出: false
 ```

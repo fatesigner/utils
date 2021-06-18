@@ -1,5 +1,6 @@
 - **开始**
 - [介绍](/)
+- [Changelog](/CHANGELOG)
 - **模块**
 - [main](/main)
 - [animation](/animation)
@@ -7,7 +8,6 @@
 - [date](/date)
 - [debug](/debug)
 - [document](/document)
-- [html-canvas](/html-canvas)
 - [random](/random)
 - [style](/style)
 - [trim](/trim)
@@ -15,5 +15,5 @@
 - [user-agent](/user-agent)
 - [validator](/validator)
 - **链接**
-- [Github](https://github.com/fatesigner/utils)
-- [NPM](https://npmjs.com/package/@fatesigner/utils)
+- [Github](https://github.com/jhildenbiddle/docsify-themeable)
+- [NPM](https://www.npmjs.com/package/docsify-themeable)

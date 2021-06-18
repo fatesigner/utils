@@ -2,19 +2,10 @@
  * document DOM 操作
  */
 
-import { ApplyBind, ForEach } from './';
-import { SupportPrefix } from './style';
-import { IsArray, IsFunction, IsString } from './type-check';
-import { BrowserClient } from './user-agent';
-
-function indexOfValidChars(str: string) {
-  for (let i = 0, l = str.length; i < l; i++) {
-    if (str[i] !== ' ' && str[i] !== '\n') {
-      return i;
-    }
-  }
-  return -1;
-}
+import { supportPrefix } from './style';
+import { browserClient } from './user-agent';
+import { isArray, isFunction, isString } from './type-check';
+import { applyBind, forEach } from './';
 
 /**
  * 枚举：用于表示方向
@@ -31,7 +22,7 @@ export enum Direction {
  * @param {string} innerHtml
  * @returns {Element} element
  */
-export function CreateElement(innerHtml: string) {
+export function createElement(innerHtml: string) {
   const element = document.createElement('div');
   element.innerHTML = innerHtml;
   return element.children[0];
@@ -41,7 +32,7 @@ export function CreateElement(innerHtml: string) {
  * 删除指定的元素
  * @param {HTMLElement} element
  */
-export function RemoveElement(element: HTMLElement) {
+export function removeElement(element: HTMLElement) {
   const parentEl = element.parentNode;
   parentEl.removeChild(element);
 }
@@ -51,7 +42,7 @@ export function RemoveElement(element: HTMLElement) {
  * @param {Node} childEl
  * @param {HTMLElement} parentEl
  */
-export function PrependChild(childEl: Node, parentEl: HTMLElement) {
+export function prependChild(childEl: Node, parentEl: HTMLElement) {
   if (parentEl.hasChildNodes()) {
     parentEl.insertBefore(childEl, parentEl.firstChild);
   } else {
@@ -64,7 +55,7 @@ export function PrependChild(childEl: Node, parentEl: HTMLElement) {
  * @param {HTMLElement} newEl
  * @param {HTMLElement} targetEl
  */
-export function IsertBefore(newEl: HTMLElement, targetEl: HTMLElement) {
+export function isertBefore(newEl: HTMLElement, targetEl: HTMLElement) {
   const parentEl = targetEl.parentNode;
   if (parentEl) {
     parentEl.insertBefore(newEl, targetEl);
@@ -76,7 +67,7 @@ export function IsertBefore(newEl: HTMLElement, targetEl: HTMLElement) {
  * @param {HTMLElement} newEl
  * @param {HTMLElement} targetEl
  */
-export function InsertAfter(newEl: HTMLElement, targetEl: HTMLElement) {
+export function insertAfter(newEl: HTMLElement, targetEl: HTMLElement) {
   const parentEl = targetEl.parentNode;
   if (parentEl.lastChild === targetEl) {
     parentEl.appendChild(newEl);
@@ -91,7 +82,7 @@ export function InsertAfter(newEl: HTMLElement, targetEl: HTMLElement) {
  * @param selector
  * @returns {boolean}
  */
-export function MatchesSelector(element: any, selector: string) {
+export function matchesSelector(element: any, selector: string) {
   if (element.matches) {
     return element.matches(selector);
   } else if (element.matchesSelector) {
@@ -117,13 +108,13 @@ export function MatchesSelector(element: any, selector: string) {
  * @param {string} selector
  * @param {boolean} containsItsOwn
  */
-export function Closest(el: any, selector: string, containsItsOwn = false) {
-  if (containsItsOwn && MatchesSelector(el, selector)) {
+export function closest(el: any, selector: string, containsItsOwn = false) {
+  if (containsItsOwn && matchesSelector(el, selector)) {
     return el;
   }
 
   while (el) {
-    if (MatchesSelector(el, selector)) {
+    if (matchesSelector(el, selector)) {
       break;
     }
     el = el.parentElement;
@@ -137,7 +128,7 @@ export function Closest(el: any, selector: string, containsItsOwn = false) {
  * @param {HTMLElement} childNode 子元素
  * @returns {boolean} isContains 是否包含
  */
-export function Contains(parentNode: HTMLElement, childNode: HTMLElement) {
+export function contains(parentNode: HTMLElement, childNode: HTMLElement) {
   if (parentNode.contains) {
     return parentNode !== childNode && parentNode.contains(childNode);
   } else {
@@ -146,41 +137,35 @@ export function Contains(parentNode: HTMLElement, childNode: HTMLElement) {
 }
 
 /**
- * 判断指定元素是否包含某个class。
+ * 判断指定元素是否包含某个 class
  * @param {HTMLElement} element
  * @param {string} className
  * @returns {boolean}
  */
-export function HasClass(element: HTMLElement, className: string) {
+export function hasClass(element: HTMLElement, className: string) {
   return !!element.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
 }
 
 /**
- * 为元素添加class
- * @param {HTMLElement} elements
+ * 为元素添加 class
+ * @param {HTMLElement} element
  * @param {string} className
  */
-export function AddClass(elements: HTMLElement, className: string) {
-  ForEach(elements, function(prev, element: any) {
-    if (!HasClass(element, className)) {
-      element.className += ' ' + className;
-    }
-    return true;
-  });
+export function addClass(element: HTMLElement, className: string) {
+  if (!hasClass(element, className)) {
+    element.className += ' ' + className;
+  }
 }
 
 /**
- * 为元素移除class
- * @param {Object} elements
+ * 为元素移除 class
+ * @param {Object} element
  * @param {string} className
  */
-export function RemoveClass(elements: HTMLElement, className: string) {
-  ForEach(elements, function(prev, element: any) {
-    if (HasClass(element, className)) {
-      element.className = element.className.replace(new RegExp('(\\s|^)' + className + '(\\s|$)'), ' ');
-    }
-    return true;
-  });
+export function removeClass(element: HTMLElement, className: string) {
+  if (hasClass(element, className)) {
+    element.className = element.className.replace(new RegExp('(\\s|^)' + className + '(\\s|$)'), ' ');
+  }
 }
 
 /**
@@ -188,7 +173,7 @@ export function RemoveClass(elements: HTMLElement, className: string) {
  * @param {HTMLDocument} dom
  * @returns {number} 宽度
  */
-export function GetViewportSize(dom: HTMLDocument): { width: number; height: number } {
+export function getViewportSize(dom: HTMLDocument): { width: number; height: number } {
   if (!dom && typeof document !== 'undefined') {
     dom = document;
   }
@@ -209,7 +194,7 @@ export function GetViewportSize(dom: HTMLDocument): { width: number; height: num
  * width：元素宽度
  * height：元素高度
  */
-export function GetBoundingClientRect(element: HTMLElement) {
+export function getBoundingClientRect(element: HTMLElement) {
   const rect = element.getBoundingClientRect();
   return {
     width: rect.width || rect.right - rect.left,
@@ -226,11 +211,11 @@ export function GetBoundingClientRect(element: HTMLElement) {
  * @param {Element} element 元素
  * @returns {Object} position
  */
-export function GetOffsetAwayFromDocument(element: any) {
+export function getOffsetAwayFromDocument(element: any) {
   let top = 0;
   let left = 0;
   if (element.getBoundingClientRect) {
-    const rect = GetBoundingClientRect(element);
+    const rect = getBoundingClientRect(element);
     const body = document.body;
     const docElem = document.documentElement;
     const scrollTop = pageYOffset || docElem.scrollTop || body.scrollTop;
@@ -268,7 +253,7 @@ export function GetOffsetAwayFromDocument(element: any) {
  * @returns {Object}
  * direction：up、down、right、left
  */
-export function GetAbsRelativeLayout(targetEl: HTMLElement, absEl: HTMLElement, direction: Direction = Direction.Down) {
+export function getAbsRelativeLayout(targetEl: HTMLElement, absEl: HTMLElement, direction: Direction = Direction.Down) {
   if (!direction || [Direction.Up, Direction.Right, Direction.Down, Direction.Left].indexOf(direction) < 0) {
     direction = Direction.Down;
   }
@@ -284,11 +269,11 @@ export function GetAbsRelativeLayout(targetEl: HTMLElement, absEl: HTMLElement, 
   };
 
   // 目标元素 在页面上的便偏移量
-  const offsetAwayFromDocument = GetOffsetAwayFromDocument(targetEl);
+  const offsetAwayFromDocument = getOffsetAwayFromDocument(targetEl);
   // 目标元素 相对浏览器视窗的位置
-  const boundingClientRect = GetBoundingClientRect(targetEl);
+  const boundingClientRect = getBoundingClientRect(targetEl);
   // 浏览器可视区域高宽
-  const viewportOffset = GetViewportSize(document);
+  const viewportOffset = getViewportSize(document);
 
   boundingClientRect.bottom = viewportOffset.height - boundingClientRect.top - targetEl.offsetHeight;
   boundingClientRect.right = viewportOffset.width - boundingClientRect.left - targetEl.offsetWidth;
@@ -414,7 +399,7 @@ export function GetAbsRelativeLayout(targetEl: HTMLElement, absEl: HTMLElement, 
  * @param {Document} dom document
  * @returns {number} left
  */
-export function GetScrollLeft(dom: any) {
+export function getScrollLeft(dom: any) {
   if (!dom) {
     dom = document;
   }
@@ -426,7 +411,7 @@ export function GetScrollLeft(dom: any) {
  * @param {Document} dom document
  * @returns {number} top
  */
-export function GetScrollTop(dom: HTMLDocument) {
+export function getScrollTop(dom: HTMLDocument) {
   if (!dom) {
     dom = document;
   }
@@ -440,14 +425,14 @@ export function GetScrollTop(dom: HTMLDocument) {
  * @param duration 间隔时间，默认为 0，即无动画效果
  * @returns {Promise}
  */
-export function ScrollYTo(container: HTMLElement, distance: number, duration = 0): Promise<void> {
+export function scrollYTo(container: HTMLElement, distance: number, duration = 0): Promise<void> {
   const initialY = container.scrollTop;
   const y = initialY + distance;
   const baseY = (initialY + y) * 0.5;
   const difference = initialY - baseY;
   const startTime = performance.now();
 
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     function step() {
       let normalizedTime = (performance.now() - startTime) / duration;
       if (normalizedTime > 1) {
@@ -473,8 +458,8 @@ export function ScrollYTo(container: HTMLElement, distance: number, duration = 0
  * @returns {Promise}
  * @constructor
  */
-export function ScrollToTop(container: HTMLElement, duration: number) {
-  return ScrollYTo(container, 0, duration);
+export function gcrollToTop(container, duration) {
+  return scrollYTo(container, 0, duration);
 }
 
 /**
@@ -484,9 +469,9 @@ export function ScrollToTop(container: HTMLElement, duration: number) {
  * @returns {Promise}
  * @constructor
  */
-export function ScrollToBottom(container: HTMLElement, duration: number) {
+export function scrollToBottom(container, duration) {
   const top = container.scrollHeight;
-  return ScrollYTo(container, top, duration);
+  return scrollYTo(container, top, duration);
 }
 
 /**
@@ -494,7 +479,7 @@ export function ScrollToBottom(container: HTMLElement, duration: number) {
  * @param {string} url 链接
  * @param {string} title 标题
  */
-export function AddToCollectionSites(url: string, title: string): Promise<void> {
+export function addToCollectionSites(url, title): Promise<void> {
   return new Promise((resolve, reject) => {
     try {
       (external as any).addFavorite(url, title);
@@ -514,7 +499,7 @@ export function AddToCollectionSites(url: string, title: string): Promise<void> 
  * @param {string} link
  * @constructor
  */
-export function OpenNewWindow(link: string) {
+export function openNewWindow(link: string) {
   const $a = document.createElement('a');
   $a.setAttribute('href', link);
   $a.setAttribute('target', '_blank');
@@ -533,14 +518,14 @@ export function OpenNewWindow(link: string) {
  * @param {string} src 脚本地址
  * @return {Promise}
  */
-export function LoadScript(src: string): Promise<any> {
+export function loadScript(src: string): Promise<any> {
   return new Promise((resolve, reject) => {
     const s = document.createElement('script');
     s.src = src;
-    s.onload = function(res) {
+    s.onload = function (res) {
       resolve(res);
     };
-    s.onerror = error => {
+    s.onerror = (error) => {
       reject(error);
     };
     document.head.appendChild(s);
@@ -566,7 +551,7 @@ export enum FileType {
  * @param input
  * @constructor
  */
-export function GetFiles(input: HTMLInputElement): string[] | FileList {
+export function getFiles(input: HTMLInputElement): string[] | FileList {
   if (input) {
     if (input.files) {
       return input.files;
@@ -582,7 +567,7 @@ export function GetFiles(input: HTMLInputElement): string[] | FileList {
  * @param {File} file
  * @returns {string}
  */
-export function GetPath(file: File): string {
+export function getPath(file: File): string {
   if (file) {
     return file.name;
   }
@@ -593,7 +578,7 @@ export function GetPath(file: File): string {
  * @param {File} file
  * @returns {number}
  */
-export function GetContentSize(file: File): number {
+export function getContentSize(file: File): number {
   if (file) {
     return file.size;
   }
@@ -605,8 +590,8 @@ export function GetContentSize(file: File): number {
  * @param {File} file 对象
  * @return {string} filename
  */
-export function GetFileName(file: File): string {
-  const path = GetPath(file);
+export function getFileName(file: File): string {
+  const path = getPath(file);
   if (path) {
     const array = path.split('/');
     return array[array.length - 1];
@@ -618,8 +603,8 @@ export function GetFileName(file: File): string {
  * @param {File} file 对象
  * @return {string} filename
  */
-export function GetFileNameWithoutExtention(file: File): string {
-  const name = GetFileName(file);
+export function getFileNameWithoutExtention(file: File): string {
+  const name = getFileName(file);
   if (name) {
     const i = name.lastIndexOf('.');
     const s = name.substring(0, i);
@@ -633,8 +618,8 @@ export function GetFileNameWithoutExtention(file: File): string {
  * @param {File} file
  * @returns {string} extname
  */
-export function GetExtension(file: File): string {
-  const name = GetFileName(file);
+export function getExtension(file: File): string {
+  const name = getFileName(file);
   if (name) {
     const i = name.lastIndexOf('.');
     return name.substring(i, name.length);
@@ -646,8 +631,8 @@ export function GetExtension(file: File): string {
  * @param {File} file
  * @returns {boolean}
  */
-export function IsImage(file: File): boolean {
-  const extension = GetExtension(file);
+export function isImage(file: File): boolean {
+  const extension = getExtension(file);
   return ImageTypeReg.test(extension);
 }
 
@@ -656,9 +641,7 @@ export function IsImage(file: File): boolean {
  * @param {File} file
  * @returns {Object} 图片尺寸
  */
-export function GetImageSize(
-  file: File
-): Promise<{
+export function getImageSize(file: File): Promise<{
   width: number;
   height: number;
 }> {
@@ -666,11 +649,11 @@ export function GetImageSize(
     if (file) {
       // 读取图片数据
       const reader = new FileReader();
-      reader.onload = function(e: any) {
+      reader.onload = function (e: any) {
         const data = e.target.result;
         // 加载图片获取图片真实宽度和高度
         const image = new Image();
-        image.onload = function() {
+        image.onload = function () {
           resolve({
             width: image.width,
             height: image.height
@@ -690,11 +673,11 @@ export function GetImageSize(
  * @param {string} url 图片地址
  * @return {Promise}
  */
-export function LoadImage(url: string) {
+export function loadImage(url) {
   return new Promise((resolve, reject) => {
     // 加载图片获取图片真实宽度和高度
     const image = new Image();
-    image.onload = function() {
+    image.onload = function () {
       resolve({
         width: image.width,
         height: image.height
@@ -710,10 +693,10 @@ export function LoadImage(url: string) {
  * @param {string} extensions 后缀名集合，用逗号隔开，如['.jpeg','png']
  * @returns {boolean}
  */
-export function FilterExtensions(file: File, extensions: string) {
-  const extension = GetExtension(file);
+export function filterExtensions(file: File, extensions: string) {
+  const extension = getExtension(file);
   const _extensions = extensions.split(',');
-  return _extensions.some(ext => ext === extension);
+  return _extensions.some((ext) => ext === extension);
 }
 
 /**
@@ -721,7 +704,7 @@ export function FilterExtensions(file: File, extensions: string) {
  * @param {File | string} file
  * @returns {Promise<string>}
  */
-export function GetImageSrc(file: File | string): Promise<any> {
+export function getImageSrc(file: File | string): Promise<any> {
   return new Promise((resolve, reject) => {
     let url;
     if (
@@ -742,7 +725,7 @@ export function GetImageSrc(file: File | string): Promise<any> {
     } else {
       const reader = new FileReader();
       reader.readAsDataURL(file as File);
-      reader.onload = function() {
+      reader.onload = function () {
         resolve(this.result.toString());
       };
     }
@@ -754,7 +737,7 @@ export function GetImageSrc(file: File | string): Promise<any> {
  * @param input
  * @constructor
  */
-export function ClearInputFile(input: HTMLInputElement) {
+export function clearInputFile(input) {
   input.value = '';
   if (!/safari/i.test(navigator.userAgent)) {
     input.type = '';
@@ -769,7 +752,7 @@ export function ClearInputFile(input: HTMLInputElement) {
 // 正则 分割空格
 const reg_splitWhitespace = /\S+/g;
 
-function getEvent(e: any) {
+function getEvent(e) {
   return e || event;
 }
 
@@ -781,7 +764,7 @@ function returnFalse() {
  * 遍历事件源节点至代理节点之间的所有节点
  * 匹配每一个事件源节点是否为绑定节点
  */
-function getHandlerQueue(e: any) {
+function getHandlerQueue(e) {
   const _this = this;
   let targetEl = e.srcElement || e.target;
   const handlerQueue = [];
@@ -799,7 +782,7 @@ function getHandlerQueue(e: any) {
   return handlerQueue;
 }
 
-function dispatch(e: any) {
+function dispatch(e) {
   const _this = this;
   let res;
   const handlerQueue = getHandlerQueue.call(this, e);
@@ -828,16 +811,16 @@ function dispatch(e: any) {
   }
 }
 
-function onHandler(e: any) {
+function onHandler(e) {
   return dispatch.call(this, e);
 }
 
-function checkHover(e: any, target: any) {
+function checkHover(e, target) {
   e = getEvent(e);
   if (e.type == 'mouseover') {
-    return !Contains(target, e.relatedTarget || e.fromElement) && !((e.relatedTarget || e.fromElement) === target);
+    return !contains(target, e.relatedTarget || e.fromElement) && !((e.relatedTarget || e.fromElement) === target);
   } else {
-    return !Contains(target, e.relatedTarget || e.toElement) && !((e.relatedTarget || e.toElement) === target);
+    return !contains(target, e.relatedTarget || e.toElement) && !((e.relatedTarget || e.toElement) === target);
   }
 }
 
@@ -846,14 +829,14 @@ function checkHover(e: any, target: any) {
  * @param {String} eventName
  * @return {String} eventName has prefix
  */
-export function AddEventPrefix(eventName: string) {
-  if (IsString(eventName)) {
+export function addEventPrefix(eventName) {
+  if (isString(eventName)) {
     if (eventName === 'transitionend') {
       return {
         '': 'transitionend',
         '-moz-': 'transitionend',
         '-webkit-': 'webkitTransitionEnd'
-      }[SupportPrefix];
+      }[supportPrefix];
     }
   }
   return eventName;
@@ -865,7 +848,7 @@ export function AddEventPrefix(eventName: string) {
  * @param {Object} type 需要代理的事件 一个或多个用空格分隔的事件类型
  * @param {Function} handler 事件触发的回调
  */
-export function RemoveEventListener(element: any, type: string, handler: (...args: any[]) => any) {
+export function removeEventListener(element, type, handler) {
   if (element.removeEventListener) {
     element.removeEventListener(type, handler);
   } else {
@@ -883,24 +866,24 @@ export function RemoveEventListener(element: any, type: string, handler: (...arg
  * false：Bubbling 方式
  * PS:该值建议设置为 false
  */
-export function AddEventListener(element: any, type: string, handler: (...args: any[]) => any, useCapture = false) {
-  RemoveEventListener(element, type, handler);
+export function addEventListener(element: any, type: string, handler: (...any) => any, useCapture = false) {
+  removeEventListener(element, type, handler);
   if (element.addEventListener) {
-    if (type === 'input' && BrowserClient.IE) {
+    if (type === 'input' && browserClient.IE) {
       element.onpropertychange = handler;
     } else {
       element.addEventListener(type, handler, useCapture);
     }
   } else {
-    element.attachEvent('on' + type, function() {
+    element.attachEvent('on' + type, function () {
       handler.call(element);
     });
   }
 }
 
 function offHandler() {
-  ForEach(this, function(prev, item: any) {
-    RemoveEventListener(item.element, item.type, item.handler);
+  forEach(this, function (item: any) {
+    removeEventListener(item.element, item.type, item.handler);
     return true;
   });
 }
@@ -916,12 +899,12 @@ function offHandler() {
  * @param {Boolean} [one=false] 事件是否只触发一次 触发完成后 清除代理
  * @return {Function} 执行后 清除代理
  */
-export function On(
-  elements: any,
+export function on(
+  elements,
   types: string,
   selector: string,
-  handlerForMatched?: (...args: any[]) => any,
-  handlerForAll?: (...args: any[]) => any,
+  handlerForMatched?: (...any) => any,
+  handlerForAll?: (...any) => any,
   one?: boolean
 ) {
   let typesArray = (types || '').match(reg_splitWhitespace);
@@ -929,33 +912,34 @@ export function On(
     typesArray = [''];
   }
 
-  const isAgency = IsString(selector) && selector.length;
+  const isAgency = isString(selector) && selector.length;
 
-  if (!IsFunction(handlerForMatched)) {
-    handlerForMatched = returnFalse;
-  } else if (!IsFunction(handlerForMatched)) {
+  if (isFunction(handlerForMatched)) {
     return;
+  } else {
+    handlerForMatched = returnFalse;
   }
-  if (!IsFunction(handlerForAll)) {
+
+  if (!isFunction(handlerForAll)) {
     handlerForAll = undefined;
   }
 
   if (one) {
     const origFn = handlerForMatched;
-    handlerForMatched = function(e, ...args) {
+    handlerForMatched = function (e, ...args) {
       return origFn.apply(this, args);
     };
   }
-  if (!IsArray(elements)) {
+  if (!isArray(elements)) {
     elements = [elements];
   }
   if (elements.length) {
-    const handlers: any[] = [];
-    ForEach(elements, function(prev, element) {
-      ForEach(typesArray, function(prev2, type: any) {
+    const handlers = [];
+    forEach(elements, function (element) {
+      forEach(typesArray, function (type: any) {
         let applyHandler = handlerForMatched;
         if (isAgency) {
-          applyHandler = ApplyBind(onHandler, {
+          applyHandler = applyBind(onHandler, {
             element,
             type,
             selector,
@@ -963,7 +947,7 @@ export function On(
             handlerForAll
           });
         }
-        AddEventListener(element, type, applyHandler, false);
+        addEventListener(element, type, applyHandler, false);
         handlers.push({
           element,
           type,
@@ -973,7 +957,7 @@ export function On(
       });
       return true;
     });
-    return ApplyBind(offHandler, handlers);
+    return applyBind(offHandler, handlers);
   }
 }
 
@@ -987,14 +971,8 @@ export function On(
  * @param {Function} handlerForAll 绑定的元素内所有的节点触发 回调
  * @return {Function} 执行后 清除代理
  */
-export function One(
-  elements: any,
-  types: string,
-  selector: string,
-  handlerForMatched?: (...args: any[]) => any,
-  handlerForAll?: (...args: any[]) => any
-) {
-  return On(elements, types, selector, handlerForMatched, handlerForAll, true);
+export function one(elements, types, selector, handlerForMatched, handlerForAll) {
+  return on(elements, types, selector, handlerForMatched, handlerForAll, true);
 }
 
 /**
@@ -1005,17 +983,12 @@ export function One(
  * @param {Function} handlerOut out 鼠标移出事件
  * @return {Function} 执行后 清除代理
  */
-export function Hover(
-  elements: any,
-  selector: string,
-  handlerIn?: (...args: any[]) => any,
-  handlerOut?: (...args: any[]) => any
-) {
-  return On(
+export function hover(elements, selector, handlerIn, handlerOut) {
+  return on(
     elements,
     'mouseover mouseout',
     selector,
-    function(e) {
+    function (e) {
       if (checkHover(e, this)) {
         if (e.type === 'mouseover') {
           handlerIn.call(this, e);
@@ -1035,41 +1008,17 @@ export function Hover(
  * @param fun
  * @constructor
  */
-export function OnTransitionEnd(el: any, fun: (...args: any[]) => any) {
+export function onTransitionEnd(el, fun) {
   const arr = ['msTransitionEnd', 'mozTransitionEnd', 'oTransitionEnd', 'webkitTransitionEnd', 'transitionend'];
   const handler = {
-    handleEvent(event: any, ...args: any[]) {
-      arr.forEach(function(eventName) {
+    handleEvent(event, ...args) {
+      arr.forEach(function (eventName) {
         el.removeEventListener(eventName, handler, false);
       });
       fun.apply(el, args);
     }
   };
-  arr.forEach(function(eventName) {
+  arr.forEach(function (eventName) {
     el.addEventListener(eventName, handler, false);
   });
 }
-
-/**
- * 调用打印
- * @param htmlStr 待打印的模板字符串
- * @constructor
- */
-export function Print(htmlStr: string): Promise<void> {
-  return new Promise((resolve) => {
-    const $iframe = document.createElement('iframe');
-    $iframe.style.display = 'none';
-    document.body.appendChild($iframe);
-    $iframe.contentDocument.write(htmlStr);
-    $iframe.contentDocument.close();
-    $iframe.contentWindow.print();
-    window.setTimeout(() => {
-      resolve();
-    }, 500);
-  });
-}
-
-const IS_TOUCH =
-  typeof window !== 'undefined' &&
-  typeof document !== 'undefined' &&
-  ('ontouchstart' in window || ((window as any).DocumentTouch && document instanceof (window as any).DocumentTouch));

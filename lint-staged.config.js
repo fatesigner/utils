@@ -4,7 +4,5 @@ module.exports = {
   'src/**/*.{ts,tsx}': [
     'eslint --fix --cache --quiet',
     'prettier --write --ignore-path .eslintignore --parser typescript'
-  ],
-  'src/**/*.{vue}': ['eslint --fix --cache --quiet'],
-  'src/**/*.{css,scss}': ['stylelint --fix --cache --quiet']
+  ]
 };
