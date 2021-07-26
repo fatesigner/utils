@@ -33,7 +33,7 @@
   },
   "prettier": "@fatesigner/eslint-config/.prettierrc",
   "dependencies": {
-    "html2canvas": "1.0.0-rc.7"
+    "html2canvas": "1.0.0"
   },
   "peerDependencies": {
     "await-to-js": "2.x || 3.x",
