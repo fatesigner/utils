@@ -1,40 +1,49 @@
-/**
- * index.spec
- */
-
+const s = '';
 import { expect } from 'chai';
-
-import * as Index from './';
-import { groupBy } from './';
+import {
+  capitalize,
+  clone,
+  convertBridgeStrToHump,
+  convertHumpStrToBridge,
+  convertToBytesUnit,
+  convertToCDB,
+  convertToDBC,
+  convertToQueryParameters,
+  deepExtend,
+  extend,
+  forEach,
+  groupBy,
+  mergeProps
+} from '../dist/';
 
 describe('# test main.', function () {
   it('## capitalize.', function () {
-    expect(Index.capitalize('capitalize')).to.equal('Capitalize');
+    expect(capitalize('capitalize')).to.equal('Capitalize');
   });
   it('## convertToCDB.', function () {
-    expect(Index.convertToCDB('ａｂｃｄ')).to.equal('abcd');
+    expect(convertToCDB('ａｂｃｄ')).to.equal('abcd');
   });
   it('## convertToDBC.', function () {
-    expect(Index.convertToDBC('abcd')).to.equal('ａｂｃｄ');
+    expect(convertToDBC('abcd')).to.equal('ａｂｃｄ');
   });
   it('## convertBridgeStrToHump.', function () {
-    expect(Index.convertBridgeStrToHump('convert-hump-str-to-bridge')).to.equal('convertHumpStrToBridge');
+    expect(convertBridgeStrToHump('convert-hump-str-to-bridge')).to.equal('convertHumpStrToBridge');
   });
   it('## convertHumpStrToBridge.', function () {
-    expect(Index.convertHumpStrToBridge('convertHumpStrToBridge')).to.equal('convert-hump-str-to-bridge');
+    expect(convertHumpStrToBridge('convertHumpStrToBridge')).to.equal('convert-hump-str-to-bridge');
   });
   it('## convertToBytesUnit.', function () {
-    expect(Index.convertToBytesUnit(234123)).to.equal('228.64kb');
-    expect(Index.convertToBytesUnit(234123, undefined, true)).to.equal('228.64KB');
-    expect(Index.convertToBytesUnit(166018, 3, true)).to.equal('162.127KB');
-    expect(Index.convertToBytesUnit(1073741824)).to.equal('1.00gb');
-    expect(Index.convertToBytesUnit(1073741824, 4, false)).to.equal('1.0000gb');
+    expect(convertToBytesUnit(234123)).to.equal('228.64kb');
+    expect(convertToBytesUnit(234123, undefined, true)).to.equal('228.64KB');
+    expect(convertToBytesUnit(166018, 3, true)).to.equal('162.127KB');
+    expect(convertToBytesUnit(1073741824)).to.equal('1.00gb');
+    expect(convertToBytesUnit(1073741824, 4, false)).to.equal('1.0000gb');
   });
   it('## convertToQueryParameters', function () {
-    expect(Index.convertToQueryParameters({ id: 'a', username: 'user' })).to.equal('id=a&username=user');
+    expect(convertToQueryParameters({ id: 'a', username: 'user' })).to.equal('id=a&username=user');
   });
   it('## forEach', function () {
-    const res = Index.forEach(
+    const res = forEach(
       [1, 2, 3, 4, 5, 6],
       function (prev, cur, index) {
         if (index === 4) {
@@ -48,7 +57,7 @@ describe('# test main.', function () {
     );
     expect(res).to.equal(10);
 
-    const res2 = Index.forEach(
+    const res2 = forEach(
       {
         a: 'a1',
         b: 'b1',
@@ -77,12 +86,12 @@ describe('# test main.', function () {
       }
     };
 
-    const clone = Index.clone(originalObject, true);
+    const cloneObject = clone(originalObject, true);
 
     // 改变 shadowClone 的对象属性
-    clone.c.f = 5;
+    cloneObject.c.f = 5;
 
-    expect(clone.c.f).to.equal(5);
+    expect(cloneObject.c.f).to.equal(5);
 
     expect(originalObject.c.f).to.equal(4);
   });
@@ -113,18 +122,18 @@ describe('# test main.', function () {
       }
     };
 
-    const obj = Index.extend({}, originalObject, extendObj);
+    const obj = extend({}, originalObject, extendObj);
 
     expect(obj.c.f).to.equal(undefined);
     expect(obj.c.g.h).to.equal(undefined);
 
     // 深度合并
-    const obj2 = Index.deepExtend({}, originalObject, extendObj);
+    const obj2 = deepExtend({}, originalObject, extendObj);
     expect(obj2.c.f).to.equal(4);
     expect(obj2.c.g.h).to.equal(2);
   });
   it('## mergeProps', function () {
-    const res = Index.mergeProps(
+    const res = mergeProps(
       {
         d: '1',
         dd: [1, 2, 3]
@@ -146,15 +155,13 @@ describe('# test main.', function () {
       { id: 2, name: '2', title: '1 2' },
       { id: 2, name: '4', title: '1 4' }
     ];
-    const arrNew = Index.groupBy(arr, 'id', (record) => {
+    const arrNew = groupBy(arr, 'id', (record) => {
       return {
         d: record.name
       };
     });
 
-    const item = arrNew[0];
-
-    console.log(arrNew, null, 2);
+    // console.log(arrNew, null, 2);
 
     expect(arrNew.length).to.equal(3);
     expect(arrNew[0].key).to.equal(1);

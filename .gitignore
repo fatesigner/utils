@@ -32,7 +32,8 @@ coverage.lcov
 .stylelintcache
 
 # IDEs and editors
-/.idea
+.idea
+.hbuilderx
 .project
 .classpath
 .c9/

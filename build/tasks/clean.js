@@ -1,12 +1,12 @@
 /**
  * clean
- * 清理 build 目录
+ * clean build dir
  */
 
-const Gulp = require('gulp');
-const Rimraf = require('rimraf');
+const gulp = require('gulp');
+const rimraf = require('rimraf');
 
-Gulp.task('clean', async function () {
-  const env = require('../env')();
-  Rimraf.sync(env.outputPath);
+gulp.task('clean', async function () {
+  const ENV = require('../env')();
+  rimraf.sync(ENV.outputPath);
 });

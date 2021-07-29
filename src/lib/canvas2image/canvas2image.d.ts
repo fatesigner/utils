@@ -3,13 +3,7 @@
  */
 
 declare namespace Canvas2Image {
-  function saveAsImage(
-    canvasObj: HTMLCanvasElement,
-    width: number,
-    height: number,
-    type: string,
-    fileName?: string
-  ): void;
+  function saveAsImage(canvasObj: HTMLCanvasElement, width: number, height: number, type: string, fileName?: string): void;
   function saveAsPNG(canvasObj: HTMLCanvasElement, width: number, height: number, fileName?: string): HTMLImageElement;
   function saveAsJPEG(canvasObj: HTMLCanvasElement, width: number, height: number, fileName?: string): HTMLImageElement;
   function saveAsGIF(canvasObj: HTMLCanvasElement, width: number, height: number, fileName?: string): HTMLImageElement;

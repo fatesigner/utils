@@ -1,8 +1,4 @@
-/**
- * debug.spec
- */
-
-import * as Debug from './debug';
+import { LatencyTimeLog } from '../dist/debug';
 
 describe('# test debug.', function () {
   it('## LatencyTimeLog', function () {
@@ -16,7 +12,7 @@ describe('# test debug.', function () {
       }
     };
 
-    Debug.LatencyTimeLog(
+    LatencyTimeLog(
       {
         target: obj,
         func: 'sync'

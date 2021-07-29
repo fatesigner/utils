@@ -5,7 +5,7 @@
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
-import { injectAround, PointcutInjectType } from './aspect';
+import { PointcutInjectType, injectAround } from './aspect';
 
 /**
  * 往指定函数切入代码，统计每次该函数执行的耗时
@@ -13,10 +13,7 @@ import { injectAround, PointcutInjectType } from './aspect';
  * @param format console.log 输出格式
  * @constructor
  */
-export function LatencyTimeLog<F extends (...arg: any) => Promise<any>>(
-  pointcut: PointcutInjectType<any>,
-  format = 'spend time：[time]'
-) {
+export function LatencyTimeLog<F extends (...arg: any) => Promise<any>>(pointcut: PointcutInjectType<any>, format = 'spend time：[time]') {
   return injectAround<F, any>(function (originFunc) {
     return async function (...args) {
       const timeStart = new Date().getTime();

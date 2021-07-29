@@ -10,13 +10,13 @@ module.exports = {
     }
   },
   testEnvironment: 'node',
-  roots: ['<rootDir>/src'],
+  roots: ['<rootDir>/tests'],
   transform: {
     '^.+\\.jsx?$': 'babel-jest',
     '^.+\\.tsx?$': 'ts-jest'
   },
-  testRegex: '(/__tests__/.*|(\\.|/)(spec))\\.tsx?$',
+  testRegex: ['(/__tests__/.*|(\\.|/)(test))\\.jsx?$', '(/__tests__/.*|(\\.|/)(test))\\.tsx?$'],
   // testMatch: ['./test/*.ts'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  transformIgnorePatterns: ['<rootDir>/node_modules/(?!lodash-es)']
+  transformIgnorePatterns: ['<rootDir>/node_modules/(?!)']
 };

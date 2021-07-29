@@ -223,9 +223,7 @@ const Canvas2Image = (function () {
       for (let x = 0; x < biWidth; x++) {
         const iOffsetX = x << 2;
         strPixelRow +=
-          fromCharCode(aImgData[iOffsetY + iOffsetX + 2]) +
-          fromCharCode(aImgData[iOffsetY + iOffsetX + 1]) +
-          fromCharCode(aImgData[iOffsetY + iOffsetX]);
+          fromCharCode(aImgData[iOffsetY + iOffsetX + 2]) + fromCharCode(aImgData[iOffsetY + iOffsetX + 1]) + fromCharCode(aImgData[iOffsetY + iOffsetX]);
       }
 
       for (let c = 0; c < iPadding; c++) {

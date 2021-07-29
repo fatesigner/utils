@@ -1,10 +1,14 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
+    "noEmitOnError": false,
     "module": "commonjs"
   },
   "include": [
-    "**/*.spec.ts"
+    "**/*.spec.ts",
+    "**/*.test.ts",
+    "**/__tests__/*.ts"
   ],
-  "exclude": []
+  "exclude": [
+  ]
 }

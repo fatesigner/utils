@@ -28,14 +28,7 @@ module.exports = {
   debug: true,
   dryRun: false,
   preset: 'angular',
-  branches: [
-    '+([0-9])?(.{+([0-9]),x}).x',
-    'master',
-    'next',
-    'next-major',
-    { name: 'beta', prerelease: true },
-    { name: 'alpha', prerelease: true }
-  ],
+  branches: ['+([0-9])?(.{+([0-9]),x}).x', 'master', 'next', 'next-major', { name: 'beta', prerelease: true }, { name: 'alpha', prerelease: true }],
   plugins: [
     [
       '@semantic-release/commit-analyzer',
@@ -57,14 +50,6 @@ module.exports = {
       }
     ],
     [
-      '@semantic-release/npm',
-      {
-        npmPublish: true,
-        pkgRoot: 'dist',
-        allowSameVersion: true
-      }
-    ],
-    [
       '@semantic-release/git',
       {
         assets: ['docs/CHANGELOG.md', 'package.json', 'package-lock.json'],
@@ -75,6 +60,14 @@ module.exports = {
       '@semantic-release/github',
       {
         // assets: 'dist/!*.tgz'
+      }
+    ],
+    [
+      '@semantic-release/npm',
+      {
+        npmPublish: true,
+        pkgRoot: 'dist',
+        allowSameVersion: true
       }
     ]
   ]

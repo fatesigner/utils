@@ -48,10 +48,7 @@ export function dateFormat(dateTime: Date, fmt = 'yyyy-MM-dd HH:mm:ss') {
     fmt = fmt.replace(RegExp.$1, (dateTime.getFullYear() + '').substr(4 - RegExp.$1.length));
   }
   if (/(E+)/.test(fmt)) {
-    fmt = fmt.replace(
-      RegExp.$1,
-      (RegExp.$1.length > 1 ? (RegExp.$1.length > 2 ? '星期' : '周') : '') + week[dateTime.getDay() + '']
-    );
+    fmt = fmt.replace(RegExp.$1, (RegExp.$1.length > 1 ? (RegExp.$1.length > 2 ? '星期' : '周') : '') + week[dateTime.getDay() + '']);
   }
   for (const k in o) {
     if (new RegExp('(' + k + ')').test(fmt)) {
@@ -97,11 +94,7 @@ export function getTimeAgo(pastTime: Date, currentTime = null) {
         // 获取前一天的0点
         let lastDate = new Date(currentTime.valueOf());
         lastDate.setDate(lastDate.getDate() - 1);
-        lastDate = new Date(
-          [lastDate.getFullYear().toString(), (lastDate.getMonth() + 1).toString(), lastDate.getDate().toString()].join(
-            '-'
-          ) + ' 00:00:00'
-        );
+        lastDate = new Date([lastDate.getFullYear().toString(), (lastDate.getMonth() + 1).toString(), lastDate.getDate().toString()].join('-') + ' 00:00:00');
         if (pastTime.getTime() > lastDate.getTime()) {
           // 显示昨天
           return `昨天 ${dateFormat(pastTime, 'HH:mm')}`;

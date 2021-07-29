@@ -33,13 +33,7 @@ export async function convertHtmlToCanvas(el: HTMLElement, options?: any): Promi
  * @param height    图片高度
  * @constructor
  */
-export async function convertHtmlToImage(
-  el: HTMLElement,
-  options?: any,
-  type: ImageType = 'jpeg',
-  width?: number,
-  height?: number
-): Promise<HTMLImageElement> {
+export async function convertHtmlToImage(el: HTMLElement, options?: any, type: ImageType = 'jpeg', width?: number, height?: number): Promise<HTMLImageElement> {
   const [err, res] = await to<any>(Promise.all([import('html2canvas'), import('./lib/canvas2image/canvas2image')]));
 
   if (err) {

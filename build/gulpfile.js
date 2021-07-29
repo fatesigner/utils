@@ -2,10 +2,10 @@
  * gulpfile
  */
 
-const Path = require('path');
-const RequireDir = require('require-dir');
+const path = require('path');
+const requireDir = require('require-dir');
 
 // 工作目录改为根目录
-process.chdir(Path.join(__dirname, '..'));
+process.chdir(path.join(__dirname, '..'));
 
-RequireDir('./tasks');
+requireDir('./tasks');

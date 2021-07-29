@@ -279,8 +279,7 @@ export function getAbsRelativeLayout(targetEl: HTMLElement, absEl: HTMLElement, 
   boundingClientRect.right = viewportOffset.width - boundingClientRect.left - targetEl.offsetWidth;
 
   // 页面文档真实高度 最小为屏幕高度
-  const documentHeight =
-    document.body.scrollHeight > screen.availHeight ? document.body.scrollHeight : screen.availHeight;
+  const documentHeight = document.body.scrollHeight > screen.availHeight ? document.body.scrollHeight : screen.availHeight;
 
   if (direction === Direction.Down || direction === Direction.Up) {
     // down 的可行性
@@ -707,11 +706,7 @@ export function filterExtensions(file: File, extensions: string) {
 export function getImageSrc(file: File | string): Promise<any> {
   return new Promise((resolve, reject) => {
     let url;
-    if (
-      navigator.userAgent.indexOf('Chrome') > 0 ||
-      navigator.userAgent.indexOf('Firefox') > 0 ||
-      navigator.userAgent.indexOf('Safari') > 0
-    ) {
+    if (navigator.userAgent.indexOf('Chrome') > 0 || navigator.userAgent.indexOf('Firefox') > 0 || navigator.userAgent.indexOf('Safari') > 0) {
       url = URL.createObjectURL(file);
       resolve(url);
     } else if (navigator.userAgent.indexOf('MSIE') >= 1 || navigator.userAgent.indexOf('Trident') >= 1) {
@@ -899,14 +894,7 @@ function offHandler() {
  * @param {Boolean} [one=false] 事件是否只触发一次 触发完成后 清除代理
  * @return {Function} 执行后 清除代理
  */
-export function on(
-  elements,
-  types: string,
-  selector: string,
-  handlerForMatched?: (...any) => any,
-  handlerForAll?: (...any) => any,
-  one?: boolean
-) {
+export function on(elements, types: string, selector: string, handlerForMatched?: (...any) => any, handlerForAll?: (...any) => any, one?: boolean) {
   let typesArray = (types || '').match(reg_splitWhitespace);
   if (!typesArray) {
     typesArray = [''];

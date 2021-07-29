@@ -88,10 +88,7 @@ export function injectBefore<F extends (...args: any) => any, T>(
  * @param pointcut
  * @constructor
  */
-export function bindAfter<F extends (...args: any[]) => any, C>(
-  aspectFunc: (args: ReturnType<F>) => ReturnType<F>,
-  pointcut: PointcutBindType<F, C>
-): F {
+export function bindAfter<F extends (...args: any[]) => any, C>(aspectFunc: (args: ReturnType<F>) => ReturnType<F>, pointcut: PointcutBindType<F, C>): F {
   if (!isFunction(aspectFunc)) {
     throw InvalidAspect;
   }
@@ -148,10 +145,7 @@ export function injectAfter<F extends (...args: any) => any, T>(
  * @param pointcut
  * @constructor
  */
-export function bindAround<F extends (...args: any) => any, C>(
-  aspectFunc: (originalFunc: F) => F,
-  pointcut: PointcutBindType<F, C>
-): F {
+export function bindAround<F extends (...args: any) => any, C>(aspectFunc: (originalFunc: F) => F, pointcut: PointcutBindType<F, C>): F {
   if (!isFunction(aspectFunc)) {
     throw InvalidAspect;
   }
@@ -169,10 +163,7 @@ export function bindAround<F extends (...args: any) => any, C>(
  * @param pointcut
  * @constructor
  */
-export function injectAround<F extends (...args: any) => any, T>(
-  aspectFunc: (originalFunc: F) => F,
-  pointcut: PointcutInjectType<T>
-): InjectResType {
+export function injectAround<F extends (...args: any) => any, T>(aspectFunc: (originalFunc: F) => F, pointcut: PointcutInjectType<T>): InjectResType {
   if (!isFunction(aspectFunc)) {
     throw InvalidAspect;
   }

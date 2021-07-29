@@ -1,10 +1,6 @@
-/**
- * aspect.spec
- */
-
 import { expect } from 'chai';
 
-import * as Aspect from './aspect';
+import { bindAfter, bindAround, bindBefore, injectAfter, injectAround, injectBefore } from '../dist/aspect';
 
 describe('# test aspect.', function () {
   const obj = {
@@ -23,7 +19,7 @@ describe('# test aspect.', function () {
   };
   it('## bind', function () {
     // 绑定执行前的代码 修改参数
-    const bindBefore = Aspect.bindBefore(
+    const _bindBefore = bindBefore(
       function (str, num, replace) {
         replace = '*';
         return [str, num, replace];
@@ -34,7 +30,7 @@ describe('# test aspect.', function () {
       }
     );
     // 绑定执行后的代码 修改结果
-    const bindAfter = Aspect.bindAfter(
+    const _bindAfter = bindAfter(
       function (res) {
         res += '000';
         return res;
@@ -45,7 +41,7 @@ describe('# test aspect.', function () {
       }
     );
     // 绑定环绕代码
-    const bindAround = Aspect.bindAround(
+    const _bindAround = bindAround(
       function (originalFunc) {
         return function (str, num, replace) {
           // 修改参数
@@ -63,14 +59,14 @@ describe('# test aspect.', function () {
       }
     );
     expect(obj.padStart('363300', 10, '0')).to.equal('0000363300');
-    expect(bindBefore('363300', 10, '0')).to.equal('****363300');
+    expect(_bindBefore('363300', 10, '0')).to.equal('****363300');
     expect(obj.padStart('363', 7, '1')).to.equal('1111363');
-    expect(bindAfter('363', 7, '1')).to.equal('1111363000');
-    expect(bindAround('363000', 10, '1')).to.equal('%%%%363000111');
+    expect(_bindAfter('363', 7, '1')).to.equal('1111363000');
+    expect(_bindAround('363000', 10, '1')).to.equal('%%%%363000111');
   });
   it('## inject', function () {
     // 绑定执行前的代码 修改参数
-    const injectBefore = Aspect.injectBefore<typeof obj.padStart, typeof obj>(
+    const _injectBefore = injectBefore<typeof obj.padStart, typeof obj>(
       function (str, num, replace) {
         replace = '*';
         return [str, num, replace];
@@ -81,10 +77,10 @@ describe('# test aspect.', function () {
       }
     );
     expect(obj.padStart('363300', 10, '0')).to.equal('****363300');
-    injectBefore.cancel();
+    _injectBefore.cancel();
     expect(obj.padStart('363300', 10, '0')).to.equal('0000363300');
     // 绑定执行后的代码 修改结果
-    const injectAfter = Aspect.injectAfter<typeof obj.padStart, typeof obj>(
+    const _injectAfter = injectAfter<typeof obj.padStart, typeof obj>(
       function (res) {
         res += '000';
         return res;
@@ -95,10 +91,10 @@ describe('# test aspect.', function () {
       }
     );
     expect(obj.padStart('363', 7, '1')).to.equal('1111363000');
-    injectAfter.cancel();
+    _injectAfter.cancel();
     expect(obj.padStart('363', 7, '1')).to.equal('1111363');
     // 绑定环绕代码
-    const injectAround = Aspect.injectAround<typeof obj.padStart, typeof obj>(
+    const _injectAround = injectAround<typeof obj.padStart, typeof obj>(
       function (originalFunc) {
         return function (str, num, replace) {
           // 修改参数
@@ -115,7 +111,7 @@ describe('# test aspect.', function () {
       }
     );
     expect(obj.padStart('363000', 10, '1')).to.equal('%%%%363000111');
-    injectAround.cancel();
+    _injectAround.cancel();
     expect(obj.padStart('363000', 10, '1')).to.equal('1111363000');
   });
 });

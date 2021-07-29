@@ -90,11 +90,7 @@ export function isInt(value: any, positive?: boolean) {
  * @param dicimalLimit 小数部分位数长度限制 [minLength, maxLength]
  * @returns {boolean}
  */
-export function isDecimal(
-  value: string | number,
-  intLimit: [number, number?] = [1],
-  dicimalLimit: [number, number?] = [0]
-) {
+export function isDecimal(value: string | number, intLimit: [number, number?] = [1], dicimalLimit: [number, number?] = [0]) {
   if (!isNullOrUndefined(value)) {
     const intLimitStr = intLimit.length > 1 ? intLimit.join(',') : intLimit[0] + ',';
     const dicimalLimitStr = dicimalLimit.length > 1 ? dicimalLimit.join(',') : dicimalLimit[0] + ',';
