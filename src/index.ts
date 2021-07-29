@@ -4,16 +4,7 @@
 
 import { cloneDeep } from 'lodash-es';
 
-import {
-  isArray,
-  isBoolean,
-  isFunction,
-  isNodeList,
-  isNullOrUndefined,
-  isNumber,
-  isObject,
-  isString
-} from './type-check';
+import { isArray, isBoolean, isFunction, isNodeList, isNullOrUndefined, isNumber, isObject, isString } from './type-check';
 
 /**
  * 无任何操作的 空函数
@@ -27,17 +18,8 @@ export function noop() {}
  * @return {Function}
  */
 export function applyBind<T, A extends any[], R>(fn: (this: T, ...args: A) => R, context: T): (...args: A) => R;
-export function applyBind<T, A0, A extends any[], R>(
-  fn: (this: T, arg0: A0, ...args: A) => R,
-  context: T,
-  arg0: A0
-): (...args: A) => R;
-export function applyBind<T, A0, A1, A extends any[], R>(
-  fn: (this: T, arg0: A0, arg1: A1, ...args: A) => R,
-  context: T,
-  arg0: A0,
-  arg1: A1
-): (...args: A) => R;
+export function applyBind<T, A0, A extends any[], R>(fn: (this: T, arg0: A0, ...args: A) => R, context: T, arg0: A0): (...args: A) => R;
+export function applyBind<T, A0, A1, A extends any[], R>(fn: (this: T, arg0: A0, arg1: A1, ...args: A) => R, context: T, arg0: A0, arg1: A1): (...args: A) => R;
 export function applyBind<T, A0, A1, A2, A extends any[], R>(
   fn: (this: T, arg0: A0, arg1: A1, arg2: A2, ...args: A) => R,
   context: T,
@@ -53,11 +35,7 @@ export function applyBind<T, A0, A1, A2, A3, A extends any[], R>(
   arg2: A2,
   arg3: A3
 ): (...args: A) => R;
-export function applyBind<T, AX, R>(
-  fn: (this: T, ...args: AX[]) => R,
-  context: T,
-  ...args: AX[]
-): (...args: AX[]) => R {
+export function applyBind<T, AX, R>(fn: (this: T, ...args: AX[]) => R, context: T, ...args: AX[]): (...args: AX[]) => R {
   return function (...argsOri: AX[]) {
     return fn.apply(context, [...args, ...argsOri]);
   };
@@ -75,12 +53,7 @@ export function applyBind<T, AX, R>(
  * @param {Function=null} alwaysDo 延迟期间仍会调用的函数 默认为空
  * @returns {Function}
  */
-export function debounce(
-  fn: (...args: any[]) => any,
-  idle: number,
-  immediate = true,
-  alwaysDo?: (...args: any[]) => any
-) {
+export function debounce(fn: (...args: any[]) => any, idle: number, immediate = true, alwaysDo?: (...args: any[]) => any) {
   let timer: any; // 定时器变量
   let previous = 0; // 时间戳 用于记录上次执行的时间点
   let context: any; // fn函数执行的作用域
@@ -465,12 +438,7 @@ export function clone(originalObject: any, circular = false) {
 }
 
 function isSpecificValue(val: any) {
-  return (
-    val instanceof Buffer ||
-    val instanceof Date ||
-    val instanceof RegExp ||
-    (typeof Node !== 'undefined' && val instanceof Node)
-  );
+  return val instanceof Buffer || val instanceof Date || val instanceof RegExp || (typeof Node !== 'undefined' && val instanceof Node);
 }
 
 function cloneSpecificValue(val: any) {
@@ -697,11 +665,7 @@ export function groupBy<TRecord extends Record<string, any>, TSlice extends Reco
  * @param mode   当有效位数确定后，其后多余位数的处理模式，默认为 normal，即银行家舍入法 "四舍六入五成双"，round：标准的四舍五入，increase：无论数值大小，一律进1，ignore：一律舍弃
  * @constructor
  */
-export function toFixed(
-  value: number,
-  digits = 0,
-  mode: 'ignore' | 'normal' | 'round' | 'increase' = 'normal'
-): string {
+export function toFixed(value: number, digits = 0, mode: 'ignore' | 'normal' | 'round' | 'increase' = 'normal'): string {
   let carry = 0;
 
   const str = value + '';
@@ -753,7 +717,7 @@ export function toFixed(
  * @constructor
  */
 export function bindLazyFunc<T extends Record<string, any>>(target: T, properties: string[]): T {
-  let resolves: any[] = [];
+  const resolves: Record<string, any[]> = {};
   const functions: any = {};
 
   const getFunc = function (propertyKey: string) {
@@ -769,7 +733,10 @@ export function bindLazyFunc<T extends Record<string, any>>(target: T, propertie
       return func(...args);
     }
     return new Promise((resolve) => {
-      resolves.push([resolve, args]);
+      if (!Object.prototype.hasOwnProperty.call(resolves, propertyKey)) {
+        resolves[propertyKey] = [];
+      }
+      resolves[propertyKey].push([resolve, args]);
     });
   };
 
@@ -786,11 +753,11 @@ export function bindLazyFunc<T extends Record<string, any>>(target: T, propertie
       set(val) {
         if (Object.prototype.hasOwnProperty.call(target, propertyKey) && properties.indexOf(propertyKey) > -1) {
           functions[propertyKey as string] = val;
-          if (resolves.length) {
-            resolves.forEach(([resolve, args]) => {
+          if (Object.prototype.hasOwnProperty.call(resolves, propertyKey)) {
+            resolves[propertyKey].forEach(([resolve, args]) => {
               resolve(val(...args));
             });
-            resolves = [];
+            delete resolves[propertyKey];
           }
         }
       }
@@ -806,10 +773,7 @@ export function bindLazyFunc<T extends Record<string, any>>(target: T, propertie
  * @param properties
  * @constructor
  */
-function bindLazyFuncProxy<T extends Record<string, (...args: any[]) => Promise<any>>, TKey extends keyof T>(
-  target: T,
-  properties: TKey[]
-): T {
+function bindLazyFuncProxy<T extends Record<string, (...args: any[]) => Promise<any>>, TKey extends keyof T>(target: T, properties: TKey[]): T {
   let args: any[];
   const functions: any[] = [];
   let promiseResolve: any;
@@ -874,9 +838,9 @@ function bindLazyFuncProxy<T extends Record<string, (...args: any[]) => Promise<
 }
 
 /**
- * 将指定的异步函数转换为队列模式，即每次调用后将进行等待，直到上一次调用完毕后再执行;
- * 类似 debounce 函数，不过执行逻辑是等待上次执行的结果，非指定时间内
- * 当设置 cached（默认为 false） 为 true，将返回上次 promise 的结果。
+ * 将指定的异步函数转换为队列模式，即每次调用后将进行等待，直到上一次调用完毕后再执行
+ * 类似 debounce 函数，不同的是，执行逻辑是等待上次执行的结果，非指定时间内
+ * 当设置 cached 为 true，将返回上次 promise 的结果。默认为 false
  * @param func
  * @param cached
  * @constructor
@@ -904,10 +868,7 @@ export function bindPromiseQueue<TFunc extends (...args: any[]) => Promise<any>>
 }
 
 const isMergeObject = function (val: any): boolean {
-  return (
-    Object.prototype.toString.call(val) === '[object Object]' ||
-    Object.prototype.toString.call(val) === '[object Undefined]'
-  );
+  return Object.prototype.toString.call(val) === '[object Object]' || Object.prototype.toString.call(val) === '[object Undefined]';
 };
 
 const customizer = function (obj: any, src: any) {
@@ -988,10 +949,7 @@ export function mergeVueProps<T extends Record<string, any>>(vue: any, defaultPr
  * @param handlers
  * @constructor
  */
-export function mergeHandlers<TTarget extends Record<string, (...args: any[]) => Promise<any>>>(
-  target: TTarget,
-  handlers: TTarget
-): TTarget {
+export function mergeHandlers<TTarget extends Record<string, (...args: any[]) => Promise<any>>>(target: TTarget, handlers: TTarget): TTarget {
   target = target || ({} as any);
   Object.keys(handlers).forEach((key) => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
