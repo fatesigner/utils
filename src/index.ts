@@ -85,11 +85,11 @@ export function debounce(fn: (...args: any[]) => any, idle: number, immediate = 
       context = this;
       args = args_;
       timer = setTimeout(later, idle);
-    }
 
-    // 在 idle 指定的时间内 仍调用的函数
-    if (alwaysDo) {
-      alwaysDo.apply(context);
+      // 在 idle 指定的时间内 仍调用的函数
+      if (alwaysDo) {
+        alwaysDo.apply(context);
+      }
     }
 
     return result;
