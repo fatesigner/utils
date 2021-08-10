@@ -1,3 +1,10 @@
+## [2.1.1](https://github.com/fatesigner/utils/compare/v2.1.0...v2.1.1) (2021-08-10)
+
+
+### Bug Fixes
+
+* update debounce function, put alwaysDo into idle time section ([1f5cd3f](https://github.com/fatesigner/utils/commit/1f5cd3f245e63c4fa37e439abb9f9fbf464af4b2))
+
 # [2.1.0](https://github.com/fatesigner/utils/compare/v2.0.1...v2.1.0) (2021-07-29)
 
 
