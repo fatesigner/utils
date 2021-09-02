@@ -1,3 +1,15 @@
+# [2.2.0](https://github.com/fatesigner/utils/compare/v2.1.1...v2.2.0) (2021-09-02)
+
+
+### Bug Fixes
+
+* upgrade html2canvas from 1.0.0 to 1.1.0 ([4cf3700](https://github.com/fatesigner/utils/commit/4cf370087c101fda7f27b19822d1bd5f57e79589))
+
+
+### Features
+
+* add scrollTo function ([8449648](https://github.com/fatesigner/utils/commit/844964806223ac4820c15e3501097b7a429f15a7))
+
 ## [2.1.1](https://github.com/fatesigner/utils/compare/v2.1.0...v2.1.1) (2021-08-10)
 
 
