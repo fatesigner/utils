@@ -43,118 +43,112 @@ export function applyBind<T, AX, R>(fn: (this: T, ...args: AX[]) => R, context: 
 
 /**
  * debounce
- * 空闲控制 返回函数连续调用时，空闲时间必须大于或等于 idle（ms），fn 才会执行
- * 描述：如果用手指一直按住一个弹簧，它将不会弹起直到你松手为止。
- * 也就是说当调用动作n毫秒后，才会执行该动作，若在这n毫秒内又调用此动作则将重新计算执行时间。
+ * 空闲控制: 返回函数连续调用时, 空闲时间必须大于或等于 idle（ms）, fn 才会执行
+ * 描述: 如果用手指一直按住一个弹簧, 它将不会弹起直到你松手为止
+ * 也就是说当调用该函数后, 将会经过 n 毫秒, 才会执行该动作, 若在这 n 毫秒内又调用此动作则将重新计算执行时间
  * @param {Function} fn 需要延迟调用的函数
- * @param {Number=0} idle 空闲时间，单位毫秒
+ * @param {Number=0} delay 延迟时间, 单位: 毫秒
  * @param {Boolean=false} immediate
- * true：表示首次调用返回值方法时，会马上调用fn
+ * true：表示首次调用返回值方法时, 会马上调用 fn
  * @param {Function=null} alwaysDo 延迟期间仍会调用的函数 默认为空
  * @returns {Function}
  */
-export function debounce(fn: (...args: any[]) => any, idle: number, immediate = true, alwaysDo?: (...args: any[]) => any) {
-  let timer: any; // 定时器变量
-  let previous = 0; // 时间戳 用于记录上次执行的时间点
-  let context: any; // fn函数执行的作用域
-  let args: any[]; // fn函数执行传入的参数
-  let result: any; // fn函数执行的返回结果
+export function debounce<Fn extends (...args: any) => any>(fn: Fn, delay: number, immediate = true, alwaysDo?: (...args: any[]) => any) {
+  let timer: any; // 定时器
+  let previous = 0; // 时间戳, 用于记录前一次时间间隔的初始时间点
 
-  function later() {
-    result = fn.apply(context, args);
-    if (!timer) {
-      context = args = undefined;
-    }
-  }
-
-  return function (...args_: any[]) {
+  return function (...args: Parameters<Fn>): ReturnType<Fn> {
     const now = Date.now();
-    const spend = now - previous;
+    const spend = previous ? now - previous : 0;
 
-    previous = now;
-
-    if (spend >= idle && immediate) {
-      // 首次调用该函数 且 immediate 为 true 则立即执行
-      result = fn.apply(this, args_);
-      context = args = undefined;
-    } else {
-      // 在 idle 指定的时间内调用该方法，则启动计时器定时调用 fn 函数
-      if (timer) {
-        clearTimeout(timer);
-      }
-      context = this;
-      args = args_;
-      timer = setTimeout(later, idle);
-
-      // 在 idle 指定的时间内 仍调用的函数
-      if (alwaysDo) {
-        alwaysDo.apply(context);
-      }
+    // 由于 setTimeout 存在最小时间精度问题, 因此会存在到达 delay 的时间间隔, 但之前设置的 setTimeout 操作还没被执行,
+    // 因此为保险起见, 这里先清理 setTimeout
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
     }
 
-    return result;
+    if (previous === 0 && immediate) {
+      // 首次调用该函数 且 immediate 为 true, 则执行 fn
+      previous = now;
+      return fn.apply(this, args);
+    } else if (spend >= delay) {
+      // 已过去指定的时间间隔, 执行 fn
+      previous = now;
+      return fn.apply(this, args);
+    } else {
+      // 在指定的 delay 时间内调用 fn, 则启动计时器延迟执行
+      previous = now;
+      timer = setTimeout(
+        function (...args_: Parameters<Fn>) {
+          // 计时器执行完毕后, 重置 previous
+          previous = 0;
+          fn.apply(this, args_);
+          timer = null;
+        }.bind(this, args),
+        delay
+      );
+
+      // 在指定的 delay 时间内 仍调用的函数
+      if (alwaysDo) {
+        alwaysDo();
+      }
+    }
   };
 }
 
 /**
  * throttle
- * 频率控制 返回函数连续调用时，fn 执行频率限定为每多少时间（ms）执行一次
- * 描述：如果将水龙头拧紧直到水是以水滴的形式流出，那你会发现每隔一段时间，就会有一滴水流出。
- * 就是会说预先设定一个执行周期，当调用动作的时刻大于等于执行周期则执行该动作，然后进入下一个新周期。
+ * 频率控制: 返回函数连续调用时, fn 执行频率限定为每多少时间（ms）执行一次
+ * 描述: 如果将水龙头拧紧直到水是以水滴的形式流出, 那你会发现每隔一段时间, 就会有一滴水流出
+ * 就是会说预先设定一个执行周期, 当调用动作的时刻大于等于执行周期则执行该动作, 然后进入下一个新周期
  * @param {Function} fn 需要调用的函数
- * @param {Number} delay 延迟时间，单位毫秒
+ * @param {Number} delay 延迟时间, 单位: 毫秒
  * @param {Boolean} immediate
- * true：首次调用返回值方法时，会马上调用fn
- * false：仅会记录当前时刻，当第二次调用的时间间隔超过delay时，才调用fn。
+ * true：首次调用返回值方法时, 会马上调用 fn
+ * false：仅会记录当前时刻, 当第二次调用的时间间隔超过 delay 时, 才调用 fn
  * @param {Boolean} trailing
- * true：当调用方法时，未到达delay指定的时间间隔，则启动计时器延迟调用fn函数，
- * 若后续在既未达到delay指定的时间间隔和fn函数又未被调用的情况下调用返回值方法，则被调用请求将被忽略。
+ * true：处于 delay 指定的时间间隔内的调用将会启动计时器延迟执行
+ * false：处于 delay 指定的时间间隔内的调用将被忽略
  */
-export function throttle(fn: (...args: any[]) => any, delay: number, immediate = true, trailing = true) {
-  let timer: any; // 定时器变量
-  let previous = 0; // 时间戳 用于记录上次执行的时间点
-  // let context; // fn函数执行的作用域
-  // let args; // fn函数执行传入的参数
-  // let result; // fn函数执行的返回结果
+export function throttle<Fn extends (...args: any) => any>(fn: Fn, delay: number, immediate = true, trailing = true) {
+  let timer: any; // 定时器
+  let previous = 0; // 时间戳, 用于记录前一次时间间隔的初始时间点
 
-  function later() {
-    if (!immediate) {
-      previous = 0;
-    } else {
-      previous = Date.now();
-    }
-    timer = undefined;
-    // result = fn.apply(context, args);
-    // context = args = undefined;
-  }
-
-  return function () {
-    // context = this;
-
-    // args = arguments;
-
+  return function (...args: Parameters<Fn>): ReturnType<Fn> {
     const now = Date.now();
+    const spend = previous ? now - previous : 0;
 
-    if (!previous && !immediate) {
-      previous = now;
+    // 由于 setTimeout 存在最小时间精度问题, 因此会存在到达 delay 的时间间隔, 但之前设置的 setTimeout 操作还没被执行,
+    // 因此为保险起见, 这里先清理 setTimeout
+    if (timer) {
+      clearTimeout(timer);
+      timer = null;
     }
 
-    const remaining = delay - (now - previous);
-
-    // remaining 小于等于 0，表示上次执行至此所间隔时间已经超过一个 delay 间隔
-    // remaining 大于 delay 间隔，表示客户端系统时间被调整过
-    if (remaining <= 0 || remaining > delay) {
-      // 由于 setTimeout 存在最小时间精度问题，因此会存在到达 wait 的时间间隔，但之前设置的 setTimeout 操作还没被执行，因此为保险起见，这里先清理 setTimeout
-      if (timer) {
-        clearTimeout(timer);
-        timer = undefined;
-      }
+    if (previous === 0 && immediate) {
+      // 首次调用该函数 且 immediate 为 true, 则执行 fn
       previous = now;
-      // result = fn.apply(context, args);
-      // context = args = undefined;
-    } else if (!timer && trailing) {
-      // 如果延迟执行定时器不存在，且trailing为true，则启动定时器
-      timer = setTimeout(later, remaining);
+      return fn.apply(this, args);
+    } else if (spend >= delay) {
+      // 已过去指定的时间间隔, 执行 fn
+      previous = now;
+      return fn.apply(this, args);
+    } else if (trailing) {
+      // 当 trailing 为 true, 且在指定的 delay 时间内调用 fn, 则启动计时器延迟执行
+      // 若 remaining 大于 delay 间隔, 表示客户端的系统时间被调整过
+      const remaining = delay - spend;
+      if (previous === 0) {
+        previous = Date.now();
+      }
+      timer = setTimeout(
+        function (...args_: Parameters<Fn>) {
+          previous = Date.now();
+          fn.apply(this, args_);
+          timer = null;
+        }.bind(this, args),
+        remaining
+      );
     }
   };
 }
@@ -346,12 +340,12 @@ export function convertToQueryParameters(obj: any) {
 }
 
 /**
- * forEach 循环指定的对象、数组，可以添加中间值，即 reduce 函数功能
+ * forEach 循环指定的对象、数组, 可以添加中间值, 即 reduce 函数功能
  * @param {Object} data 需要循环的对象 可以是 Object、Array
  * @param {Function} fn 回调
  * 如果此回调返回了false：则结束此次循环
  * @param {Function} reducer 中间值
- * reducer 不推荐设置Wie boolean 值，不然会与 break 结束循环逻辑发生冲突
+ * reducer 不推荐设置Wie boolean 值, 不然会与 break 结束循环逻辑发生冲突
  * @return {Object} reducer
  */
 export function forEach<T extends any[] | Record<string, any>, R>(
@@ -388,7 +382,7 @@ export function forEach<T extends any[] | Record<string, any>, R>(
 /**
  * 深拷贝指定对象
  * @param originalObject 被拷贝对象
- * @param circular 检测是否存在循环引用，并自动处理其拷贝，默认为 false
+ * @param circular 检测是否存在循环引用, 并自动处理其拷贝, 默认为 false
  * @constructor
  */
 export function clone(originalObject: any, circular = false) {
@@ -590,10 +584,10 @@ export function getParamsFromUrl(paramStr?: string): Record<string, any> {
 type byProp<T> = (record: T) => string | number;
 
 /**
- * 指定属性，为数组进行分组
+ * 指定属性, 为数组进行分组
  * @param arr 数组
  * @param by 待分组的属性
- * @param slice 分组后的 item 默认不包含源 item 的属性，提供一个函数选择指定包含的属性
+ * @param slice 分组后的 item 默认不包含源 item 的属性, 提供一个函数选择指定包含的属性
  * @constructor
  */
 export function groupBy<TRecord extends Record<string, any>, TSlice extends Record<string, any>>(
@@ -659,10 +653,10 @@ export function groupBy<TRecord extends Record<string, any>, TSlice extends Reco
 }
 
 /**
- * 替代原生 toFixed 函数，解决 js 精度丢失问题
+ * 替代原生 toFixed 函数, 解决 js 精度丢失问题
  * @param value  指定的待转换的数值
- * @param digits 小数点后数字的个数；介于 0 到 20 （包括）之间，实现环境可能支持更大范围。如果忽略该参数，则默认为 0。
- * @param mode   当有效位数确定后，其后多余位数的处理模式，默认为 normal，即银行家舍入法 "四舍六入五成双"，round：标准的四舍五入，increase：无论数值大小，一律进1，ignore：一律舍弃
+ * @param digits 小数点后数字的个数；介于 0 到 20 （包括）之间, 实现环境可能支持更大范围如果忽略该参数, 则默认为 0
+ * @param mode   当有效位数确定后, 其后多余位数的处理模式, 默认为 normal, 即银行家舍入法 "四舍六入五成双", round：标准的四舍五入, increase：无论数值大小, 一律进1, ignore：一律舍弃
  * @constructor
  */
 export function toFixed(value: number, digits = 0, mode: 'ignore' | 'normal' | 'round' | 'increase' = 'normal'): string {
@@ -693,10 +687,10 @@ export function toFixed(value: number, digits = 0, mode: 'ignore' | 'normal' | '
       const before = parseInt(str.substr(dotIndex + digits, 1));
       // 判断前一位奇偶
       if (before % 2) {
-        // 奇数，进
+        // 奇数, 进
         carry = 1;
       } else {
-        // 偶数，舍
+        // 偶数, 舍
         carry = 0;
       }
     } else if (last > 5) {
@@ -818,7 +812,7 @@ function bindLazyFuncProxy<T extends Record<string, (...args: any[]) => Promise<
         functions.push(propertyKey);
 
         if (functions.length === properties.length) {
-          // 所绑定的属性均已执行过 set，清除 proxy
+          // 所绑定的属性均已执行过 set, 清除 proxy
           target_ = target;
           // revocable.revoke();
         }
@@ -838,9 +832,9 @@ function bindLazyFuncProxy<T extends Record<string, (...args: any[]) => Promise<
 }
 
 /**
- * 将指定的异步函数转换为队列模式，即每次调用后将进行等待，直到上一次调用完毕后再执行
- * 类似 debounce 函数，不同的是，执行逻辑是等待上次执行的结果，非指定时间内
- * 当设置 cached 为 true，将返回上次 promise 的结果。默认为 false
+ * 将指定的异步函数转换为队列模式, 即每次调用后将进行等待, 直到上一次调用完毕后再执行
+ * 类似 debounce 函数, 不同的是, 执行逻辑是等待上次执行的结果, 非指定时间内
+ * 当设置 cached 为 true, 将返回上次 promise 的结果默认为 false
  * @param func
  * @param cached
  * @constructor
@@ -878,11 +872,11 @@ const customizer = function (obj: any, src: any) {
 };
 
 /**
- * 合并对象，遇到数组属性覆盖
+ * 合并对象, 遇到数组属性覆盖
  * @param defaultProps 默认值
  * @param props 需要覆盖的对象
- * @param deep 是否深度合并，默认为 false
- * @param assignment 自定义赋值操作，默认为引用或值的传递
+ * @param deep 是否深度合并, 默认为 false
+ * @param assignment 自定义赋值操作, 默认为引用或值的传递
  * @constructor
  */
 export function mergeProps<T extends Record<string, any>>(
@@ -905,14 +899,14 @@ export function mergeProps<T extends Record<string, any>>(
         } else {
           if (isObject(defaultProps[key])) {
             if (deep) {
-              // 深度模式，进行递归合并
+              // 深度模式, 进行递归合并
               assignment(props, key, {});
               mergeProps(defaultProps[key], props[key], deep);
             } else {
               assignment(props, key, defaultProps[key]);
             }
           } else if (Array.isArray(defaultProps[key])) {
-            // 数组类型，将其克隆后替换
+            // 数组类型, 将其克隆后替换
             if (deep) {
               assignment(props, key, cloneDeep(defaultProps[key]));
             } else {
@@ -960,7 +954,7 @@ export function mergeHandlers<TTarget extends Record<string, (...args: any[]) =>
 }
 
 /**
- * 为指定字符串添加掩码，用于隐私信息显示，如身份证号码生日的数字替换为星号
+ * 为指定字符串添加掩码, 用于隐私信息显示, 如身份证号码生日的数字替换为星号
  * @param value
  * @param mask
  * @param start
@@ -1043,7 +1037,7 @@ export function convertModelArrToEnum<
 /**
  * 将指定的字符串数组转换为枚举类型
  * @param items
- * @param callback 指定枚举的 value，默认为键值
+ * @param callback 指定枚举的 value, 默认为键值
  * @constructor
  */
 export function convertArrToEnum<T extends readonly string[]>(

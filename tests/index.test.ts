@@ -1,4 +1,3 @@
-const s = '';
 import { expect } from 'chai';
 import {
   capitalize,
@@ -9,12 +8,17 @@ import {
   convertToCDB,
   convertToDBC,
   convertToQueryParameters,
+  debounce,
   deepExtend,
   extend,
   forEach,
   groupBy,
-  mergeProps
-} from '../dist/';
+  mergeProps,
+  throttle
+} from '../dist';
+
+jest.setTimeout(30000);
+jest.useFakeTimers();
 
 describe('# test main.', function () {
   it('## capitalize.', function () {
@@ -161,10 +165,179 @@ describe('# test main.', function () {
       };
     });
 
-    // console.log(arrNew, null, 2);
-
     expect(arrNew.length).to.equal(3);
     expect(arrNew[0].key).to.equal(1);
     expect(arrNew[0].d).to.equal('1');
+  });
+
+  it('## debounce', function (done) {
+    let index = 0;
+    let index2 = 0;
+    let res = undefined;
+    let res2 = undefined;
+
+    const func = debounce(
+      function (str: string, abs: number) {
+        index++;
+        return str + ' ' + index * abs;
+      },
+      2000,
+      false
+    );
+
+    const func2 = debounce(
+      function (str: string, abs: number) {
+        index2++;
+        return str + ' ' + index2 * abs;
+      },
+      2000,
+      true
+    );
+
+    res = func('tom', 10);
+    expect(index).to.equal(0);
+    expect(res).to.equal(undefined);
+
+    // immediate
+    res2 = func2('tom2', 10);
+
+    expect(index).to.equal(0);
+    expect(res).to.equal(undefined);
+    expect(index2).to.equal(1);
+    expect(res2).to.equal('tom2 10');
+
+    jest.advanceTimersByTime(1000);
+
+    // after 1s
+    expect(index).to.equal(0);
+    expect(res).to.equal(undefined);
+    expect(index2).to.equal(1);
+    expect(res2).to.equal('tom2 10');
+
+    jest.advanceTimersByTime(1000);
+
+    // after 1s
+    expect(index).to.equal(1);
+    expect(res).to.equal(undefined);
+
+    // run func
+    func('tom', 10);
+    expect(index).to.equal(1);
+    expect(res).to.equal(undefined);
+
+    jest.advanceTimersByTime(1000);
+
+    // after 1s
+    expect(index).to.equal(1);
+    expect(res).to.equal(undefined);
+
+    // run func again, will delay
+    func('tom', 10);
+    expect(index).to.equal(1);
+    expect(res).to.equal(undefined);
+
+    jest.advanceTimersByTime(1000);
+
+    // after 1s, will delay again
+    expect(index).to.equal(1);
+    expect(res).to.equal(undefined);
+
+    jest.advanceTimersByTime(1000);
+
+    // after 1s, will run
+    expect(index).to.equal(2);
+    expect(res).to.equal(undefined);
+
+    done();
+  });
+
+  let index = 0;
+  let index2 = 0;
+  let index3 = 0;
+  let n = 0;
+  let timer;
+
+  const func = throttle(
+    function (str: string, abs: number) {
+      index++;
+      return str + ' ' + index * abs;
+    },
+    2000,
+    false
+  );
+
+  const func2 = throttle(
+    function (str: string, abs: number) {
+      index2++;
+      return str + ' ' + index2 * abs;
+    },
+    2000,
+    true
+  );
+
+  const func3 = throttle(
+    function (str: string, abs: number) {
+      index3++;
+      return str + ' ' + index3 * abs;
+    },
+    2000,
+    true,
+    false
+  );
+
+  const setTime = function (delay, number) {
+    index = 0;
+    index2 = 0;
+    index3 = 0;
+    n = 0;
+
+    func('tom', 10);
+    func2('tom2', 10);
+    func2('tom3', 10);
+    timer = setInterval(() => {
+      func('tom', 10);
+      func2('tom2', 10);
+      func3('tom3', 10);
+      n++;
+      if (n >= number) {
+        clearInterval(timer);
+      }
+    }, delay);
+  };
+
+  it('## throttle', function (done) {
+    setTime(500, 8);
+    jest.advanceTimersByTime(10000);
+
+    // after 10s
+    expect(n).to.equal(8);
+    expect(index).to.equal(2);
+    expect(index2).to.equal(3);
+    expect(index3).to.equal(2);
+
+    jest.advanceTimersByTime(1000);
+
+    // after 1s
+    expect(index).to.equal(2);
+    expect(index2).to.equal(3);
+    expect(index3).to.equal(2);
+
+    jest.advanceTimersByTime(5000);
+
+    // after 5s
+    expect(index).to.equal(2);
+    expect(index2).to.equal(3);
+    expect(index3).to.equal(2);
+
+    setTime(1000, 10);
+    jest.advanceTimersByTime(10000);
+
+    // after 10s
+    expect(n).to.equal(10);
+    expect(index).to.equal(6);
+    expect(index2).to.equal(6);
+    expect(index3).to.equal(5);
+
+    done();
   });
 });
