@@ -80,7 +80,7 @@ export function debounce<Fn extends (...args: any) => any>(fn: Fn, delay: number
       // 在指定的 delay 时间内调用 fn, 则启动计时器延迟执行
       previous = now;
       timer = setTimeout(
-        function (...args_: Parameters<Fn>) {
+        function (args_) {
           // 计时器执行完毕后, 重置 previous
           previous = 0;
           fn.apply(this, args_);
@@ -142,7 +142,7 @@ export function throttle<Fn extends (...args: any) => any>(fn: Fn, delay: number
         previous = Date.now();
       }
       timer = setTimeout(
-        function (...args_: Parameters<Fn>) {
+        function (args_) {
           previous = Date.now();
           fn.apply(this, args_);
           timer = null;
