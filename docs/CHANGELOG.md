@@ -1,3 +1,11 @@
+## [2.2.1](https://github.com/fatesigner/utils/compare/v2.2.0...v2.2.1) (2021-09-22)
+
+
+### Bug Fixes
+
+* upgrade html2canvas from 1.1.0 to 1.2.2 ([91b2c05](https://github.com/fatesigner/utils/commit/91b2c0537d9f0c9c612569d4ab1a77d901a8fe6b))
+* 更新 debounce and throttle 函数 ([075ecab](https://github.com/fatesigner/utils/commit/075ecab542069aaf4db850a438458887673167dc))
+
 # [2.2.0](https://github.com/fatesigner/utils/compare/v2.1.1...v2.2.0) (2021-09-02)
 
 
