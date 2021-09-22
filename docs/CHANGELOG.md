@@ -1,3 +1,10 @@
+## [2.2.2](https://github.com/fatesigner/utils/compare/v2.2.1...v2.2.2) (2021-09-22)
+
+
+### Bug Fixes
+
+* 修复 debounce and throttle 函数传参 BUG ([e25d91e](https://github.com/fatesigner/utils/commit/e25d91e466c3cab29cf2a65b7493ae6b82668adc))
+
 ## [2.2.1](https://github.com/fatesigner/utils/compare/v2.2.0...v2.2.1) (2021-09-22)
 
 
