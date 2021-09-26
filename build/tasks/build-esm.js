@@ -8,24 +8,24 @@ const merge = require('merge2');
 const ts = require('gulp-typescript');
 
 gulp.task('build-esm', async function () {
-  const env = require('../env')();
+  const { OUTPUT_PATH, ROOT_PATH, SRC_PATH } = require('../constants');
 
   // Build esm module
-  const TsProject = ts.createProject(path.join(env.rootPath, 'tsconfig.json'), {
+  const TsProject = ts.createProject(path.join(ROOT_PATH, 'tsconfig.json'), {
     declaration: true
   });
   const tsResult = gulp
     .src(
       [
-        path.join(env.srcPath, '**/*.ts'),
-        '!' + path.join(env.srcPath, '**/types.ts'),
-        '!' + path.join(env.srcPath, '**/*.d.ts'),
-        '!' + path.join(env.srcPath, '**/*.spec.ts')
+        path.join(SRC_PATH, '**/*.ts'),
+        '!' + path.join(SRC_PATH, '**/types.ts'),
+        '!' + path.join(SRC_PATH, '**/*.d.ts'),
+        '!' + path.join(SRC_PATH, '**/*.spec.ts')
       ],
       {
         allowEmpty: true
       }
     )
     .pipe(TsProject());
-  merge([tsResult.dts.pipe(gulp.dest(env.outputPath)), tsResult.js.pipe(gulp.dest(env.outputPath))]);
+  merge([tsResult.dts.pipe(gulp.dest(OUTPUT_PATH)), tsResult.js.pipe(gulp.dest(OUTPUT_PATH))]);
 });

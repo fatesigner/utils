@@ -152,11 +152,7 @@ export class StructureTree<
     return some(nodes, []);
   }
 
-  reduce<TPrev = any>(
-    nodes: T[],
-    callback: (prev: TPrev, cur: T, index: number, parentNodes: T[]) => TPrev,
-    prev: TPrev
-  ): TPrev {
+  reduce<TPrev = any>(nodes: T[], callback: (prev: TPrev, cur: T, index: number, parentNodes: T[]) => TPrev, prev: TPrev): TPrev {
     this.forEach(nodes, (node, index, parentNodes) => {
       prev = callback(prev, node, index, parentNodes);
     });

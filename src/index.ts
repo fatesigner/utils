@@ -659,7 +659,7 @@ export function groupBy<TRecord extends Record<string, any>, TSlice extends Reco
  * @param mode   当有效位数确定后, 其后多余位数的处理模式, 默认为 normal, 即银行家舍入法 "四舍六入五成双", round：标准的四舍五入, increase：无论数值大小, 一律进1, ignore：一律舍弃
  * @constructor
  */
-export function toFixed(value: number, digits = 0, mode: 'ignore' | 'normal' | 'round' | 'increase' = 'normal'): string {
+export function toFixed(value: number, digits = 0, mode: 'ignore' | 'normal' | 'round' | 'increase' = 'normal'): number {
   let carry = 0;
 
   const str = value + '';
@@ -701,7 +701,7 @@ export function toFixed(value: number, digits = 0, mode: 'ignore' | 'normal' | '
   const multiple = Math.pow(10, digits);
   const num = Math.floor(value * multiple) + carry;
 
-  return (num / multiple) as any;
+  return num / multiple;
 }
 
 /**

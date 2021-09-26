@@ -14,13 +14,32 @@ require('./clean');
 gulp.task(
   'build',
   gulp.series('clean', gulp.parallel('build-cjs', 'build-esm'), async function () {
-    const env = require('../env')();
+    const { OUTPUT_PATH, ROOT_PATH, SRC_PATH } = require('../constants');
+
+    // Copy type.ts
+    await new Promise((resolve) => {
+      gulp
+        .src([path.join(SRC_PATH, 'types/**/*.ts')], {
+          allowEmpty: true,
+          base: SRC_PATH
+        })
+        .pipe(gulp.dest(OUTPUT_PATH))
+        .on('end', resolve);
+    });
+
+    // Copy other files to output
+    await new Promise((resolve) => {
+      gulp
+        .src([path.join(SRC_PATH, '**/*'), '!' + path.join(SRC_PATH, '**/*.ts')])
+        .pipe(gulp.dest(OUTPUT_PATH))
+        .on('end', resolve);
+    });
 
     // Copy npm publish files to output
     await new Promise((resolve) => {
       gulp
-        .src(['README.md'].map((x) => path.join(env.rootPath, x)))
-        .pipe(gulp.dest(env.outputPath))
+        .src(['README.md'].map((x) => path.join(ROOT_PATH, x)))
+        .pipe(gulp.dest(OUTPUT_PATH))
         .on('end', resolve);
     });
 
@@ -34,25 +53,6 @@ gulp.task(
         return prev;
       }, {});
     }
-    fs.writeFileSync(path.join(env.outputPath, 'package.json'), JSON.stringify(pkg, null, 2), { encoding: 'utf8' });
-
-    // Copy type.ts
-    await new Promise((resolve) => {
-      gulp
-        .src([path.join(env.srcPath, 'types/**/*.ts')], {
-          allowEmpty: true,
-          base: env.srcPath
-        })
-        .pipe(gulp.dest(env.outputPath))
-        .on('end', resolve);
-    });
-
-    // Copy other files to output
-    await new Promise((resolve) => {
-      gulp
-        .src([path.join(env.srcPath, '**/*'), '!' + path.join(env.srcPath, '**/*.ts')])
-        .pipe(gulp.dest(env.outputPath))
-        .on('end', resolve);
-    });
+    fs.writeFileSync(path.join(OUTPUT_PATH, 'package.json'), JSON.stringify(pkg, null, 2), { encoding: 'utf8' });
   })
 );
