@@ -5,7 +5,7 @@
 import { supportPrefix } from './style';
 import { browserClient } from './user-agent';
 import { isArray, isFunction, isNullOrUndefined, isString } from './type-check';
-import { applyBind, forEach } from './';
+import { applyBind } from './';
 
 /**
  * 枚举：用于表示方向
@@ -932,9 +932,8 @@ export function addEventListener(element: any, type: string, handler: (...any) =
 }
 
 function offHandler() {
-  forEach(this, function (item: any) {
+  this.forEach(function (item: any) {
     removeEventListener(item.element, item.type, item.handler);
-    return true;
   });
 }
 
@@ -978,8 +977,8 @@ export function on(elements, types: string, selector: string, handlerForMatched?
   }
   if (elements.length) {
     const handlers = [];
-    forEach(elements, function (element) {
-      forEach(typesArray, function (type: any) {
+    elements.forEach(function (element) {
+      typesArray.forEach(function (type: any) {
         let applyHandler = handlerForMatched;
         if (isAgency) {
           applyHandler = applyBind(onHandler, {
@@ -996,9 +995,7 @@ export function on(elements, types: string, selector: string, handlerForMatched?
           type,
           handler: applyHandler
         });
-        return true;
       });
-      return true;
     });
     return applyBind(offHandler, handlers);
   }
