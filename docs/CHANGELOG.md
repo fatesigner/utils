@@ -1,3 +1,10 @@
+## [2.2.4](https://github.com/fatesigner/utils/compare/v2.2.3...v2.2.4) (2021-12-02)
+
+
+### Bug Fixes
+
+* remove foreach in document ([153e9cf](https://github.com/fatesigner/utils/commit/153e9cf3531b3149905fc057d126b4311f00e403))
+
 ## [2.2.3](https://github.com/fatesigner/utils/compare/v2.2.2...v2.2.3) (2021-12-02)
 
 
