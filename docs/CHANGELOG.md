@@ -1,3 +1,10 @@
+## [2.2.3](https://github.com/fatesigner/utils/compare/v2.2.2...v2.2.3) (2021-12-02)
+
+
+### Bug Fixes
+
+* fix on ([d1417ba](https://github.com/fatesigner/utils/commit/d1417ba38195aa88cbcaf7013999e32d19636736))
+
 ## [2.2.2](https://github.com/fatesigner/utils/compare/v2.2.1...v2.2.2) (2021-09-22)
 
 
