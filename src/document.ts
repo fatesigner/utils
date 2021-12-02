@@ -957,8 +957,6 @@ export function on(elements, types: string, selector: string, handlerForMatched?
   const isAgency = isString(selector) && selector.length;
 
   if (!isFunction(handlerForMatched)) {
-    return;
-  } else {
     handlerForMatched = returnFalse;
   }
 
