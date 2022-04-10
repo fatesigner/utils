@@ -5,7 +5,8 @@ release.md
 /deploykeys*
 
 # dependencies
-/node_modules
+node_modules
+yarn-error.log
 
 # test output
 /.nyc_output
@@ -17,6 +18,7 @@ coverage.lcov
 
 # compiled output
 /dist
+/example
 /static
 /tmp
 /temp

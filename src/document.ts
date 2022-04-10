@@ -762,12 +762,12 @@ export function getImageSrc(file: File | string): Promise<any> {
   return new Promise((resolve, reject) => {
     let url;
     if (navigator.userAgent.indexOf('Chrome') > 0 || navigator.userAgent.indexOf('Firefox') > 0 || navigator.userAgent.indexOf('Safari') > 0) {
-      url = URL.createObjectURL(file);
+      url = URL.createObjectURL(file as File);
       resolve(url);
     } else if (navigator.userAgent.indexOf('MSIE') >= 1 || navigator.userAgent.indexOf('Trident') >= 1) {
       // url = file.value;
       if (URL && URL.createObjectURL) {
-        url = URL.createObjectURL(file);
+        url = URL.createObjectURL(file as File);
         resolve(url);
       } else {
         reject(new Error('Get image src are not supported in the current browser.'));
@@ -800,7 +800,7 @@ export function clearInputFile(input) {
  */
 
 // 正则 分割空格
-const reg_splitWhitespace = /\S+/g;
+const regSplitWhitespace = /\S+/g;
 
 function getEvent(e) {
   return e || event;
@@ -820,7 +820,7 @@ function getHandlerQueue(e) {
   const handlerQueue = [];
   const selectors = _this.element.querySelectorAll(_this.selector);
   if (_this && _this.element && targetEl.nodeType && (!e.button || e.type !== 'click')) {
-    for (; targetEl != _this.element; targetEl = targetEl.parentNode || _this.element) {
+    for (; targetEl !== _this.element; targetEl = targetEl.parentNode || _this.element) {
       for (let j = 0, jl = selectors.length; j < jl; j++) {
         if (selectors[j] === targetEl) {
           handlerQueue.push(targetEl);
@@ -867,7 +867,7 @@ function onHandler(e) {
 
 function checkHover(e, target) {
   e = getEvent(e);
-  if (e.type == 'mouseover') {
+  if (e.type === 'mouseover') {
     return !contains(target, e.relatedTarget || e.fromElement) && !((e.relatedTarget || e.fromElement) === target);
   } else {
     return !contains(target, e.relatedTarget || e.toElement) && !((e.relatedTarget || e.toElement) === target);
@@ -949,7 +949,7 @@ function offHandler() {
  * @return {Function} 执行后 清除代理
  */
 export function on(elements, types: string, selector: string, handlerForMatched?: (...any) => any, handlerForAll?: (...any) => any, one?: boolean) {
-  let typesArray = (types || '').match(reg_splitWhitespace);
+  let typesArray = (types || '').match(regSplitWhitespace);
   if (!typesArray) {
     typesArray = [''];
   }
