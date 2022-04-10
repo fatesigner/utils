@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/fatesigner/utils/compare/v2.2.5...v2.3.0) (2022-04-10)
+
+
+### Features
+
+* add helper tools for Exceljs ([da6d62e](https://github.com/fatesigner/utils/commit/da6d62e37f375997f41b4f8cc7488958303a9886))
+
 ## [2.2.5](https://github.com/fatesigner/utils/compare/v2.2.4...v2.2.5) (2021-12-02)
 
 
