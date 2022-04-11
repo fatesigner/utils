@@ -1,3 +1,11 @@
+# [2.4.0](https://github.com/fatesigner/utils/compare/v2.3.0...v2.4.0) (2022-04-11)
+
+
+### Features
+
+* add getLength function for ExceljsHelper ([c8a114d](https://github.com/fatesigner/utils/commit/c8a114d4d4adabbe32ca1a7ef2f53ef26211c9bb))
+* add test flow ([6691177](https://github.com/fatesigner/utils/commit/6691177c09672b8ecfed73357974aa677f417d5f))
+
 # [2.3.0](https://github.com/fatesigner/utils/compare/v2.2.5...v2.3.0) (2022-04-10)
 
 
