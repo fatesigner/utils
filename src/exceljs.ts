@@ -10,7 +10,7 @@ import { isObject } from './type-check';
 /**
  * Worksheet Column options type
  */
-export interface IWorksheetColumn<TModel extends Record<string, any>> extends Excel.Column {
+export interface IWorksheetColumn<TModel extends Record<string, any>> extends Partial<Excel.Column> {
   /**
    * Column format type
    *
@@ -110,6 +110,24 @@ export function configureExceljs(options: Partial<IExceljsHelperOptions>) {
      worksheet.mergeCells(`${createCellPos(i)}1:${createCellPos(i)}2`);
    }
 } */
+
+/**
+ * Get the actual length of the string
+ * @param str
+ */
+function getStrLen(str: string) {
+  let leng = 0;
+  let charCode = -1;
+  for (let i = 0, len = str.length; i < len; i++) {
+    charCode = str.charCodeAt(i);
+    if (charCode >= 0 && charCode <= 128) {
+      leng += 1;
+    } else {
+      leng += 2;
+    }
+  }
+  return leng;
+}
 
 /**
  * Set style for specified row
@@ -257,7 +275,8 @@ export class ExceljsHelper {
       const widthRatio = ((options?.fontSize ?? 10) - 8) * 0.086 + 0.768;
 
       for (const s of str) {
-        maxWidth = Math.max(maxWidth, s.length * widthRatio);
+        const len = getStrLen(s);
+        maxWidth = Math.max(maxWidth, len * widthRatio);
       }
 
       return maxWidth;
@@ -293,11 +312,7 @@ export class ExceljsHelper {
    */
   static async addWorksheet<TModel extends Record<string, any>>(
     name?: string,
-    options?: IExceljsHelperOptions & {
-      columns: IWorksheetColumn<TModel>[];
-      data: TModel[];
-      worksheetOptions?: Partial<Excel.AddWorksheetOptions>;
-    },
+    options?: IWorksheetAddOptions<TModel>,
     workbook?: Excel.Workbook
   ): Promise<{
     workbook: Excel.Workbook;
