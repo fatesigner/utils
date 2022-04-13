@@ -1,3 +1,11 @@
+# [2.5.0](https://github.com/fatesigner/utils/compare/v2.4.0...v2.5.0) (2022-04-13)
+
+
+### Features
+
+* add helpers for gsap and OData ([a29779e](https://github.com/fatesigner/utils/commit/a29779eb82856d68595090c78810143ac14aacca))
+* update som function ([69f1f5d](https://github.com/fatesigner/utils/commit/69f1f5dc389865e062f55941ad2a072bced17ead))
+
 # [2.4.0](https://github.com/fatesigner/utils/compare/v2.3.0...v2.4.0) (2022-04-11)
 
 
