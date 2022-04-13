@@ -14,7 +14,8 @@ import {
   forEach,
   groupBy,
   mergeProps,
-  throttle
+  throttle,
+  toFixed
 } from '../dist';
 
 jest.setTimeout(30000);
@@ -173,8 +174,8 @@ describe('# test main.', function () {
   it('## debounce', function (done) {
     let index = 0;
     let index2 = 0;
-    let res = undefined;
-    let res2 = undefined;
+    let res;
+    let res2;
 
     const func = debounce(
       function (str: string, abs: number) {
@@ -339,5 +340,10 @@ describe('# test main.', function () {
     expect(index3).to.equal(5);
 
     done();
+  });
+  it('## toFixed', function () {
+    expect(toFixed(12.3232)).to.equal(12);
+    expect(toFixed(12.3232, 2)).to.equal(12.32);
+    expect(toFixed(12.3232, 4)).to.equal(12.3232);
   });
 });

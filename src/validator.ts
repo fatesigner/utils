@@ -7,17 +7,17 @@ import { isArray, isBoolean, isNullOrUndefined, isString } from './type-check';
 
 /**
  * 判断指定的值是否符合必填规则
- * 对于数组，判断数量是否大于 0,
- * @param {Object} value
+ * 对于数组，判断数量是否大于 0
+ * @param value
  * @returns {boolean}
  */
-export function Required(value: any): boolean {
+export function Required(value: unknown): boolean {
   if (isNullOrUndefined(value)) {
     return false;
   } else if (isString(value)) {
     return !!value;
   } else if (isArray(value)) {
-    return !!value.length;
+    return !!(value as unknown[]).length;
   } else if (isBoolean(value)) {
     return !!value;
   } else {
@@ -27,16 +27,16 @@ export function Required(value: any): boolean {
 
 /**
  * 判断是否为数字
- * @param {Object} value
+ * @param value
  * @returns {boolean}
  */
-export function isNumber(value: any) {
-  return !isNaN(value);
+export function isNumber(value: unknown) {
+  return !isNaN(value as number);
 }
 
 /**
  * 判断指定的字符串长度是否符合给定的范围
- * @param {Object} value
+ * @param value
  * @param {number} minLength
  * @param maxLength
  * @returns {boolean}
@@ -53,16 +53,16 @@ export function LenLimit(value: string, minLength = 0, maxLength: number) {
 
 /**
  * 整数（包含0）
- * @param {Object} value
+ * @param value
  * @param {boolean} positive 是否为正数，否则为负数
  * @returns {boolean}
  */
-export function isInt(value: any, positive?: boolean) {
+export function isInt(value: unknown, positive?: boolean) {
   if (!isNullOrUndefined(value)) {
     if (isNumber(value)) {
       value = value.toString();
     }
-    if (isString(value) && value.length) {
+    if (isString(value) && (value as string).length) {
       if (isBoolean(positive)) {
         if (positive) {
           // 非负整数 + 0
@@ -85,7 +85,7 @@ export function isInt(value: any, positive?: boolean) {
 
 /**
  * 判断是否为符合指定规则的 decimal
- * @param {Object} value
+ * @param value
  * @param intLimit 整数部分位数长度限制 [minLength, maxLength]
  * @param dicimalLimit 小数部分位数长度限制 [minLength, maxLength]
  * @returns {boolean}
@@ -110,19 +110,19 @@ export function isDecimal(value: string | number, intLimit: [number, number?] = 
  * 17段：170、176、177、178
  * 18段：180-189
  * 19段：198、199
- * @param {Object} value
+ * @param value
  * @returns {boolean}
  */
 export function isCellphone(value: string | number) {
   if (value) {
-    return /^(((13[0-9])|(14[0-9])|(15[0-9])|(16[0-9])|(17[0-9])|(18[0-9])|(19[0-9]))+\d{8})$/.test(value.toString());
+    return /^(((13\d)|(14\d)|(15\d)|(16\d)|(17\d)|(18\d)|(19\d))+\d{8})$/.test(value.toString());
   }
   return true;
 }
 
 /**
  * 身份证号码，简单版本，验证15或18位
- * @param {Object} value
+ * @param value
  * @returns {boolean}
  */
 export function isIdCard(value: string) {
@@ -142,12 +142,12 @@ export function isIdCard(value: string) {
  * 3.@符号是必填项
  * 4.右则部分可分为两部分，第一部分为邮件提供商域名地址，第二部分为域名后缀，现已知的最短为2位。最长的为6为。
  * 5.邮件提供商域可以包含特殊字符-、_、.
- * @param {Object} value
+ * @param value
  * @returns {boolean}
  */
 export function isEmail(value: string) {
   if (value) {
-    return /^[a-z0-9]+([._\\-]*[a-z0-9])*@([a-z0-9]+[-a-z0-9]*[a-z0-9]+.){1,63}[a-z0-9]+$/.test(value);
+    return /^[a-z\d]+([._\\-]*[a-z\d])*@([a-z\d]+[-a-z\d]*[a-z\d]+.){1,63}[a-z\d]+$/.test(value);
   }
   return true;
 }

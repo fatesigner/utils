@@ -6,6 +6,7 @@ import { merge } from 'lodash-es';
 import Excel from 'exceljs/index.d';
 
 import { isObject } from './type-check';
+import { downloadFile } from './document';
 
 /**
  * Worksheet Column options type
@@ -381,12 +382,6 @@ export class ExceljsHelper {
   static async downloadFile(workbook: Excel.Workbook, filename?: string, contentType?: string) {
     const buffer = await workbook.xlsx.writeBuffer();
     const blob = new Blob([buffer], { type: contentType ?? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8' });
-    const objectUrl = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    document.body.appendChild(a);
-    a.href = objectUrl;
-    a.download = `${filename || new Date().getTime()}.xlsx`;
-    a.click();
-    document.body.removeChild(a);
+    downloadFile(blob, filename);
   }
 }

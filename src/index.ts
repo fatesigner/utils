@@ -4,6 +4,7 @@
 
 import { cloneDeep } from 'lodash-es';
 
+import { UnknownType } from './types';
 import { isArray, isBoolean, isFunction, isNodeList, isNullOrUndefined, isNumber, isObject, isString } from './type-check';
 
 /**
@@ -226,7 +227,7 @@ export function convertHumpStrToBridge(hump: string) {
   if (hump) {
     let s = hump.replace(/([A-Z])/g, '-$1').toLowerCase();
     if (s && s.length && s[0] === '-') {
-      s = s.substr(1, s.length - 1);
+      s = s.substring(1);
     }
     return s;
   }
@@ -296,7 +297,7 @@ export function convertBase64ToBlob(b64Data: string, contentType?: string, slice
   let byteCharacters;
 
   if (s.length && s[0].indexOf('base64') >= 0) {
-    byteCharacters = atob(s[1]);
+    byteCharacters = Buffer.from(s[1], 'base64').toString('binary');
   } else {
     byteCharacters = encodeURI(s[1]);
   }
@@ -486,7 +487,6 @@ function deepCloneArray(arr: any[]) {
       } else if (isSpecificValue(item)) {
         clone[index] = cloneSpecificValue(item);
       } else {
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define
         clone[index] = deepExtend({}, item);
       }
     } else {
@@ -634,7 +634,7 @@ export function groupBy<TRecord extends Record<string, any>, TSlice extends Reco
             item = Object.assign({}, item, slice(cur));
           }
           if (isString(by)) {
-            item['key'] = cur[by as keyof TRecord];
+            item.key = cur[by as keyof TRecord];
           }
           item.children = [cur];
           prev.arr.push(item);
@@ -667,7 +667,7 @@ export function toFixed(value: number, digits = 0, mode: 'ignore' | 'normal' | '
 
   let last = 0;
   if (dotIndex > -1) {
-    last = parseInt(str.substr(dotIndex + digits + 1, 1)) || 0;
+    last = parseInt(str.substring(dotIndex + digits + 1, dotIndex + digits + 2)) || 0;
   }
 
   if (mode === 'ignore') {
@@ -684,7 +684,7 @@ export function toFixed(value: number, digits = 0, mode: 'ignore' | 'normal' | '
     // normal
     if (last === 5) {
       // get before
-      const before = parseInt(str.substr(dotIndex + digits, 1));
+      const before = parseInt(str.substring(dotIndex + digits, dotIndex + digits + 1));
       // 判断前一位奇偶
       if (before % 2) {
         // 奇数, 进
@@ -865,12 +865,6 @@ const isMergeObject = function (val: any): boolean {
   return Object.prototype.toString.call(val) === '[object Object]' || Object.prototype.toString.call(val) === '[object Undefined]';
 };
 
-const customizer = function (obj: any, src: any) {
-  if (isArray(src)) {
-    return src;
-  }
-};
-
 /**
  * 合并对象, 遇到数组属性覆盖
  * @param defaultProps 默认值
@@ -972,8 +966,8 @@ export function addMask(value: string, start = 0, end = 0, mask = '*') {
   if (!end) {
     end = length;
   }
-  const startStr = value.substr(0, start);
-  const endStr = value.substr(end, value.length - 1);
+  const startStr = value.substring(0, start);
+  const endStr = value.substring(end, end + value.length - 1);
   let c = '';
   if (length >= start) {
     for (; start < end; start++) {
@@ -992,6 +986,7 @@ export function addMask(value: string, start = 0, end = 0, mask = '*') {
  * @constructor
  */
 export function convertModelArrToEnum<
+  // eslint-disable-next-line no-use-before-define
   T extends Readonly<Array<{ name: TName; value: TValue; text: TText } & { [key in string]: any }>>,
   TName extends string,
   TValue extends string | number,
@@ -1054,4 +1049,44 @@ export function convertArrToEnum<T extends readonly string[]>(
     }
     return prev;
   }, {} as any);
+}
+
+/**
+ * 移动指定集合中元素的位置
+ * @param arr
+ * @param index
+ * @param index2
+ * @return arr
+ */
+export function exchangeItem(arr: unknown[], index: number, index2: number) {
+  if (index !== index2) {
+    if (index > index2) {
+      const temp = index2;
+      index2 = index;
+      index = temp;
+    }
+    const item = arr?.[index];
+    if (item && arr.length >= index2 - 1) {
+      arr.splice(index2 + 1, 0, item);
+      arr.splice(index, 1);
+    }
+  }
+  return arr;
+}
+
+/**
+ * 移除集合中的指定元素，并返回该元素在集合中的位置
+ * @param callback
+ * @param arr
+ * @return index
+ */
+export function removeItem<T extends UnknownType = never>(callback: (record: T) => boolean, arr: T[]): number {
+  if (arr) {
+    const index = arr.findIndex((x) => callback(x));
+    if (index > -1) {
+      arr.splice(index, 1);
+    }
+    return index;
+  }
+  return -1;
 }
