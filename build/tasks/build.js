@@ -39,9 +39,10 @@ gulp.task(
     // Copy type.ts
     await new Promise((resolve) => {
       gulp
-        .src([path.join(env.srcPath, 'types/**/*.ts')], {
+        .src([path.join(env.srcPath, '**/*.d.ts'), '!' + path.join(env.srcPath, 'types/**/*.ts')], {
           allowEmpty: true,
-          base: env.srcPath
+          base: env.srcPath,
+          nodir: true
         })
         .pipe(gulp.dest(env.outputPath))
         .on('end', resolve);
@@ -50,7 +51,9 @@ gulp.task(
     // Copy other files to output
     await new Promise((resolve) => {
       gulp
-        .src([path.join(env.srcPath, '**/*'), '!' + path.join(env.srcPath, '**/*.ts')])
+        .src([path.join(env.srcPath, '**/*'), '!' + path.join(env.srcPath, '**/*.ts')], {
+          nodir: true
+        })
         .pipe(gulp.dest(env.outputPath))
         .on('end', resolve);
     });

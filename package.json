@@ -38,6 +38,7 @@
   "peerDependencies": {
     "await-to-js": "2.x || 3.x",
     "exceljs": "4.x",
+    "gsap": "3.x",
     "lodash-es": "4.x",
     "rxjs": "6.x || 7.x"
   },
