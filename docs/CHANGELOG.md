@@ -1,3 +1,10 @@
+# [2.6.0](https://github.com/fatesigner/utils/compare/v2.5.0...v2.6.0) (2022-04-15)
+
+
+### Features
+
+* add strictFunctionTypes option, then update function and types ([a0f99d9](https://github.com/fatesigner/utils/commit/a0f99d96315de1e81f62a22df2acbecc8c05262d))
+
 # [2.5.0](https://github.com/fatesigner/utils/compare/v2.4.0...v2.5.0) (2022-04-13)
 
 
