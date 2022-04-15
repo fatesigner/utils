@@ -133,3 +133,12 @@ export function isFunction(obj: unknown) {
 export function isSymbol(obj: unknown) {
   return typeof obj === 'symbol' || (typeof obj === 'object' && Object.prototype.toString.call(obj) === '[object Symbol]');
 }
+
+/**
+ * 判断给定的值是否为 Date 类型
+ * @param obj
+ * @return {boolean}
+ */
+export function isDate(obj: unknown) {
+  return Object.prototype.toString.call(obj) === '[object Date]';
+}

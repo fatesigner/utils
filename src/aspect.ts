@@ -8,180 +8,188 @@ import { isFunction } from './type-check';
 const InvalidAspect = new Error('Missing a valid aspect. Aspect is not a function.');
 const InvalidMethod = new Error('Missing valid method to apply aspect on.');
 
-export type PointcutBindType<F, C> = {
-  func: F;
-  context: C;
-};
-
-export type PointcutInjectType<T> = {
-  func: string;
-  target: T;
-};
-
 export type InjectResType = {
   cancel: () => void;
 };
 
 /**
- * 创建一个新函数，并以指定的作用域执行切入的代码，之后调用目标函数
- * @param aspectFunc
- * @param pointcut
- * @constructor
+ * 创建一个新函数，以指定的作用域执行切入的代码，之后调用目标函数
+ * @param aspectFunc 切入的自定义函数
+ * @param sourceFunc 要切入的目标函数
+ * @param context 函数执行的作用域
  */
-export function bindBefore<A extends (...args: Parameters<F>) => Parameters<F>, F extends (...args: any) => any, C>(
+export function bindBefore<S extends (...args: unknown[]) => unknown, A extends (...args: Parameters<S>) => Parameters<S>>(
   aspectFunc: A,
-  pointcut: PointcutBindType<F, C>
-): F {
+  sourceFunc: S,
+  context?
+) {
   if (!isFunction(aspectFunc)) {
     throw InvalidAspect;
   }
 
-  if (!pointcut.func) {
+  if (!isFunction(sourceFunc)) {
     throw InvalidMethod;
   }
 
-  return function (...args) {
-    args = aspectFunc.apply(pointcut.context || this, args);
-    return pointcut.func.apply(pointcut.context || this, args);
-  } as F;
+  return function (...args: Parameters<S>): ReturnType<S> {
+    const ctx = context ?? this;
+    const args_ = aspectFunc.apply(ctx, args);
+    return sourceFunc.apply(ctx, args_);
+  };
 }
 
 /**
- * 往目标函数的执行前阶段以指定的作用域注入代码
- * @param aspectFunc
- * @param pointcut
- * @constructor
+ * 创建一个新函数，以指定的作用域执行目标函数，之后执行切入的代码
+ * @param aspectFunc 切入的自定义函数
+ * @param sourceFunc 要切入的目标函数
+ * @param context 函数执行的作用域
  */
-export function injectBefore<F extends (...args: any) => any, T>(
-  aspectFunc: (...args: Parameters<F>) => Parameters<F>,
-  pointcut: PointcutInjectType<T>
+export function bindAfter<S extends (...args: unknown[]) => unknown>(aspectFunc: (args: ReturnType<S>) => ReturnType<S>, sourceFunc: S, context?) {
+  if (!isFunction(aspectFunc)) {
+    throw InvalidAspect;
+  }
+
+  if (!isFunction(sourceFunc)) {
+    throw InvalidMethod;
+  }
+
+  return function (...args: Parameters<S>): ReturnType<S> {
+    const ctx = context ?? this;
+    const args_ = sourceFunc.apply(ctx, args);
+    return aspectFunc.apply(ctx, [args_]);
+  };
+}
+
+/**
+ * 往目标函数的执行前阶段切入代码
+ * @param aspectFunc 切入的自定义函数
+ * @param name 要切入的目标函数名
+ * @param target 目标函数对象（作用域）
+ */
+export function injectBefore<S extends (...args: unknown[]) => unknown>(
+  aspectFunc: (...args: Parameters<S>) => Parameters<S>,
+  name: string,
+  target
 ): InjectResType {
   if (!isFunction(aspectFunc)) {
     throw InvalidAspect;
   }
 
-  const prototype = (pointcut.target as any).prototype ? (pointcut.target as any).prototype : pointcut.target;
+  if (!name) {
+    throw InvalidMethod;
+  }
 
-  const originalFunc = prototype[pointcut.func];
+  const prototype = (target as any)?.prototype ?? target;
+
+  const originalFunc = prototype?.[name];
 
   if (!originalFunc) {
     throw InvalidMethod;
   }
 
-  prototype[pointcut.func] = function (...args: Parameters<F>): ReturnType<F> {
-    args = aspectFunc.apply(pointcut.target || this, args);
-    return originalFunc.apply(pointcut.target || this, args);
-  } as any;
+  prototype[name] = function (...args: Parameters<S>): ReturnType<S> {
+    const ctx = target ?? this;
+    const args_ = aspectFunc.apply(ctx, args);
+    return originalFunc.apply(ctx, args_);
+  };
 
   return {
     cancel() {
       if (originalFunc) {
-        prototype[pointcut.func] = originalFunc;
+        prototype[name] = originalFunc;
       }
     }
   };
 }
 
 /**
- * 创建一个新函数，并以指定的作用域调用目标函数，之后执行切入的代码
- * @param aspectFunc
- * @param pointcut
- * @constructor
+ * 往目标函数的执行后阶段注入代码
+ * @param aspectFunc 切入的自定义函数
+ * @param name 要切入的目标函数名
+ * @param target 目标函数对象（作用域）
  */
-export function bindAfter<F extends (...args: any[]) => any, C>(aspectFunc: (args: ReturnType<F>) => ReturnType<F>, pointcut: PointcutBindType<F, C>): F {
-  if (!isFunction(aspectFunc)) {
-    throw InvalidAspect;
-  }
-
-  if (!pointcut.func) {
-    throw InvalidMethod;
-  }
-
-  return function (...args) {
-    const res = pointcut.func.apply(pointcut.context || this, args);
-    return aspectFunc.apply(pointcut.context || this, [res]);
-  } as F;
-}
-
-/**
- * 往目标函数的执行后阶段以指定的作用域注入代码
- * @param aspectFunc
- * @param pointcut
- * @constructor
- */
-export function injectAfter<F extends (...args: any) => any, T>(
-  aspectFunc: (args: ReturnType<F>) => ReturnType<F>,
-  pointcut: PointcutInjectType<T>
+export function injectAfter<S extends (...args: unknown[]) => unknown>(
+  aspectFunc: (args: ReturnType<S>) => ReturnType<S>,
+  name: string,
+  target
 ): InjectResType {
   if (!isFunction(aspectFunc)) {
     throw InvalidAspect;
   }
 
-  const prototype = (pointcut.target as any).prototype ? (pointcut.target as any).prototype : pointcut.target;
+  if (!name) {
+    throw InvalidMethod;
+  }
 
-  const originalFunc = prototype[pointcut.func];
+  const prototype = (target as any)?.prototype ?? target;
+
+  const originalFunc = prototype?.[name];
 
   if (!originalFunc) {
     throw InvalidMethod;
   }
 
-  prototype[pointcut.func] = function (...args) {
-    const res = originalFunc.apply(pointcut.target || this, args);
-    return aspectFunc.apply(pointcut.target || this, [res]);
-  } as F;
+  prototype[name] = function (...args: Parameters<S>): ReturnType<S> {
+    const ctx = target ?? this;
+    const args_ = originalFunc.apply(ctx, args);
+    return aspectFunc.apply(ctx, [args_]);
+  };
 
   return {
     cancel() {
       if (originalFunc) {
-        prototype[pointcut.func] = originalFunc;
+        prototype[name] = originalFunc;
       }
     }
   };
 }
 
 /**
- * 创建一个新函数，并以指定的作用域和顺序执行切入的代码和调用目标函数
- * @param aspectFunc
- * @param pointcut
- * @constructor
+ * 创建一个新函数，将目标函数作为参数
+ * @param aspectFunc 切入的自定义函数
+ * @param sourceFunc 要切入的目标函数
  */
-export function bindAround<F extends (...args: any) => any, C>(aspectFunc: (originalFunc: F) => F, pointcut: PointcutBindType<F, C>): F {
+export function bindAround<S extends (...args: unknown[]) => unknown>(aspectFunc: (func: S) => S, sourceFunc: S) {
   if (!isFunction(aspectFunc)) {
     throw InvalidAspect;
   }
 
-  if (!pointcut.func) {
+  if (!isFunction(sourceFunc)) {
     throw InvalidMethod;
   }
 
-  return aspectFunc(pointcut.func);
+  return aspectFunc(sourceFunc);
 }
 
 /**
- * 往目标函数的执行后阶段以指定的作用域和顺序执行切入的代码
- * @param aspectFunc
- * @param pointcut
- * @constructor
+ * 往目标函数以指定的作用域和顺序执行切入的代码
+ * @param aspectFunc 切入的自定义函数
+ * @param name 要切入的目标函数名
+ * @param target 目标函数对象（作用域）
  */
-export function injectAround<F extends (...args: any) => any, T>(aspectFunc: (originalFunc: F) => F, pointcut: PointcutInjectType<T>): InjectResType {
+export function injectAround<S extends (...args: unknown[]) => unknown>(aspectFunc: (func: S) => S, name: string, target): InjectResType {
   if (!isFunction(aspectFunc)) {
     throw InvalidAspect;
   }
 
-  const prototype = (pointcut.target as any).prototype ? (pointcut.target as any).prototype : pointcut.target;
+  if (!name) {
+    throw InvalidMethod;
+  }
 
-  const originalFunc = prototype[pointcut.func];
+  const prototype = (target as any)?.prototype ?? target;
+
+  const originalFunc = prototype?.[name];
 
   if (!originalFunc) {
     throw InvalidMethod;
   }
 
-  prototype[pointcut.func] = aspectFunc(originalFunc);
+  prototype[name] = aspectFunc(originalFunc);
 
   return {
     cancel() {
       if (originalFunc) {
-        prototype[pointcut.func] = originalFunc;
+        prototype[name] = originalFunc;
       }
     }
   };

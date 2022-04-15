@@ -20,11 +20,12 @@ if (prefix) {
   _cancelAnimationFrame = window[prefix + 'CancelAnimationFrame'] || window[prefix + 'CancelRequestAnimationFrame'];
 } else {
   let lastTime = 0;
-  _requestAnimationFrame = function (callback) {
+  _requestAnimationFrame = function (cb) {
     const currTime = new Date().getTime();
     const timeToCall = Math.max(0, 16.7 - (currTime - lastTime));
     const id: any = setTimeout(function () {
-      callback(currTime + timeToCall);
+      // eslint-disable-next-line node/no-callback-literal
+      cb(currTime + timeToCall);
     }, timeToCall);
     lastTime = currTime + timeToCall;
     return id;

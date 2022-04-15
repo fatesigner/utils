@@ -24,10 +24,8 @@ describe('# test aspect.', function () {
         replace = '*';
         return [str, num, replace];
       },
-      {
-        context: obj,
-        func: obj.padStart
-      }
+      obj.padStart,
+      obj
     );
     // 绑定执行后的代码 修改结果
     const _bindAfter = bindAfter(
@@ -35,29 +33,21 @@ describe('# test aspect.', function () {
         res += '000';
         return res;
       },
-      {
-        context: obj,
-        func: obj.padStart
-      }
+      obj.padStart,
+      obj
     );
     // 绑定环绕代码
-    const _bindAround = bindAround(
-      function (originalFunc) {
-        return function (str, num, replace) {
-          // 修改参数
-          replace = '%';
-          // 执行原函数
-          let res = originalFunc(str, num, replace);
-          // 修改结果
-          res += '111';
-          return res;
-        };
-      },
-      {
-        context: obj,
-        func: obj.padStart
-      }
-    );
+    const _bindAround = bindAround(function (originalFunc) {
+      return function (str, num, replace) {
+        // 修改参数
+        replace = '%';
+        // 执行原函数
+        let res = originalFunc(str, num, replace);
+        // 修改结果
+        res += '111';
+        return res;
+      };
+    }, obj.padStart);
     expect(obj.padStart('363300', 10, '0')).to.equal('0000363300');
     expect(_bindBefore('363300', 10, '0')).to.equal('****363300');
     expect(obj.padStart('363', 7, '1')).to.equal('1111363');
@@ -66,35 +56,31 @@ describe('# test aspect.', function () {
   });
   it('## inject', function () {
     // 绑定执行前的代码 修改参数
-    const _injectBefore = injectBefore<typeof obj.padStart, typeof obj>(
+    const _injectBefore = injectBefore<typeof obj.padStart>(
       function (str, num, replace) {
         replace = '*';
         return [str, num, replace];
       },
-      {
-        func: 'padStart',
-        target: obj
-      }
+      'padStart',
+      obj
     );
     expect(obj.padStart('363300', 10, '0')).to.equal('****363300');
     _injectBefore.cancel();
     expect(obj.padStart('363300', 10, '0')).to.equal('0000363300');
     // 绑定执行后的代码 修改结果
-    const _injectAfter = injectAfter<typeof obj.padStart, typeof obj>(
+    const _injectAfter = injectAfter<typeof obj.padStart>(
       function (res) {
         res += '000';
         return res;
       },
-      {
-        func: 'padStart',
-        target: obj
-      }
+      'padStart',
+      obj
     );
     expect(obj.padStart('363', 7, '1')).to.equal('1111363000');
     _injectAfter.cancel();
     expect(obj.padStart('363', 7, '1')).to.equal('1111363');
     // 绑定环绕代码
-    const _injectAround = injectAround<typeof obj.padStart, typeof obj>(
+    const _injectAround = injectAround<typeof obj.padStart>(
       function (originalFunc) {
         return function (str, num, replace) {
           // 修改参数
@@ -105,10 +91,8 @@ describe('# test aspect.', function () {
           return res;
         };
       },
-      {
-        func: 'padStart',
-        target: obj
-      }
+      'padStart',
+      obj
     );
     expect(obj.padStart('363000', 10, '1')).to.equal('%%%%363000111');
     _injectAround.cancel();

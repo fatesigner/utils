@@ -10,8 +10,7 @@
  */
 export function trimStart(str: string, char = '') {
   if (char === '') {
-    char =
-      ' \n\r\t\f\x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000';
+    char = ' \n\r\t\f\x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000';
   }
   for (let i = 0, len = str.length; i < len; i++) {
     if (char.indexOf(str.charAt(i)) === -1) {
@@ -30,8 +29,7 @@ export function trimStart(str: string, char = '') {
  */
 export function trimEnd(str: string, char = '') {
   if (char === '') {
-    char =
-      ' \n\r\t\f\x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000';
+    char = ' \n\r\t\f\x0b\xa0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000';
   }
   for (let i = str.length - 1; i >= 0; i--) {
     if (char.indexOf(str.charAt(i)) === -1) {

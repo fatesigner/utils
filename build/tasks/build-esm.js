@@ -11,7 +11,7 @@ gulp.task('build-esm', async function () {
   const env = require('../env')();
 
   // Build esm module
-  const TsProject = ts.createProject(path.join(env.rootPath, 'tsconfig.json'), {
+  const tsProject = ts.createProject(path.join(env.rootPath, 'tsconfig.json'), {
     declaration: true
   });
   const tsResult = gulp
@@ -26,6 +26,7 @@ gulp.task('build-esm', async function () {
         allowEmpty: true
       }
     )
-    .pipe(TsProject());
+    .pipe(tsProject(ts.reporter.fullReporter()))
+    .on('error', () => {});
   merge([tsResult.dts.pipe(gulp.dest(env.outputPath)), tsResult.js.pipe(gulp.dest(env.outputPath))]);
 });

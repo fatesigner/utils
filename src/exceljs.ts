@@ -5,18 +5,32 @@
 import { merge } from 'lodash-es';
 import Excel from 'exceljs/index.d';
 
+import { UnknownType } from './types';
 import { isObject } from './type-check';
 import { downloadFile } from './document';
 
 /**
- * Worksheet Column options type
+ * Default format name type for excel column
  */
-export interface IWorksheetColumn<TModel extends Record<string, any>> extends Partial<Excel.Column> {
+export type IExceljsHelperFormatName = 'number' | 'currency' | 'date' | 'time' | 'datetime' | 'percentage' | 'fraction' | 'scientific' | 'text';
+
+/**
+ * Format options type for Excel column
+ * number: 0.00
+ */
+export type IExceljsHelperFormatOptions<FormatName extends string = IExceljsHelperFormatName> = {
+  [P in FormatName]: string;
+};
+
+/**
+ * Worksheet Column options type for Excel
+ */
+export interface IWorksheetColumn<TModel extends UnknownType = Record<string, unknown>> extends Partial<Excel.Column> {
   /**
    * Column format type
    *
    */
-  type?: 'text' | 'currency';
+  format?: IExceljsHelperFormatName;
   /**
    * Auto width, default is fasle
    */
@@ -32,9 +46,9 @@ export interface IWorksheetColumn<TModel extends Record<string, any>> extends Pa
 }
 
 /**
- * Options type of Exceljs helper
+ * Options type of Excel
  */
-export interface IExceljsHelperOptions {
+export interface IExceljsHelperOptions<FormatName extends string = string> {
   /**
    * Auto width, default is fasle
    */
@@ -51,19 +65,49 @@ export interface IExceljsHelperOptions {
    * WorksheetOptions
    */
   worksheetOptions?: Partial<Excel.AddWorksheetOptions>;
+  /**
+   * Map for each column
+   */
+  columnMap?: (column: IWorksheetColumn) => IWorksheetColumn;
+  /**
+   * Format options
+   */
+  formatOptions?: Partial<IExceljsHelperFormatOptions<IExceljsHelperFormatName | FormatName>>;
 }
 
 /**
  * Options type for add worksheet
  */
-export interface IWorksheetAddOptions<TModel extends Record<string, any>> extends IExceljsHelperOptions {
+export interface IWorksheetAddOptions<TModel extends Record<string, any>> extends Omit<IExceljsHelperOptions, 'columnMap' | 'formatOptions'> {
   columns: IWorksheetColumn<TModel>[];
   data: TModel[];
-  worksheetOptions?: Partial<Excel.AddWorksheetOptions>;
 }
 
+// Define default format options
+const formatOptions: IExceljsHelperFormatOptions = {
+  number: '0.0000;[Red]-0.0000',
+  currency: '#,##0.00;[Red]-#,##0.00',
+  date: 'yyyy/MM/dd',
+  time: 'HH:mm:ss',
+  datetime: 'yyyy/MM/dd HH:mm:ss',
+  percentage: '0.00%;[Red]-0.00%',
+  fraction: '# ??/??',
+  scientific: '0.0000E+00',
+  text: '@'
+};
+
 // Define a default options, will be merged later
-const defaultOptions: IExceljsHelperOptions = {};
+const defaultOptions: IExceljsHelperOptions = {
+  style: {
+    alignment: {
+      vertical: 'middle',
+      horizontal: 'left',
+      indent: 0,
+      wrapText: true
+    }
+  },
+  formatOptions
+};
 
 /**
  * Configure Exceljs default options
@@ -141,7 +185,7 @@ function setRowStyle<TModel extends Record<string, any>>(
   worksheet: Excel.Worksheet,
   row: Excel.Row,
   isTheadRow: boolean,
-  options: IWorksheetAddOptions<TModel>
+  options: IExceljsHelperOptions & IWorksheetAddOptions<TModel>
 ) {
   if (!row) {
     return;
@@ -154,11 +198,13 @@ function setRowStyle<TModel extends Record<string, any>>(
 
   // set thead row Style
   if (isTheadRow) {
-    if (options.theadStyle) {
-      Object.assign(row, options.theadStyle);
-    } else if (options.style) {
-      Object.assign(row, options.style);
-    }
+    Object.assign(
+      row,
+      {
+        numFmt: '@'
+      },
+      options.theadStyle ?? options.style
+    );
   } else {
     if (options.style) {
       Object.assign(row, options.style);
@@ -175,8 +221,17 @@ function setRowStyle<TModel extends Record<string, any>>(
         });
       }
     } else {
+      const format = column?.format ?? 'text';
+      const numFmt = options?.formatOptions?.[format];
       Object.assign(cell, {
-        style: merge({}, cell.style, { numFmt: column?.type === 'currency' ? '#,##0.00;[Red]-#,##0.00' : 'text' }, column.style)
+        style: merge(
+          {},
+          cell.style,
+          {
+            numFmt
+          },
+          column.style
+        )
       });
     }
     // update column width dynamic
@@ -269,15 +324,28 @@ export class ExceljsHelper {
       }
 
       // handle new lines
-      const str = text.split(/[\n\r]+/);
+      const arr = text.split(/[\n\r]+/);
 
       // because of the font and bold, need increase width with ratio
       // const widthRatio = parseFloat(((options?.fontSize ?? 11) / 11).toFixed(3)) * (options?.fontBold ? 1.08 : 1);
-      const widthRatio = ((options?.fontSize ?? 10) - 8) * 0.086 + 0.768;
+      const widthRatio = (((options?.fontSize ?? 10) - 8) * 0.086 + 0.86) * (options?.fontBold ? 1.08 : 1);
 
-      for (const s of str) {
-        const len = getStrLen(s);
-        maxWidth = Math.max(maxWidth, len * widthRatio);
+      for (const str of arr) {
+        let px = 0;
+        for (let i = 0, len = str.length; i < len; i++) {
+          const charCode = str.charCodeAt(i);
+          if (charCode >= 0 && charCode <= 128) {
+            if (charCode === 32) {
+              // space
+              px += 0.4;
+            } else {
+              px += widthRatio;
+            }
+          } else {
+            px += 1.8 * widthRatio;
+          }
+        }
+        maxWidth = Math.max(maxWidth, px);
       }
 
       return maxWidth;
@@ -293,9 +361,6 @@ export class ExceljsHelper {
   static getFitContentWidthByCell(cell: Excel.Cell): number {
     // ignore merged cells
     if (!cell.isMerged && cell.value) {
-      if (cell?.font?.bold) {
-        console.log('dd');
-      }
       return ExceljsHelper.getFitContentWidth(cell.value, {
         fontSize: cell?.font?.size,
         fontBold: cell?.font?.bold
@@ -309,11 +374,11 @@ export class ExceljsHelper {
    * Add a Worksheet
    * @param workbook
    * @param name
-   * @param options
+   * @param worksheetAddOptions
    */
   static async addWorksheet<TModel extends Record<string, any>>(
     name?: string,
-    options?: IWorksheetAddOptions<TModel>,
+    worksheetAddOptions?: IWorksheetAddOptions<TModel>,
     workbook?: Excel.Workbook
   ): Promise<{
     workbook: Excel.Workbook;
@@ -323,7 +388,7 @@ export class ExceljsHelper {
     const ExcelJS = _excel.default;
 
     // merge options
-    options = merge({}, defaultOptions, options);
+    const options: IExceljsHelperOptions & IWorksheetAddOptions<TModel> = merge({}, defaultOptions, worksheetAddOptions);
 
     if (!workbook) {
       workbook = new ExcelJS.Workbook();
@@ -332,14 +397,15 @@ export class ExceljsHelper {
     const worksheet = workbook.addWorksheet(name, options?.worksheetOptions);
 
     // map columns
+    if (options?.columnMap) {
+      options.columns = options?.columns?.map((column) => options.columnMap(column as any)) ?? [];
+    }
     worksheet.columns =
-      options?.columns?.map((column: any) => {
-        return {
-          key: column.key,
-          header: column.header,
-          width: column.width
-        };
-      }) ?? [];
+      options?.columns?.map((column) => ({
+        key: column.key,
+        header: column.header || column.key,
+        width: column.width
+      })) ?? [];
 
     // repeat data
     if (options?.columns?.length) {

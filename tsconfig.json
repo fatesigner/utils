@@ -37,6 +37,7 @@
     "sourceMap": true,
     "strict": false,
     "strictNullChecks": false,
+    "strictFunctionTypes": true,
     "strictPropertyInitialization": false,
     "esModuleInterop": true,
     "baseUrl": ".",

@@ -5,7 +5,7 @@
 
 import { getGUID } from './random';
 
-export interface IStructureTreeConfig<T> {
+export interface IStructureTreeConfig {
   idKey?: string;
   labelKey?: string;
   childrenKey?: string;
@@ -16,9 +16,9 @@ export class StructureTree<
     [key in string]?: any;
   }
 > {
-  config: IStructureTreeConfig<T>;
+  config: IStructureTreeConfig;
 
-  constructor(config?: IStructureTreeConfig<T>) {
+  constructor(config?: IStructureTreeConfig) {
     this.config = Object.assign(
       {
         idKey: 'id',
@@ -152,11 +152,7 @@ export class StructureTree<
     return some(nodes, []);
   }
 
-  reduce<TPrev = any>(
-    nodes: T[],
-    callback: (prev: TPrev, cur: T, index: number, parentNodes: T[]) => TPrev,
-    prev: TPrev
-  ): TPrev {
+  reduce<TPrev = any>(nodes: T[], callback: (prev: TPrev, cur: T, index: number, parentNodes: T[]) => TPrev, prev: TPrev): TPrev {
     this.forEach(nodes, (node, index, parentNodes) => {
       prev = callback(prev, node, index, parentNodes);
     });

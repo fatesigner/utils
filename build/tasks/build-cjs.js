@@ -12,14 +12,15 @@ gulp.task('build-cjs', async function () {
   const env = require('../env')();
 
   // Build command.js
-  const TsProjectCMD = ts.createProject(path.join(env.rootPath, 'tsconfig.json'), {
+  const tsProject = ts.createProject(path.join(env.rootPath, 'tsconfig.json'), {
     declaration: false,
     module: 'commonjs'
   });
 
   const tsResultCMD = await gulp
     .src([path.resolve(env.srcPath, '**/*.ts'), '!' + path.resolve(env.srcPath, '**/*.d.ts'), '!' + path.resolve(env.srcPath, '**/*.spec.ts')])
-    .pipe(TsProjectCMD());
+    .pipe(tsProject(ts.reporter.fullReporter()))
+    .on('error', () => {});
 
   merge([
     tsResultCMD.js

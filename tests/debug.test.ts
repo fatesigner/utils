@@ -13,13 +13,7 @@ describe('# test debug.', function () {
       }
     };
 
-    LatencyTimeLog(
-      {
-        target: obj,
-        func: 'sync'
-      },
-      '_____time spend：[time]'
-    );
+    LatencyTimeLog('sync', obj, '_____time spend：[time]');
 
     obj.sync();
   });

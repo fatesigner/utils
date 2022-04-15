@@ -2,13 +2,15 @@
  * 处理日期、时间
  */
 
+import { isDate, isNullOrUndefined, isString } from './type-check';
+
 /**
  * 将 str 转换为 date
  */
 export function convertStrToDate(dateTimeStr: string) {
   if (dateTimeStr) {
     // 将所有的'-'转为'/'，以解决IE、firefox浏览器下JS的new Date()的值为Invalid Date、NaN-NaN的问题
-    dateTimeStr = dateTimeStr.replace(new RegExp(/-/gm), '/');
+    dateTimeStr = dateTimeStr.replace(/-/gm, '/');
     return new Date(dateTimeStr);
   }
 }
@@ -28,7 +30,7 @@ export function dateFormat(dateTime: Date, fmt = 'yyyy-MM-dd HH:mm:ss') {
   const o = {
     'M+': dateTime.getMonth() + 1, // 月份
     'd+': dateTime.getDate(), // 日
-    'h+': dateTime.getHours() % 12 == 0 ? 12 : dateTime.getHours() % 12, // 小时
+    'h+': dateTime.getHours() % 12 === 0 ? 12 : dateTime.getHours() % 12, // 小时
     'H+': dateTime.getHours(), // 小时
     'm+': dateTime.getMinutes(), // 分
     's+': dateTime.getSeconds(), // 秒
@@ -44,15 +46,24 @@ export function dateFormat(dateTime: Date, fmt = 'yyyy-MM-dd HH:mm:ss') {
     '5': '五',
     '6': '六'
   };
-  if (/(y+)/.test(fmt)) {
-    fmt = fmt.replace(RegExp.$1, (dateTime.getFullYear() + '').substr(4 - RegExp.$1.length));
+  let matched = fmt.match(/(y+)/);
+  if (matched?.length) {
+    fmt = fmt.replace(
+      matched[0],
+      dateTime
+        .getFullYear()
+        .toString()
+        .substring(4 - matched[0].length)
+    );
   }
-  if (/(E+)/.test(fmt)) {
-    fmt = fmt.replace(RegExp.$1, (RegExp.$1.length > 1 ? (RegExp.$1.length > 2 ? '星期' : '周') : '') + week[dateTime.getDay() + '']);
+  matched = fmt.match(/(E+)/);
+  if (matched?.length) {
+    fmt = fmt.replace(matched[0], (matched[0].length > 1 ? (matched[0].length > 2 ? '星期' : '周') : '') + week[dateTime.getDay() + '']);
   }
   for (const k in o) {
-    if (new RegExp('(' + k + ')').test(fmt)) {
-      fmt = fmt.replace(RegExp.$1, RegExp.$1.length == 1 ? o[k] : ('00' + o[k]).substr(('' + o[k]).length));
+    matched = fmt.match(new RegExp('(' + k + ')'));
+    if (matched?.length) {
+      fmt = fmt.replace(matched[0], matched[0].length === 1 ? o[k] : ('00' + o[k]).substring(('' + o[k]).length));
     }
   }
   return fmt;
@@ -105,4 +116,30 @@ export function getTimeAgo(pastTime: Date, currentTime = null) {
       }
     }
   }
+}
+
+/**
+ * 获取指定时间的时间戳字符串，默认为当前时间
+ */
+export function getTimestampStr(date?: Date | string) {
+  let date_;
+  if (isNullOrUndefined(date)) {
+    date_ = new Date();
+  } else if (isString(date)) {
+    date_ = new Date(date);
+  }
+
+  if (!isDate(date_)) {
+    throw new Error('[getTimestampStr error]: The value is not a correct date');
+  }
+
+  return (
+    date_.getFullYear() +
+    (date_.getMonth() + 1).toString().padStart(2, '0') +
+    date_.getDate().toString().padStart(2, '0') +
+    date_.getHours().toString().padStart(2, '0') +
+    date_.getMinutes().toString().padStart(2, '0') +
+    date_.getSeconds().toString().padStart(2, '0') +
+    date_.getMilliseconds().toString().padStart(4, '0')
+  );
 }

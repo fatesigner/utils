@@ -3,6 +3,7 @@
  */
 
 import { supportPrefix } from './style';
+import { getTimestampStr } from './date';
 import { browserClient } from './user-agent';
 import { isArray, isFunction, isNullOrUndefined, isString } from './type-check';
 import { applyBind } from './';
@@ -1066,7 +1067,10 @@ export function onTransitionEnd(el, fun) {
  * @param file
  * @param filename
  */
-export function downloadFile(file: Blob | File, filename: string) {
+export function downloadFile(file: Blob | File, filename?: string) {
+  if (!filename) {
+    filename = getTimestampStr();
+  }
   const url = window.URL.createObjectURL(file);
   const link = document.createElement('a');
   link.style.display = 'none';

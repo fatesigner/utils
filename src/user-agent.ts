@@ -28,7 +28,7 @@ export const browserClient = {
   Safari: UserAgent.indexOf('Safari') > -1,
   Chrome: UserAgent.indexOf('Chrome') > -1 || UserAgent.indexOf('CriOS') > -1,
   // eslint-disable-next-line
-  IE: !-[1] || (UserAgent.indexOf('MSIE') > -1 || UserAgent.indexOf('Trident') > -1),
+  IE: !-[1] || UserAgent.indexOf('MSIE') > -1 || UserAgent.indexOf('Trident') > -1,
   Edge: UserAgent.indexOf('Edge') > -1,
   Firefox: UserAgent.indexOf('Firefox') > -1 || UserAgent.indexOf('FxiOS') > -1,
   Firefox_Focus: UserAgent.indexOf('Focus') > -1,
@@ -82,6 +82,4 @@ export const browserPlatform = {
 /**
  * 是否为移动端
  */
-export const isMobile =
-  (UserAgent.indexOf('Mobi') > -1 || UserAgent.indexOf('iPh') > -1 || UserAgent.indexOf('480') > -1) &&
-  !(UserAgent.indexOf('iPad') > -1);
+export const isMobile = (UserAgent.indexOf('Mobi') > -1 || UserAgent.indexOf('iPh') > -1 || UserAgent.indexOf('480') > -1) && !(UserAgent.indexOf('iPad') > -1);

@@ -4,10 +4,12 @@ import { dateFormat, getTimeAgo } from '../dist/date';
 
 describe('# test date.', function () {
   it('## dateFormat.', function () {
-    const dateStr = '2012-12-12 12:12:12';
-    const date = new Date(dateStr);
-    const dateStr2 = dateFormat(date);
-    expect(dateStr2).to.equal(dateStr);
+    const date = new Date('2012-01-06 12:12:12');
+    expect(dateFormat(date)).to.equal('2012-01-06 12:12:12');
+    expect(dateFormat(date, 'HH:mm:ss')).to.equal('12:12:12');
+    expect(dateFormat(date, 'yyyy-MM-dd')).to.equal('2012-01-06');
+    expect(dateFormat(date, 'yyyy-M-d')).to.equal('2012-1-6');
+    expect(dateFormat(date, 'yyyy/M/d')).to.equal('2012/1/6');
   });
   it('## getTimeAgo.', function () {
     const currentTime = new Date('2012-12-12 01:12:12');
