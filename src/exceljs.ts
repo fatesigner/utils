@@ -6,8 +6,8 @@ import { merge } from 'lodash-es';
 import Excel from 'exceljs/index.d';
 
 import { UnknownType } from './types';
-import { isObject } from './type-check';
 import { downloadFile } from './document';
+import { isFunction, isObject } from './type-check';
 
 /**
  * Default format name type for excel column
@@ -25,7 +25,7 @@ export type IExceljsHelperFormatOptions<FormatName extends string = IExceljsHelp
 /**
  * Worksheet Column options type for Excel
  */
-export interface IWorksheetColumn<TModel extends UnknownType = Record<string, unknown>> extends Partial<Excel.Column> {
+export interface IWorksheetColumn<TModel extends UnknownType = Record<string, unknown>> extends Partial<Omit<Excel.Column, 'eachCell'>> {
   /**
    * Column format type
    *
@@ -40,9 +40,17 @@ export interface IWorksheetColumn<TModel extends UnknownType = Record<string, un
    */
   theadStyle?: Partial<Excel.Style>;
   /**
+   * Set dataValidation for each cell
+   */
+  dataValidation?: Excel.DataValidation;
+  /**
    * Custom text render
    */
   customRender?: (params: { record: TModel; text: string | number }) => string | number;
+  /**
+   * For each cell
+   */
+  eachCell?: (cell: Excel.Cell, rowNumber: number) => void;
 }
 
 /**
@@ -178,13 +186,13 @@ function getStrLen(str: string) {
  * Set style for specified row
  * @param worksheet
  * @param row
- * @param isTheadRow
+ * @param rowNumber
  * @param options
  */
 function setRowStyle<TModel extends Record<string, any>>(
   worksheet: Excel.Worksheet,
   row: Excel.Row,
-  isTheadRow: boolean,
+  rowNumber: number,
   options: IExceljsHelperOptions & IWorksheetAddOptions<TModel>
 ) {
   if (!row) {
@@ -197,7 +205,7 @@ function setRowStyle<TModel extends Record<string, any>>(
   }
 
   // set thead row Style
-  if (isTheadRow) {
+  if (rowNumber === 1) {
     Object.assign(
       row,
       {
@@ -214,7 +222,7 @@ function setRowStyle<TModel extends Record<string, any>>(
   // set cell style
   row.eachCell(function (cell, colNumber) {
     const column: IWorksheetColumn<TModel> = options?.columns?.[colNumber - 1];
-    if (isTheadRow) {
+    if (rowNumber === 1) {
       if (column?.theadStyle) {
         Object.assign(cell, {
           style: merge({}, cell.style, column.theadStyle)
@@ -233,16 +241,21 @@ function setRowStyle<TModel extends Record<string, any>>(
           column.style
         )
       });
+      if (column?.dataValidation) {
+        cell.dataValidation = column.dataValidation;
+      }
+    }
+    // for each cell
+    if (isFunction(column.eachCell)) {
+      column.eachCell(cell, rowNumber);
     }
     // update column width dynamic
-    if (column) {
-      const autoWidth = column?.autoWidth ?? options?.autoWidth;
-      if (autoWidth) {
-        const width = ExceljsHelper.getFitContentWidthByCell(cell);
-        if (width) {
-          if (!worksheet.columns[colNumber - 1].width || width > worksheet.columns[colNumber - 1].width) {
-            worksheet.columns[colNumber - 1].width = Math.max(worksheet.columns[colNumber - 1].width ?? 0, width);
-          }
+    const autoWidth = column?.autoWidth ?? options?.autoWidth;
+    if (autoWidth) {
+      const width = ExceljsHelper.getFitContentWidthByCell(cell);
+      if (width) {
+        if (!worksheet.columns[colNumber - 1].width || width > worksheet.columns[colNumber - 1].width) {
+          worksheet.columns[colNumber - 1].width = Math.max(worksheet.columns[colNumber - 1].width ?? 0, width);
         }
       }
     }
@@ -409,7 +422,7 @@ export class ExceljsHelper {
 
     // repeat data
     if (options?.columns?.length) {
-      options?.data?.forEach((item) => {
+      options?.data?.forEach((item, index) => {
         // get rowData
         const rowData = options.columns.reduce((prev, column) => {
           const key = column.key;
@@ -426,12 +439,12 @@ export class ExceljsHelper {
 
         // add row
         const row = worksheet.addRow(rowData);
-        setRowStyle(worksheet, row, false, options);
+        setRowStyle(worksheet, row, index + 2, options);
       });
     }
 
     // set thead row style
-    setRowStyle(worksheet, worksheet.getRow(1), true, options);
+    setRowStyle(worksheet, worksheet.getRow(1), 1, options);
 
     return {
       worksheet,
