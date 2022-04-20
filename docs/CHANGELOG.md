@@ -1,3 +1,10 @@
+# [2.7.0](https://github.com/fatesigner/utils/compare/v2.6.0...v2.7.0) (2022-04-20)
+
+
+### Features
+
+* add dataValidation and eachCell options to exceljs ([255f79a](https://github.com/fatesigner/utils/commit/255f79aeae0f0dc72906c03d7dd0c934127f61b2))
+
 # [2.6.0](https://github.com/fatesigner/utils/compare/v2.5.0...v2.6.0) (2022-04-15)
 
 
