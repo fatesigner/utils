@@ -50,7 +50,7 @@ export interface IWorksheetColumn<TModel extends UnknownType = Record<string, un
   /**
    * For each cell
    */
-  eachCell?: (cell: Excel.Cell, rowNumber: number) => void;
+  eachCell?: (cell: Excel.Cell, row: Excel.Row, rowNumber: number, record: TModel, index: number) => void;
 }
 
 /**
@@ -188,12 +188,16 @@ function getStrLen(str: string) {
  * @param row
  * @param rowNumber
  * @param options
+ * @param record
+ * @param index
  */
 function setRowStyle<TModel extends Record<string, any>>(
   worksheet: Excel.Worksheet,
   row: Excel.Row,
   rowNumber: number,
-  options: IExceljsHelperOptions & IWorksheetAddOptions<TModel>
+  options: IExceljsHelperOptions & IWorksheetAddOptions<TModel>,
+  record?: TModel,
+  index?: number
 ) {
   if (!row) {
     return;
@@ -247,7 +251,7 @@ function setRowStyle<TModel extends Record<string, any>>(
     }
     // for each cell
     if (isFunction(column.eachCell)) {
-      column.eachCell(cell, rowNumber);
+      column.eachCell(cell, row, rowNumber, record, index);
     }
     // update column width dynamic
     const autoWidth = column?.autoWidth ?? options?.autoWidth;
@@ -439,7 +443,7 @@ export class ExceljsHelper {
 
         // add row
         const row = worksheet.addRow(rowData);
-        setRowStyle(worksheet, row, index + 2, options);
+        setRowStyle(worksheet, row, index + 2, options, item, index);
       });
     }
 
