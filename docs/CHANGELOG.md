@@ -1,3 +1,10 @@
+# [2.8.0](https://github.com/fatesigner/utils/compare/v2.7.0...v2.8.0) (2022-05-20)
+
+
+### Features
+
+* update params for eachCell in exceljs ([d5af940](https://github.com/fatesigner/utils/commit/d5af940fcd45560aa6c761b62feff5b188f0fb33))
+
 # [2.7.0](https://github.com/fatesigner/utils/compare/v2.6.0...v2.7.0) (2022-04-20)
 
 
