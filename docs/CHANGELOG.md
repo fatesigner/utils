@@ -1,3 +1,10 @@
+# [2.9.0](https://github.com/fatesigner/utils/compare/v2.8.0...v2.9.0) (2022-05-21)
+
+
+### Features
+
+* add convertNoToLetter、convertLetterToNo function for Excel helper ([f9108bd](https://github.com/fatesigner/utils/commit/f9108bd1ffccb67c3506c663e1e51681f94365f6))
+
 # [2.8.0](https://github.com/fatesigner/utils/compare/v2.7.0...v2.8.0) (2022-05-20)
 
 
