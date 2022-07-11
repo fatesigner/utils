@@ -1,3 +1,10 @@
+# [2.10.0](https://github.com/fatesigner/utils/compare/v2.9.0...v2.10.0) (2022-07-11)
+
+
+### Features
+
+* remove children property in StructureTree ([7e8765b](https://github.com/fatesigner/utils/commit/7e8765b49a8ed11a5a681a5051534bf8d30a1bdb))
+
 # [2.9.0](https://github.com/fatesigner/utils/compare/v2.8.0...v2.9.0) (2022-05-21)
 
 
