@@ -83,6 +83,9 @@ export class StructureTree<
           if (childrenNodes && childrenNodes.length) {
             forEach(childrenNodes, childNodeNew[this.config.childrenKey], [...parentNodes, childNode]);
           }
+          if (!childNodeNew[this.config.childrenKey].length) {
+            delete childNodeNew[this.config.childrenKey];
+          }
         }
       }
     };
@@ -172,6 +175,9 @@ export class StructureTree<
         const childrenNodes = childNode[this.config.childrenKey] as T[];
         if (childrenNodes && childrenNodes.length) {
           forEach(childrenNodes, childNodeNew[this.config.childrenKey], [...parentNodes, childNode]);
+        }
+        if (!childNodeNew[this.config.childrenKey].length) {
+          delete childNodeNew[this.config.childrenKey];
         }
       }
     };
