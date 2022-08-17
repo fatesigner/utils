@@ -1,3 +1,10 @@
+# [2.11.0](https://github.com/fatesigner/utils/compare/v2.10.0...v2.11.0) (2022-08-17)
+
+
+### Features
+
+* update type check ([e9eb3a0](https://github.com/fatesigner/utils/commit/e9eb3a0a4ea8ef2745fd4ecad250c7c7b705c8c1))
+
 # [2.10.0](https://github.com/fatesigner/utils/compare/v2.9.0...v2.10.0) (2022-07-11)
 
 
