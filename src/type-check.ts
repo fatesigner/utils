@@ -122,7 +122,8 @@ export function isNodeList(obj: unknown) {
  * @return {boolean}
  */
 export function isFunction(obj: unknown) {
-  return Object.prototype.toString.call(obj) === '[object Function]';
+  const s = Object.prototype.toString.call(obj);
+  return s === '[object Function]' || s === '[object AsyncFunction]';
 }
 
 /**
