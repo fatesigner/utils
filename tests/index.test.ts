@@ -345,5 +345,14 @@ describe('# test main.', function () {
     expect(toFixed(12.3232)).to.equal(12);
     expect(toFixed(12.3232, 2)).to.equal(12.32);
     expect(toFixed(12.3232, 4)).to.equal(12.3232);
+    expect(toFixed(12.08, 4)).to.equal(12.08);
+    expect(toFixed(12.086, 4)).to.equal(12.086);
+    expect(toFixed(12.0867, 4)).to.equal(12.0867);
+    expect(toFixed(12.08679, 4)).to.equal(12.0868);
+    expect(toFixed(12.086793, 4)).to.equal(12.0868);
+    expect(toFixed(12.086793, 4, 'ignore')).to.equal(12.0867);
+    expect(toFixed(12.086793, 2, 'ignore')).to.equal(12.08);
+    expect(toFixed(12.086793, 0, 'ignore')).to.equal(12);
+    expect(toFixed(12.086793)).to.equal(12);
   });
 });

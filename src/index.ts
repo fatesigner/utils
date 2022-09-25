@@ -698,8 +698,18 @@ export function toFixed(value: number, digits = 0, mode: 'ignore' | 'normal' | '
     }
   }
 
+  let valueStr = value.toString().replace('.', '');
+  const newDotIndex = dotIndex + digits;
+  if (newDotIndex > valueStr.length) {
+    // 超出，补 0
+    valueStr = valueStr + '0'.repeat(newDotIndex - valueStr.length);
+  } else if (newDotIndex < valueStr.length) {
+    // 移动小数点
+    valueStr = valueStr.substring(0, newDotIndex) + '.' + valueStr.substring(newDotIndex, valueStr.length + 1);
+  }
+
   const multiple = Math.pow(10, digits);
-  const num = Math.floor(value * multiple) + carry;
+  const num = Math.floor(parseFloat(valueStr)) + carry;
 
   return (num / multiple) as any;
 }
