@@ -699,7 +699,7 @@ export function toFixed(value: number, digits = 0, mode: 'ignore' | 'normal' | '
   }
 
   let valueStr = value.toString().replace('.', '');
-  const newDotIndex = dotIndex + digits;
+  const newDotIndex = dotIndex > -1 ? dotIndex + digits : valueStr.length + digits;
   if (newDotIndex > valueStr.length) {
     // 超出，补 0
     valueStr = valueStr + '0'.repeat(newDotIndex - valueStr.length);
@@ -709,7 +709,7 @@ export function toFixed(value: number, digits = 0, mode: 'ignore' | 'normal' | '
   }
 
   const multiple = Math.pow(10, digits);
-  const num = Math.floor(parseFloat(valueStr)) + carry;
+  const num = parseFloat(valueStr.split('.')[0]) + carry;
 
   return (num / multiple) as any;
 }
