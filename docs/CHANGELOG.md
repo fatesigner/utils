@@ -1,3 +1,10 @@
+## [2.11.2](https://github.com/fatesigner/utils/compare/v2.11.1...v2.11.2) (2023-02-04)
+
+
+### Bug Fixes
+
+* update toFixed function ([4ca336a](https://github.com/fatesigner/utils/commit/4ca336acd88bc46f4effdccd28647e0dca51f034))
+
 ## [2.11.1](https://github.com/fatesigner/utils/compare/v2.11.0...v2.11.1) (2023-02-02)
 
 
