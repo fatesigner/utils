@@ -1,5 +1,27 @@
 # Utils
 
+[![build][travis-image]][travis-url]
+[![commitizen][commitizen-image]][commitizen-url]
+[![codecov][codecov-image]][codecov-url]
+[![download][download-image]][download-url]
+[![npm][npm-image]][npm-url]
+[![semantic][semantic-image]][semantic-url]
+
+[npm-image]: https://img.shields.io/npm/v/@fatesigner/utils.svg?color=green
+[npm-url]: https://npmjs.com/package/@fatesigner/utils
+[travis-image]: https://travis-ci.com/fatesigner/utils.svg?token=i21P7stb8bZPNjZakvsi&color=success&branch=master
+[travis-url]: https://travis-ci.com/fatesigner/utils
+[codecov-image]: https://codecov.io/gh/fatesigner/utils/branch/master/graph/badge.svg?token=i5Q9N7m8v5
+[codecov-url]: https://codecov.io/gh/fatesigner/utils
+[david-image]: https://david-dm.org/fatesigner/utils.svg
+[david-url]: https://david-dm.org/fatesigner/utils
+[download-image]: https://img.shields.io/npm/dw/@fatesigner/utils.svg?style=flat-square
+[download-url]: https://npmjs.com/package/@fatesigner/utils
+[commitizen-image]: https://img.shields.io/badge/commitizen-friendly-green.svg
+[commitizen-url]: http://commitizen.github.io/cz-cli/
+[semantic-image]: https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg?style=flat-square
+[semantic-url]: https://opensource.org/licenses/MIT
+
 JavaScript工具库.
 
 ## 说明

@@ -59,7 +59,8 @@
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
-    "src/types/**/*.d.ts"
+    "src/types/**/*.d.ts",
+    "tests/**/*.ts"
   ],
   "exclude": [
     "node_modules",

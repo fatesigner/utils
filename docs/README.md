@@ -26,9 +26,9 @@ JavaScript工具库.
 
 ## 说明
 
-- 此工具库是自己从事前端开发以来整理和完善的，里面有些函数可以用 [Underscore](https://underscorejs.org/) 和 [lodash](https://lodash.com/docs) 代替。
+- js 工具库，里面有些函数可以用 [Underscore](https://underscorejs.org/) 和 [lodash](https://lodash.com/docs) 代替。
 - 由 typescript 编写，并编译为一份 ESnext 和 [CommonJs](https://requirejs.org/docs/commonjs.html) 的代码。
-所以如果引入到您的项目中使用，需搭建好 [babel](https://babeljs.io/docs/en/) 编译环境。
+  所以如果引入到您的项目中使用，需搭建好 [babel](https://babeljs.io/docs/en/) 编译环境。
 - 借助于 [tree shaking](https://webpack.docschina.org/guides/tree-shaking/) 可以不用担心导入多余的代码。
 
 ## 安装
@@ -39,17 +39,16 @@ npm i -S @fatesigner/utils
 
 ## 用法
 ```js
-import { ToDecimal } from '@fatesigner/utils';
+import { toDecimal } from '@fatesigner/utils';
 
 let num = 120;
-console.log(ToDecimal(num, 2));
+console.log(toDecimal(num, 2));
 // 120.00
 
 // 绑定事件：delegate
-import { On } from '@fatesigner/utils/event';
+import { on } from '@fatesigner/utils/event';
 
-On(document.body, 'scroll', null, (event) => {
+on(document.body, 'scroll', null, (event) => {
   console.log(event.target);
 });
 ```
-
