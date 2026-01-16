@@ -1,3 +1,10 @@
+# [2.12.0](https://github.com/fatesigner/utils/compare/v2.11.2...v2.12.0) (2026-01-16)
+
+
+### Features
+
+* **utils:** 完善工具函数实现 ([9efd4d8](https://github.com/fatesigner/utils/commit/9efd4d8ff533ff651ab542b3ecd112a1197039ea))
+
 ## [2.11.2](https://github.com/fatesigner/utils/compare/v2.11.1...v2.11.2) (2023-02-04)
 
 
