@@ -98,4 +98,14 @@ describe('# test aspect.', function () {
     _injectAround.cancel();
     expect(obj.padStart('363000', 10, '1')).to.equal('1111363000');
   });
+
+  it('## errors', function () {
+    expect(() => bindBefore(null as any, obj.padStart)).to.throw(Error);
+    expect(() => bindBefore(() => [], null as any)).to.throw(Error);
+    expect(() => bindAfter(null as any, obj.padStart)).to.throw(Error);
+    expect(() => bindAround(null as any, obj.padStart)).to.throw(Error);
+    expect(() => injectBefore(() => [], '', obj)).to.throw(Error);
+    expect(() => injectAfter(() => '', '', obj)).to.throw(Error);
+    expect(() => injectAround(() => obj.padStart, '', obj)).to.throw(Error);
+  });
 });

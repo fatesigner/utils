@@ -8,10 +8,12 @@ import {
   convertToCDB,
   convertToDBC,
   convertToQueryParameters,
+  applyBind,
   debounce,
   deepExtend,
   extend,
   forEach,
+  getParamsFromUrl,
   groupBy,
   mergeProps,
   throttle,
@@ -27,15 +29,22 @@ describe('# test main.', function () {
   });
   it('## convertToCDB.', function () {
     expect(convertToCDB('ａｂｃｄ')).to.equal('abcd');
+    expect(convertToCDB('　')).to.equal(' ');
+    expect(convertToCDB('abc')).to.equal('abc');
   });
   it('## convertToDBC.', function () {
     expect(convertToDBC('abcd')).to.equal('ａｂｃｄ');
+    expect(convertToDBC(' ')).to.equal('　');
+    expect(convertToDBC('中')).to.equal('中');
   });
   it('## convertBridgeStrToHump.', function () {
     expect(convertBridgeStrToHump('convert-hump-str-to-bridge')).to.equal('convertHumpStrToBridge');
+    expect(convertBridgeStrToHump('')).to.equal('');
   });
   it('## convertHumpStrToBridge.', function () {
     expect(convertHumpStrToBridge('convertHumpStrToBridge')).to.equal('convert-hump-str-to-bridge');
+    expect(convertHumpStrToBridge('Abc')).to.equal('abc');
+    expect(convertHumpStrToBridge('')).to.equal('');
   });
   it('## convertToBytesUnit.', function () {
     expect(convertToBytesUnit(234123)).to.equal('228.64kb');
@@ -43,9 +52,21 @@ describe('# test main.', function () {
     expect(convertToBytesUnit(166018, 3, true)).to.equal('162.127KB');
     expect(convertToBytesUnit(1073741824)).to.equal('1.00gb');
     expect(convertToBytesUnit(1073741824, 4, false)).to.equal('1.0000gb');
+    expect(convertToBytesUnit(null as any)).to.equal('0 Bytes');
+    expect(convertToBytesUnit(1024, 'x' as any)).to.equal('1kb');
   });
   it('## convertToQueryParameters', function () {
     expect(convertToQueryParameters({ id: 'a', username: 'user' })).to.equal('id=a&username=user');
+    expect(convertToQueryParameters({ id: undefined })).to.equal('id=');
+  });
+
+  it('## applyBind', function () {
+    const ctx = { v: 2 };
+    function add(a: number, b: number) {
+      return this.v + a + b;
+    }
+    const bound = applyBind(add, ctx, 3);
+    expect(bound(4)).to.equal(9);
   });
   it('## forEach', function () {
     const res = forEach(
@@ -81,6 +102,10 @@ describe('# test main.', function () {
     );
     expect(res2).to.equal('a1b1');
   });
+  it('## forEach without function', function () {
+    const res = forEach([1, 2], null as any, 5);
+    expect(res).to.equal(5);
+  });
   it('## clone', function () {
     const originalObject = {
       a: 1,
@@ -99,6 +124,16 @@ describe('# test main.', function () {
     expect(cloneObject.c.f).to.equal(5);
 
     expect(originalObject.c.f).to.equal(4);
+  });
+  it('## clone null', function () {
+    expect(clone(null as any)).to.equal(null);
+  });
+  it('## clone non-circular', function () {
+    const original = { a: 1, b: { c: 2 } };
+    const copied = clone(original, false);
+    copied.b.c = 3;
+    expect(original.b.c).to.equal(2);
+    expect(copied.b.c).to.equal(3);
   });
   it('## extend', function () {
     const originalObject = {
@@ -137,6 +172,46 @@ describe('# test main.', function () {
     expect(obj2.c.f).to.equal(4);
     expect(obj2.c.g.h).to.equal(2);
   });
+
+  it('## extend null target', function () {
+    expect(() => extend(null as any, { a: 1 })).to.throw(Error);
+  });
+
+  it('## clone circular', function () {
+    const obj: any = { a: 1 };
+    obj.self = obj;
+    const cloned = clone(obj, true);
+    expect(cloned).to.not.equal(obj);
+    expect(cloned.self).to.equal(cloned);
+  });
+
+  it('## deepExtend special values', function () {
+    const date = new Date(0);
+    const reg = /a/;
+    const buf = Buffer.from('x');
+    const res: any = deepExtend({}, { date, reg, buf });
+    expect(res.date.getTime()).to.equal(0);
+    expect(res.reg.source).to.equal('a');
+    expect(Buffer.isBuffer(res.buf)).to.equal(true);
+  });
+
+  it('## deepExtend arrays', function () {
+    const res: any = deepExtend({}, { arr: [1, { a: 2 }, [3]] });
+    expect(res.arr[0]).to.equal(1);
+    expect(res.arr[1].a).to.equal(2);
+    expect(Array.isArray(res.arr[2])).to.equal(true);
+  });
+  it('## deepExtend invalid params', function () {
+    expect(deepExtend() as any).to.equal(false);
+    const target = { a: 1 };
+    expect(deepExtend(target)).to.equal(target);
+  });
+  it('## deepExtend ignore array param', function () {
+    const target = { a: 1 };
+    const res: any = deepExtend(target, [] as any);
+    expect(res).to.equal(target);
+    expect(res.a).to.equal(1);
+  });
   it('## mergeProps', function () {
     const res = mergeProps(
       {
@@ -152,6 +227,17 @@ describe('# test main.', function () {
     expect(res.dd[0]).to.equal(3);
     expect(res.dd[1]).to.equal(4);
     expect(res.dd[2]).to.equal(5);
+  });
+
+  it('## mergeProps default and array', function () {
+    const defaults = { a: [1, 2], b: { c: 1 } };
+    const res = mergeProps(defaults as any, undefined as any);
+    expect(res).to.equal(defaults);
+
+    const res2: any = mergeProps({ a: [1, 2], b: { c: 1 } } as any, {} as any, true);
+    expect(Array.isArray(res2.a)).to.equal(true);
+    expect(res2.a.length).to.equal(2);
+    expect(res2.b.c).to.equal(1);
   });
   it('## groupBy', function () {
     const arr = [
@@ -169,6 +255,37 @@ describe('# test main.', function () {
     expect(arrNew.length).to.equal(3);
     expect(arrNew[0].key).to.equal(1);
     expect(arrNew[0].d).to.equal('1');
+  });
+
+  it('## groupBy by function and undefined key', function () {
+    const arr = [{ id: 1 }, { id: undefined }, { id: 1 }];
+    const res = groupBy(arr, (item) => item.id as any);
+    expect(res.length).to.equal(2);
+    expect(res[1].children.length).to.equal(1);
+  });
+  it('## groupBy multiple undefined', function () {
+    const arr = [{ id: undefined }, { id: undefined }, { id: 1 }];
+    const res = groupBy(arr, (item) => item.id as any);
+    expect(res.length).to.equal(2);
+    expect(res[0].children.length).to.equal(2);
+  });
+
+  it('## groupBy invalid key', function () {
+    let error: Error;
+    try {
+      groupBy([{ id: 1 }], 123 as any);
+    } catch (err: any) {
+      error = err;
+    }
+    expect(error).to.be.instanceof(Error);
+  });
+
+  it('## getParamsFromUrl undefined', function () {
+    expect(getParamsFromUrl(undefined)).to.deep.equal({});
+  });
+  it('## getParamsFromUrl empty key', function () {
+    const params = getParamsFromUrl('https://example.com?=1&b=2');
+    expect(params.b).to.equal('2');
   });
 
   it('## debounce', function (done) {
@@ -250,6 +367,68 @@ describe('# test main.', function () {
     expect(res).to.equal(undefined);
 
     done();
+  });
+
+  it('## debounce alwaysDo', function () {
+    jest.useFakeTimers();
+    let count = 0;
+    let always = 0;
+    const fn = debounce(
+      () => {
+        count += 1;
+      },
+      1000,
+      false,
+      () => {
+        always += 1;
+      }
+    );
+    fn();
+    fn();
+    expect(always).to.equal(2);
+    jest.advanceTimersByTime(1000);
+    expect(count).to.equal(1);
+  });
+
+  it('## debounce immediate and spend>=delay', function () {
+    const fn = jest.fn();
+    const nowSpy = jest.spyOn(Date, 'now');
+    let now = 1000;
+    nowSpy.mockImplementation(() => now);
+    const debounced = debounce(fn, 1000, true);
+    debounced();
+    expect(fn.mock.calls.length).to.equal(1);
+    now += 1100;
+    debounced();
+    expect(fn.mock.calls.length).to.equal(2);
+    nowSpy.mockRestore();
+  });
+
+  it('## throttle spend>=delay', function () {
+    const fn = jest.fn();
+    const nowSpy = jest.spyOn(Date, 'now');
+    let now = 2000;
+    nowSpy.mockImplementation(() => now);
+    const throttled = throttle(fn, 1000, true, false);
+    throttled();
+    expect(fn.mock.calls.length).to.equal(1);
+    now += 1500;
+    throttled();
+    expect(fn.mock.calls.length).to.equal(2);
+    nowSpy.mockRestore();
+  });
+
+  it('## throttle trailing init', function () {
+    const fn = jest.fn();
+    const nowSpy = jest.spyOn(Date, 'now');
+    let now = 3000;
+    nowSpy.mockImplementation(() => now);
+    const throttled = throttle(fn, 1000, false, true);
+    throttled();
+    expect(fn.mock.calls.length).to.equal(0);
+    jest.advanceTimersByTime(1000);
+    expect(fn.mock.calls.length).to.equal(1);
+    nowSpy.mockRestore();
   });
 
   let index = 0;
@@ -362,5 +541,11 @@ describe('# test main.', function () {
     expect(toFixed(265345, 4)).to.equal(265345);
     expect(toFixed(265345.12, 4)).to.equal(265345.12);
     expect(toFixed(265345.99, 4, 'ignore')).to.equal(265345.99);
+    expect(toFixed(1.235, 2, 'round')).to.equal(1.24);
+    expect(toFixed(1.231, 2, 'increase')).to.equal(1.24);
+    expect(toFixed(1.2, 5, 'ignore')).to.equal(1.2);
+    expect(toFixed(1.25, 1)).to.equal(1.2);
+    expect(toFixed(1.35, 1)).to.equal(1.4);
+    expect(toFixed(1.26, 1)).to.equal(1.3);
   });
 });

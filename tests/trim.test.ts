@@ -27,4 +27,19 @@ describe('# test trim.', function () {
     const str = trimEnd('123sssssss', 's');
     expect(str).to.equal('123');
   });
+
+  it('## TrimStart all removed', function () {
+    const str = trimStart('     ');
+    expect(str).to.equal('');
+  });
+
+  it('## TrimEnd all removed', function () {
+    const str = trimEnd('xxxx', 'x');
+    expect(str).to.equal('');
+  });
+
+  it('## Trim all removed', function () {
+    const str = trim('     ');
+    expect(str).to.equal('');
+  });
 });

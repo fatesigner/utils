@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 
-import { isCellphone, isDecimal, isEmail, isIdCard, isInt, isNumber } from '../dist/validator';
+import { LenLimit, Password, Required, isCellphone, isDecimal, isEmail, isIdCard, isInt, isNumber } from '../dist/validator';
 
 describe('# test validator.', function () {
   it('## isNumber', function () {
@@ -67,5 +67,55 @@ describe('# test validator.', function () {
     expect(isEmail('123123@.com')).to.not.be.ok;
     expect(isEmail('123123@gmailcom')).to.be.ok;
     expect(isEmail('123123@gmail.')).to.not.be.ok;
+  });
+
+  it('## Required', function () {
+    expect(Required(undefined)).to.not.be.ok;
+    expect(Required(null)).to.not.be.ok;
+    expect(Required('')).to.not.be.ok;
+    expect(Required('x')).to.be.ok;
+    expect(Required([])).to.not.be.ok;
+    expect(Required([1])).to.be.ok;
+    expect(Required(false)).to.not.be.ok;
+    expect(Required(true)).to.be.ok;
+    expect(Required(0)).to.be.ok;
+  });
+
+  it('## LenLimit', function () {
+    expect(LenLimit('abc', 1, 3)).to.be.ok;
+    expect(LenLimit('abcd', 1, 3)).to.not.be.ok;
+    expect(LenLimit(undefined as any, 1, 3)).to.be.ok;
+    let error: Error;
+    try {
+      LenLimit('abc', undefined as any, undefined as any);
+    } catch (err: any) {
+      error = err;
+    }
+    expect(error).to.be.instanceof(Error);
+  });
+
+  it('## isInt null and string empty', function () {
+    expect(isInt(undefined as any)).to.be.ok;
+    expect(isInt('')).to.not.be.ok;
+  });
+
+  it('## isDecimal null', function () {
+    expect(isDecimal(undefined as any)).to.be.ok;
+  });
+
+  it('## isCellphone empty', function () {
+    expect(isCellphone('')).to.be.ok;
+  });
+
+  it('## isIdCard empty', function () {
+    expect(isIdCard('')).to.be.ok;
+  });
+
+  it('## Password', function () {
+    expect(Password('abc123')).to.be.ok;
+    expect(Password('abcdef')).to.not.be.ok;
+    expect(Password('123456')).to.not.be.ok;
+    expect(Password('a1', 1, 2)).to.be.ok;
+    expect(Password('', 1, 2)).to.be.ok;
   });
 });
