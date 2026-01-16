@@ -44,6 +44,12 @@ module.exports = {
     ],
     '@semantic-release/release-notes-generator',
     [
+      '@semantic-release/exec',
+      {
+        prepareCmd: 'npm run build'
+      }
+    ],
+    [
       '@semantic-release/changelog',
       {
         changelogFile: 'docs/CHANGELOG.md'
@@ -53,7 +59,7 @@ module.exports = {
       '@semantic-release/git',
       {
         assets: ['docs/CHANGELOG.md', 'package.json', 'package-lock.json'],
-        message: 'chore(🤖):${nextRelease.version} [skip ci]\n\n${nextRelease.notes}'
+        message: 'chore(release):${nextRelease.version} [skip ci]\n\n${nextRelease.notes}'
       }
     ],
     [
@@ -72,3 +78,9 @@ module.exports = {
     ]
   ]
 };
+
+
+
+
+
+
