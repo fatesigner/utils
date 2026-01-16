@@ -7,14 +7,22 @@ module.exports = {
   collectCoverage: true,
   coverageDirectory: 'coverage',
   coverageReporters: ['json', 'html', 'lcov', 'text', 'text-summary', 'clover'],
+  globals: {},
   testEnvironment: 'node',
   roots: ['<rootDir>/tests'],
   transform: {
-    '^.+\\.jsx?$': '<rootDir>/jest.babel.js',
-    '^.+\\.tsx?$': '<rootDir>/jest.babel.js'
+    '^.+\\.[jt]sx?$': [
+      'babel-jest',
+      {
+        configFile: './babel.test.config.js'
+      }
+    ]
   },
-  // testMatch: ['./test/*.ts'],
   testRegex: ['(/tests/.*|(\\.|/)(test))\\.jsx?$', '(/tests/.*|(\\.|/)(test))\\.tsx?$'],
+  // testMatch: ['./test/*.ts'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
-  transformIgnorePatterns: ['<rootDir>/node_modules/(?!)']
+  moduleNameMapper: {
+    '^\\.\\./dist/(.*)$': '<rootDir>/dist/$1.cjs'
+  },
+  transformIgnorePatterns: ['<rootDir>/node_modules/(?!(chai|lodash-es)/)']
 };

@@ -1,5 +1,11 @@
 /**
- * babel.config
+ * babel.config（js 代码转换配置）
+ * node_module
+ * npm i -D @babel/core @babel/preset-env @babel/plugin-transform-runtime @babel/runtime-corejs3
+ * npm i -D @babel/preset-typescript babel-plugin-transform-typescript-metadata @babel/plugin-proposal-decorators @babel/plugin-transform-class-properties @babel/plugin-transform-object-rest-spread @babel/plugin-transform-private-methods
+ * @babel/plugin-transform-runtime 主要作用是将 helper 和 polyfill 都改为从一个统一的地方引入，且引入的对象和全局变量是完全隔离的
+ * 1、避免因引入 polyfill 而带来的全局变量被污染的副作用
+ * 2、避免生成重复的 helper 函数
  */
 
 module.exports = {
@@ -9,7 +15,7 @@ module.exports = {
     [
       '@babel/preset-env',
       {
-        spec: false,
+        specz: false,
         loose: false,
         modules: false,
         debug: false,
@@ -28,7 +34,7 @@ module.exports = {
         shippedProposals: false
       }
     ],
-    ['@babel/preset-typescript']
+    ['@babel/preset-typescript', { isTSX: true, allExtensions: true }]
   ],
   plugins: [
     [
@@ -41,6 +47,7 @@ module.exports = {
         absoluteRuntime: false
       }
     ],
+    'babel-plugin-transform-typescript-metadata',
     [
       '@babel/plugin-proposal-decorators',
       {
@@ -48,7 +55,7 @@ module.exports = {
       }
     ],
     [
-      '@babel/plugin-proposal-class-properties',
+      '@babel/plugin-transform-class-properties',
       {
         /**
          * 指示编译类属性时，使用赋值表达式（loose: false）或者 Object.defineProperty（loose: true）
@@ -56,7 +63,15 @@ module.exports = {
         loose: false
       }
     ],
-    ['@babel/plugin-proposal-object-rest-spread'],
-    ['@babel/plugin-proposal-private-methods', { loose: false }]
+    ['@babel/plugin-transform-object-rest-spread'],
+    /* [
+      'import',
+      {
+        libraryName: 'ant-design-vue',
+        libraryDirectory: 'es',
+        style: true
+      }
+    ], */
+    ['@babel/plugin-transform-private-methods', { loose: false }]
   ]
 };
