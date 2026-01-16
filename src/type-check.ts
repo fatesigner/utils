@@ -104,7 +104,7 @@ export function isElement(obj: unknown) {
  * @return {boolean}
  */
 export function isNode(obj: unknown) {
-  return obj instanceof Node;
+  return typeof Node !== 'undefined' && obj instanceof Node;
 }
 
 /**

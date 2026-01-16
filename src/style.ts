@@ -2,8 +2,8 @@
  * CSS样式 操作
  */
 
-import { forEach } from './';
 import { isString } from './type-check';
+import { forEach } from './';
 
 let supportPrefix = '';
 
@@ -30,10 +30,14 @@ export { supportPrefix };
  * @return {Boolean} isSupport
  */
 export function isSupport(style) {
+  if (typeof document === 'undefined') {
+    return false;
+  }
   if (isString(style)) {
     const style_ = document.createElement('div').style;
     return style in style_;
   }
+  return false;
 }
 
 /**

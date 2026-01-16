@@ -5,7 +5,7 @@
 
 let _userAgent = '';
 
-if (typeof document !== 'undefined') {
+if (typeof navigator !== 'undefined' && navigator.userAgent) {
   _userAgent = navigator.userAgent;
 }
 

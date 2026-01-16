@@ -16,13 +16,21 @@ export function setIdentification(identification: string): void {
 export const LocalStorage = {
   // 标识符，用于区分不同的应用
   set(key: string, data: any | any[]): void {
-    return window.localStorage.setItem(Identification + '_' + key, JSON.stringify(data));
+    const storage = typeof window === 'undefined' ? null : window.localStorage;
+    if (!storage) {
+      return;
+    }
+    storage.setItem(Identification + '_' + key, JSON.stringify(data));
   },
   get(key: string): any {
-    const str = window.localStorage.getItem(Identification + '_' + key);
+    const storage = typeof window === 'undefined' ? null : window.localStorage;
+    if (!storage) {
+      return null;
+    }
+    const str = storage.getItem(Identification + '_' + key);
     if (str) {
       try {
-        return JSON.parse(window.localStorage.getItem(Identification + '_' + key));
+        return JSON.parse(str);
       } catch (e) {
         return null;
       }
@@ -30,6 +38,10 @@ export const LocalStorage = {
     return null;
   },
   remove(key: string): void {
-    window.localStorage.removeItem(Identification + '_' + key);
+    const storage = typeof window === 'undefined' ? null : window.localStorage;
+    if (!storage) {
+      return;
+    }
+    storage.removeItem(Identification + '_' + key);
   }
 };

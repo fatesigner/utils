@@ -2,12 +2,20 @@
  * Helper for exceljs
  */
 
+import type * as Excel from 'exceljs';
 import { merge } from 'lodash-es';
-import Excel from 'exceljs/index.d';
 
-import { UnknownType } from './types';
 import { downloadFile } from './document';
 import { isFunction, isObject } from './type-check';
+import { UnknownType } from './types';
+
+function importModule<T = any>(modulePath: string): Promise<T> {
+  const requireFunc = typeof require === 'function' ? require : null;
+  if (requireFunc) {
+    return Promise.resolve(requireFunc(modulePath));
+  }
+  return import(modulePath) as Promise<T>;
+}
 
 /**
  * Default format name type for excel column
@@ -191,14 +199,7 @@ function getStrLen(str: string) {
  * @param record
  * @param index
  */
-function setRowStyle<TModel extends Record<string, any>>(
-  worksheet: Excel.Worksheet,
-  row: Excel.Row,
-  rowNumber: number,
-  options: IExceljsHelperOptions & IWorksheetAddOptions<TModel>,
-  record?: TModel,
-  index?: number
-) {
+function setRowStyle<TModel extends Record<string, any>>(worksheet: Excel.Worksheet, row: Excel.Row, rowNumber: number, options: IExceljsHelperOptions & IWorksheetAddOptions<TModel>, record?: TModel, index?: number) {
   if (!row) {
     return;
   }
@@ -307,12 +308,13 @@ export class ExceljsHelper {
     const result: string[] = [];
 
     const row = worksheet.getRow(rowNumber);
+    const values = row?.values;
 
-    if (row === null || !row.values || !row.values.length) {
+    if (!Array.isArray(values) || values.length === 0) {
       return [];
     }
 
-    for (let i: number = 1; i < row.values.length; i++) {
+    for (let i: number = 1; i < values.length; i++) {
       const cell = row.getCell(i);
       result.push(cell.text);
     }
@@ -429,7 +431,7 @@ export class ExceljsHelper {
     workbook: Excel.Workbook;
     worksheet: Excel.Worksheet;
   }> {
-    const _excel = await import('exceljs');
+    const _excel = await importModule<any>('exceljs');
     const ExcelJS = _excel.default;
 
     // merge options

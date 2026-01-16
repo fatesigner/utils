@@ -5,7 +5,7 @@
 import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 
-import { InjectResType, injectAround } from './aspect';
+import { injectAround, InjectResType } from './aspect';
 
 /**
  * 往指定函数切入代码，统计每次该函数执行的耗时
@@ -17,9 +17,18 @@ import { InjectResType, injectAround } from './aspect';
 export function LatencyTimeLog<S extends (...args: unknown[]) => unknown>(name: string, target, format = 'spend time：[time]'): InjectResType {
   return injectAround(
     function (originFunc) {
-      return async function (...args) {
-        // const timeStart = new Date().getTime();
-        return await originFunc(args);
+      return function (...args) {
+        const timeStart = Date.now();
+        const res = originFunc.apply(this, args);
+        if (res && typeof (res as Promise<unknown>).finally === 'function') {
+          return (res as Promise<unknown>).finally(() => {
+            const spend = Date.now() - timeStart;
+            console.log(format.replace('[time]', spend.toString()));
+          });
+        }
+        const spend = Date.now() - timeStart;
+        console.log(format.replace('[time]', spend.toString()));
+        return res;
       };
     },
     name,

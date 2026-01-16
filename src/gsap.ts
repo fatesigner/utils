@@ -1,4 +1,4 @@
-import { Power1, gsap } from 'gsap';
+import { gsap, Power1 } from 'gsap';
 
 /**
  * 创建一个数值过渡

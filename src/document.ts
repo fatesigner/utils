@@ -2,10 +2,10 @@
  * document DOM 操作
  */
 
-import { supportPrefix } from './style';
 import { getTimestampStr } from './date';
-import { browserClient } from './user-agent';
+import { supportPrefix } from './style';
 import { isArray, isFunction, isNullOrUndefined, isString } from './type-check';
+import { browserClient } from './user-agent';
 import { applyBind } from './';
 
 /**
@@ -24,6 +24,9 @@ export enum Direction {
  * @returns {Element} element
  */
 export function createElement(innerHtml: string) {
+  if (typeof document === 'undefined') {
+    return null;
+  }
   const element = document.createElement('div');
   element.innerHTML = innerHtml;
   return element.children[0];
@@ -34,8 +37,13 @@ export function createElement(innerHtml: string) {
  * @param {HTMLElement} element
  */
 export function removeElement(element: HTMLElement) {
+  if (!element) {
+    return;
+  }
   const parentEl = element.parentNode;
-  parentEl.removeChild(element);
+  if (parentEl) {
+    parentEl.removeChild(element);
+  }
 }
 
 /**
@@ -44,6 +52,9 @@ export function removeElement(element: HTMLElement) {
  * @param {HTMLElement} parentEl
  */
 export function prependChild(childEl: Node, parentEl: HTMLElement) {
+  if (!parentEl) {
+    return;
+  }
   if (parentEl.hasChildNodes()) {
     parentEl.insertBefore(childEl, parentEl.firstChild);
   } else {
@@ -57,7 +68,7 @@ export function prependChild(childEl: Node, parentEl: HTMLElement) {
  * @param {HTMLElement} targetEl
  */
 export function isertBefore(newEl: HTMLElement, targetEl: HTMLElement) {
-  const parentEl = targetEl.parentNode;
+  const parentEl = targetEl?.parentNode;
   if (parentEl) {
     parentEl.insertBefore(newEl, targetEl);
   }
@@ -69,7 +80,10 @@ export function isertBefore(newEl: HTMLElement, targetEl: HTMLElement) {
  * @param {HTMLElement} targetEl
  */
 export function insertAfter(newEl: HTMLElement, targetEl: HTMLElement) {
-  const parentEl = targetEl.parentNode;
+  const parentEl = targetEl?.parentNode;
+  if (!parentEl) {
+    return;
+  }
   if (parentEl.lastChild === targetEl) {
     parentEl.appendChild(newEl);
   } else {
@@ -97,9 +111,17 @@ export function matchesSelector(element: any, selector: string) {
   } else if (element.oMatchesSelector) {
     return element.oMatchesSelector(selector);
   } else {
-    const matches = (this.document || this.ownerDocument).querySelectorAll(selector);
-    const i = matches.length;
-    return i > -1;
+    const doc = element?.ownerDocument || (typeof document === 'undefined' ? null : document);
+    if (!doc) {
+      return false;
+    }
+    const matches = doc.querySelectorAll(selector);
+    for (let i = 0; i < matches.length; i++) {
+      if (matches[i] === element) {
+        return true;
+      }
+    }
+    return false;
   }
 }
 
@@ -130,6 +152,9 @@ export function closest(el: any, selector: string, containsItsOwn = false) {
  * @returns {boolean} isContains 是否包含
  */
 export function contains(parentNode: HTMLElement, childNode: HTMLElement) {
+  if (!parentNode || !childNode) {
+    return false;
+  }
   if (parentNode.contains) {
     return parentNode !== childNode && parentNode.contains(childNode);
   } else {
@@ -144,6 +169,9 @@ export function contains(parentNode: HTMLElement, childNode: HTMLElement) {
  * @returns {boolean}
  */
 export function hasClass(element: HTMLElement, className: string) {
+  if (!element || !className) {
+    return false;
+  }
   return !!element.className.match(new RegExp('(\\s|^)' + className + '(\\s|$)'));
 }
 
@@ -153,6 +181,9 @@ export function hasClass(element: HTMLElement, className: string) {
  * @param {string} className
  */
 export function addClass(element: HTMLElement, className: string) {
+  if (!element || !className) {
+    return;
+  }
   if (!hasClass(element, className)) {
     element.className += ' ' + className;
   }
@@ -164,6 +195,9 @@ export function addClass(element: HTMLElement, className: string) {
  * @param {string} className
  */
 export function removeClass(element: HTMLElement, className: string) {
+  if (!element || !className) {
+    return;
+  }
   if (hasClass(element, className)) {
     element.className = element.className.replace(new RegExp('(\\s|^)' + className + '(\\s|$)'), ' ');
   }
@@ -175,7 +209,10 @@ export function removeClass(element: HTMLElement, className: string) {
  * @returns {number} 宽度
  */
 export function getViewportSize(dom: HTMLDocument): { width: number; height: number } {
-  if (!dom && typeof document !== 'undefined') {
+  if (!dom) {
+    if (typeof document === 'undefined') {
+      return { width: 0, height: 0 };
+    }
     dom = document;
   }
   return {
@@ -213,14 +250,17 @@ export function getBoundingClientRect(element: HTMLElement) {
  * @returns {Object} position
  */
 export function getOffsetAwayFromDocument(element: any) {
+  if (!element || typeof document === 'undefined') {
+    return { top: 0, left: 0 };
+  }
   let top = 0;
   let left = 0;
   if (element.getBoundingClientRect) {
     const rect = getBoundingClientRect(element);
     const body = document.body;
     const docElem = document.documentElement;
-    const scrollTop = pageYOffset || docElem.scrollTop || body.scrollTop;
-    const scrollLeft = pageXOffset || docElem.scrollLeft || body.scrollLeft;
+    const scrollTop = window.pageYOffset || docElem.scrollTop || body.scrollTop;
+    const scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft;
     const clientTop = docElem.clientTop || body.clientTop;
     const clientLeft = docElem.clientLeft || body.clientLeft;
     top = rect.top + scrollTop - clientTop;
@@ -281,6 +321,7 @@ export function getAbsRelativeLayout(targetEl: HTMLElement, absEl: HTMLElement, 
 
   // 页面文档真实高度 最小为屏幕高度
   const documentHeight = document.body.scrollHeight > screen.availHeight ? document.body.scrollHeight : screen.availHeight;
+  const documentWidth = document.body.scrollWidth > screen.availWidth ? document.body.scrollWidth : screen.availWidth;
 
   if (direction === Direction.Down || direction === Direction.Up) {
     // down 的可行性
@@ -338,11 +379,11 @@ export function getAbsRelativeLayout(targetEl: HTMLElement, absEl: HTMLElement, 
   }
   if (direction === Direction.Right || direction === Direction.Left) {
     // right 的可行性
-    const _isDown = offsetAwayFromDocument.left + targetEl.offsetWidth + absEl.offsetWidth <= documentHeight;
+    const _isRight = offsetAwayFromDocument.left + targetEl.offsetWidth + absEl.offsetWidth <= documentWidth;
     // left 的可行性
-    const _isUp = offsetAwayFromDocument.left - absEl.offsetWidth >= 0;
+    const _isLeft = offsetAwayFromDocument.left - absEl.offsetWidth >= 0;
     if (direction === Direction.Right) {
-      if (absEl.offsetWidth < boundingClientRect.bottom) {
+      if (absEl.offsetWidth < boundingClientRect.right) {
         res.left = offsetAwayFromDocument.left + targetEl.offsetWidth;
         res.direction = Direction.Right;
       } else {
@@ -350,14 +391,14 @@ export function getAbsRelativeLayout(targetEl: HTMLElement, absEl: HTMLElement, 
           res.left = offsetAwayFromDocument.left - absEl.offsetWidth;
           res.direction = Direction.Left;
         } else {
-          if (_isDown) {
+          if (_isRight) {
             res.left = offsetAwayFromDocument.left + targetEl.offsetWidth;
             res.direction = Direction.Right;
-          } else if (_isUp) {
-            res.left = offsetAwayFromDocument.top - absEl.offsetWidth;
+          } else if (_isLeft) {
+            res.left = offsetAwayFromDocument.left - absEl.offsetWidth;
             res.direction = Direction.Left;
           } else {
-            res.left = offsetAwayFromDocument.top + targetEl.offsetWidth;
+            res.left = offsetAwayFromDocument.left + targetEl.offsetWidth;
             res.direction = Direction.Right;
           }
         }
@@ -367,14 +408,14 @@ export function getAbsRelativeLayout(targetEl: HTMLElement, absEl: HTMLElement, 
         res.left = offsetAwayFromDocument.left - absEl.offsetWidth;
         res.direction = Direction.Left;
       } else {
-        if (absEl.offsetWidth < boundingClientRect.bottom) {
+        if (absEl.offsetWidth < boundingClientRect.right) {
           res.left = offsetAwayFromDocument.left + targetEl.offsetWidth;
           res.direction = Direction.Right;
         } else {
-          if (_isUp) {
+          if (_isLeft) {
             res.left = offsetAwayFromDocument.left - absEl.offsetWidth;
             res.direction = Direction.Left;
-          } else if (_isDown) {
+          } else if (_isRight) {
             res.left = offsetAwayFromDocument.left + targetEl.offsetWidth;
             res.direction = Direction.Right;
           } else {
@@ -385,7 +426,7 @@ export function getAbsRelativeLayout(targetEl: HTMLElement, absEl: HTMLElement, 
       }
     }
     if (offsetAwayFromDocument.top + (absEl.offsetHeight + targetEl.offsetHeight) / 2 > viewportOffset.height) {
-      res.top = viewportOffset.width - absEl.offsetHeight;
+      res.top = viewportOffset.height - absEl.offsetHeight;
     } else {
       res.top = offsetAwayFromDocument.top - (absEl.offsetHeight - targetEl.offsetHeight) / 2;
     }
@@ -401,9 +442,12 @@ export function getAbsRelativeLayout(targetEl: HTMLElement, absEl: HTMLElement, 
  */
 export function getScrollLeft(dom: any) {
   if (!dom) {
+    if (typeof document === 'undefined') {
+      return 0;
+    }
     dom = document;
   }
-  return dom.documentElement.scrollLeft || dom.body.scrollLeft;
+  return dom.documentElement.scrollLeft || dom.body.scrollLeft || 0;
 }
 
 /**
@@ -413,9 +457,12 @@ export function getScrollLeft(dom: any) {
  */
 export function getScrollTop(dom: HTMLDocument) {
   if (!dom) {
+    if (typeof document === 'undefined') {
+      return 0;
+    }
     dom = document;
   }
-  return dom.documentElement.scrollTop || dom.body.scrollTop;
+  return dom.documentElement.scrollTop || dom.body.scrollTop || 0;
 }
 
 /**
@@ -434,8 +481,8 @@ export function scrollTo(containerEl: HTMLElement, left: number, top: number, du
   const initialX = containerEl.scrollLeft;
   const initialY = containerEl.scrollTop;
 
-  const baseX = (initialX + left ?? 0) * 0.5;
-  const baseY = (initialY + top ?? 0) * 0.5;
+  const baseX = (initialX + (left ?? 0)) * 0.5;
+  const baseY = (initialY + (top ?? 0)) * 0.5;
   const differenceX = initialX - baseX;
   const differenceY = initialY - baseY;
 
@@ -447,12 +494,12 @@ export function scrollTo(containerEl: HTMLElement, left: number, top: number, du
           containerEl.scrollTo(initialX, baseY + differenceY * Math.cos(normalizedTime * Math.PI));
         }
       : isNullOrUndefined(top)
-      ? function (normalizedTime) {
-          containerEl.scrollTo(baseX + differenceX * Math.cos(normalizedTime * Math.PI), initialY);
-        }
-      : function (normalizedTime) {
-          containerEl.scrollTo(baseX + differenceX * Math.cos(normalizedTime * Math.PI), baseY + differenceY * Math.cos(normalizedTime * Math.PI));
-        };
+        ? function (normalizedTime) {
+            containerEl.scrollTo(baseX + differenceX * Math.cos(normalizedTime * Math.PI), initialY);
+          }
+        : function (normalizedTime) {
+            containerEl.scrollTo(baseX + differenceX * Math.cos(normalizedTime * Math.PI), baseY + differenceY * Math.cos(normalizedTime * Math.PI));
+          };
 
     const step = function () {
       let normalizedTime = (performance.now() - startTime) / duration;

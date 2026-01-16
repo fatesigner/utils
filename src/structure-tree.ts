@@ -219,7 +219,10 @@ export class StructureTree<
 
   // 指定节点向前移动
   moveForward(nodes: T[], id: string): void {
-    const cur = this.find(nodes, (x) => x.id === id);
+    const cur = this.find(nodes, (x) => x[this.config.idKey] === id);
+    if (!cur) {
+      return;
+    }
     let arr;
     if (cur.parentNodes.length) {
       arr = cur.parentNodes[cur.parentNodes.length - 1].children;
@@ -234,7 +237,10 @@ export class StructureTree<
 
   // 向后移动
   moveBack(nodes: T[], id: string): void {
-    const cur = this.find(nodes, (x) => x.id === id);
+    const cur = this.find(nodes, (x) => x[this.config.idKey] === id);
+    if (!cur) {
+      return;
+    }
     let arr;
     if (cur.parentNodes.length) {
       arr = cur.parentNodes[cur.parentNodes.length - 1].children;

@@ -6,6 +6,14 @@ import to from 'await-to-js';
 
 export type ImageType = 'png' | 'jpeg' | 'gif' | 'bmp';
 
+function importModule<T = any>(modulePath: string): Promise<T> {
+  const requireFunc = typeof require === 'function' ? require : null;
+  if (requireFunc) {
+    return Promise.resolve(requireFunc(modulePath));
+  }
+  return import(modulePath) as Promise<T>;
+}
+
 /**
  * 将指定的 HtmlElement 转换为 HTMLCanvasElement
  * @param el        html 元素
@@ -13,7 +21,7 @@ export type ImageType = 'png' | 'jpeg' | 'gif' | 'bmp';
  * @constructor
  */
 export async function convertHtmlToCanvas(el: HTMLElement, options?: any): Promise<HTMLCanvasElement> {
-  const [err, res] = await to<any>(import('html2canvas'));
+  const [err, res] = await to<any>(importModule('html2canvas'));
 
   if (err) {
     throw err;
@@ -34,7 +42,7 @@ export async function convertHtmlToCanvas(el: HTMLElement, options?: any): Promi
  * @constructor
  */
 export async function convertHtmlToImage(el: HTMLElement, options?: any, type: ImageType = 'jpeg', width?: number, height?: number): Promise<HTMLImageElement> {
-  const [err, res] = await to<any>(Promise.all([import('html2canvas'), import('./lib/canvas2image/canvas2image')]));
+  const [err, res] = await to<any>(Promise.all([importModule('html2canvas'), importModule('./lib/canvas2image/canvas2image')]));
 
   if (err) {
     throw err;
@@ -62,15 +70,8 @@ export async function convertHtmlToImage(el: HTMLElement, options?: any, type: I
  * @param height    图片高度
  * @constructor
  */
-export async function saveHtmlAsImage(
-  el: HTMLElement,
-  options?: any,
-  type: ImageType = 'jpeg',
-  fileName?: string,
-  width?: number,
-  height?: number
-): Promise<void> {
-  const [err, res] = await to<any>(Promise.all([import('html2canvas'), import('./lib/canvas2image/canvas2image')]));
+export async function saveHtmlAsImage(el: HTMLElement, options?: any, type: ImageType = 'jpeg', fileName?: string, width?: number, height?: number): Promise<void> {
+  const [err, res] = await to<any>(Promise.all([importModule('html2canvas'), importModule('./lib/canvas2image/canvas2image')]));
 
   if (err) {
     throw err;

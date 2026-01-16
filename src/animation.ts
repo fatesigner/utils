@@ -6,26 +6,41 @@
 
 import { supportPrefix } from './style';
 
-let _requestAnimationFrame: (callback: (...any) => any) => number;
+type RafCallback = (...args: [number] | [Error | null, number]) => any;
+
+let _requestAnimationFrame: (callback: RafCallback) => number;
 let _cancelAnimationFrame: (id: number) => void;
 
 const prefix = {
   '': '',
   '-moz-': 'moz',
-  '-webkit-': 'webkit'
+  '-webkit-': 'webkit',
+  '-ms-': 'ms'
 }[supportPrefix];
 
-if (prefix) {
-  _requestAnimationFrame = window[prefix + 'RequestAnimationFrame'];
-  _cancelAnimationFrame = window[prefix + 'CancelAnimationFrame'] || window[prefix + 'CancelRequestAnimationFrame'];
-} else {
+const hasWindow = typeof window !== 'undefined';
+if (hasWindow && prefix !== undefined) {
+  if (prefix === '') {
+    _requestAnimationFrame = window.requestAnimationFrame?.bind(window);
+    _cancelAnimationFrame = window.cancelAnimationFrame?.bind(window);
+  } else {
+    _requestAnimationFrame = (window as any)[prefix + 'RequestAnimationFrame'];
+    _cancelAnimationFrame = (window as any)[prefix + 'CancelAnimationFrame'] || (window as any)[prefix + 'CancelRequestAnimationFrame'];
+  }
+}
+
+if (!_requestAnimationFrame || !_cancelAnimationFrame) {
   let lastTime = 0;
   _requestAnimationFrame = function (cb) {
     const currTime = new Date().getTime();
     const timeToCall = Math.max(0, 16.7 - (currTime - lastTime));
     const id: any = setTimeout(function () {
-      // eslint-disable-next-line node/no-callback-literal
-      cb(currTime + timeToCall);
+      const time = currTime + timeToCall;
+      if (cb.length >= 2) {
+        cb(null, time);
+        return;
+      }
+      cb(time);
     }, timeToCall);
     lastTime = currTime + timeToCall;
     return id;

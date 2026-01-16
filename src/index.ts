@@ -4,8 +4,8 @@
 
 import { cloneDeep } from 'lodash-es';
 
-import { UnknownType } from './types';
 import { isArray, isBoolean, isFunction, isNodeList, isNullOrUndefined, isNumber, isObject, isString } from './type-check';
+import { UnknownType } from './types';
 
 /**
  * 无任何操作的 空函数
@@ -21,21 +21,8 @@ export function noop() {}
 export function applyBind<T, A extends any[], R>(fn: (this: T, ...args: A) => R, context: T): (...args: A) => R;
 export function applyBind<T, A0, A extends any[], R>(fn: (this: T, arg0: A0, ...args: A) => R, context: T, arg0: A0): (...args: A) => R;
 export function applyBind<T, A0, A1, A extends any[], R>(fn: (this: T, arg0: A0, arg1: A1, ...args: A) => R, context: T, arg0: A0, arg1: A1): (...args: A) => R;
-export function applyBind<T, A0, A1, A2, A extends any[], R>(
-  fn: (this: T, arg0: A0, arg1: A1, arg2: A2, ...args: A) => R,
-  context: T,
-  arg0: A0,
-  arg1: A1,
-  arg2: A2
-): (...args: A) => R;
-export function applyBind<T, A0, A1, A2, A3, A extends any[], R>(
-  fn: (this: T, arg0: A0, arg1: A1, arg2: A2, arg3: A3, ...args: A) => R,
-  context: T,
-  arg0: A0,
-  arg1: A1,
-  arg2: A2,
-  arg3: A3
-): (...args: A) => R;
+export function applyBind<T, A0, A1, A2, A extends any[], R>(fn: (this: T, arg0: A0, arg1: A1, arg2: A2, ...args: A) => R, context: T, arg0: A0, arg1: A1, arg2: A2): (...args: A) => R;
+export function applyBind<T, A0, A1, A2, A3, A extends any[], R>(fn: (this: T, arg0: A0, arg1: A1, arg2: A2, arg3: A3, ...args: A) => R, context: T, arg0: A0, arg1: A1, arg2: A2, arg3: A3): (...args: A) => R;
 export function applyBind<T, AX, R>(fn: (this: T, ...args: AX[]) => R, context: T, ...args: AX[]): (...args: AX[]) => R {
   return function (...argsOri: AX[]) {
     return fn.apply(context, [...args, ...argsOri]);
@@ -349,11 +336,7 @@ export function convertToQueryParameters(obj: any) {
  * reducer 不推荐设置Wie boolean 值, 不然会与 break 结束循环逻辑发生冲突
  * @return {Object} reducer
  */
-export function forEach<T extends any[] | Record<string, any>, R>(
-  data: T,
-  fn: (prev: R, cur: T extends any[] ? T[number] : keyof T, index: number, data: T) => R | boolean | void,
-  reducer?: R
-) {
+export function forEach<T extends any[] | Record<string, any>, R>(data: T, fn: (prev: R, cur: T extends any[] ? T[number] : keyof T, index: number, data: T) => R | boolean | void, reducer?: R) {
   if (isFunction(fn)) {
     if (isArray(data) || isNodeList(data)) {
       for (let i = 0, l = data.length; i < l; i++) {
@@ -581,7 +564,7 @@ export function getParamsFromUrl(paramStr?: string): Record<string, any> {
   return undefined;
 }
 
-type byProp<T> = (record: T) => string | number;
+type byProp<T> = (_record: T) => string | number;
 
 /**
  * 指定属性, 为数组进行分组
@@ -593,7 +576,7 @@ type byProp<T> = (record: T) => string | number;
 export function groupBy<TRecord extends Record<string, any>, TSlice extends Record<string, any>>(
   arr: TRecord[],
   by: keyof TRecord | byProp<TRecord>,
-  slice?: (record: TRecord) => TSlice
+  slice?: (_record: TRecord) => TSlice
 ): Array<
   TSlice & {
     key: string | number;
@@ -1090,7 +1073,7 @@ export function exchangeItem(arr: unknown[], index: number, index2: number) {
  * @param arr
  * @return index
  */
-export function removeItem<T extends UnknownType = never>(callback: (record: T) => boolean, arr: T[]): number {
+export function removeItem<T extends UnknownType = never>(callback: (_record: T) => boolean, arr: T[]): number {
   if (arr) {
     const index = arr.findIndex((x) => callback(x));
     if (index > -1) {

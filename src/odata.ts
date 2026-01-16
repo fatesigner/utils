@@ -1,15 +1,14 @@
-import { isNull, isNullOrUndefined, isNumber, isString, isUndefined } from './type-check';
-
+import { isNullOrUndefined, isNumber, isString, isUndefined } from './type-check';
 import { UnknownKey } from './types';
 
 /**
  * Odata 运算符
- * eq	等于	==
- * ne	不等于	!=
- * gt	大于	>
- * ge	大于等于	>=
- * lt	小于	<
- * le	小于等于	<=
+ * eq  等于  ==
+ * ne  不等于  !=
+ * gt  大于  >
+ * ge  大于等于  >=
+ * lt  小于  <
+ * le  小于等于  <=
  * contains 包含
  * not contains 不包含
  * startswith 以xx开头
@@ -80,6 +79,19 @@ export interface IOdataOrderItem {
  */
 export type IOdataFunction = 'startswith' | 'endswith' | 'length' | 'indexof' | 'replace' | 'substring' | 'tolower' | 'toupper' | 'trim';
 
+function formatODataValue(value: string | number, dateof?: boolean) {
+  if (isNullOrUndefined(value)) {
+    return 'null';
+  }
+  if (dateof) {
+    return value.toString();
+  }
+  if (isNumber(value)) {
+    return value.toString();
+  }
+  return `'${value}'`;
+}
+
 /**
  * 用于 Odata 辅助操作类
  */
@@ -106,24 +118,17 @@ export class ODataHelper {
       return '';
     }
 
-    if (!dateof) {
-      if (!isNumber(value)) {
-        // 非数值，添加单引号
-        value = `'${value}'`;
-      }
-
-      if (isNull(value)) {
-        value = 'null';
-      }
-    }
+    const valueStr = formatODataValue(value, dateof);
 
     if (operator === 'contains') {
-      return `${operator}(tolower(${name.toString()}), ${isNull(value) ? 'null' : `tolower(${value})`})`;
+      const valueExpr = valueStr === 'null' ? 'null' : isString(value) ? `tolower(${valueStr})` : valueStr;
+      const nameExpr = isString(value) ? `tolower(${name.toString()})` : name.toString();
+      return `${operator}(${nameExpr}, ${valueExpr})`;
     } else if (operator === 'not contains' || operator === 'startswith' || operator === 'endswith') {
-      return `${operator}(${name.toString()}, ${isNull(value) ? 'null' : value})`;
+      return `${operator}(${name.toString()}, ${valueStr})`;
     }
 
-    return `${name.toString()} ${operator} ${value}`;
+    return `${name.toString()} ${operator} ${valueStr}`;
   }
 
   /**
@@ -136,10 +141,11 @@ export class ODataHelper {
     if (isNullOrUndefined(name) || isUndefined(value)) {
       return '';
     }
-    if (operator === 'length' || operator === 'indexof') {
-      return `length(${name.toString()}) eq ${isNull(value) ? 'null' : `'${value}'`}`;
+    const valueStr = formatODataValue(value);
+    if (operator === 'length') {
+      return `length(${name.toString()}) eq ${valueStr}`;
     }
-    return `${operator}(${name.toString()}, ${isNull(value) ? 'null' : `'${value}'`})`;
+    return `${operator}(${name.toString()}, ${valueStr})`;
   }
 
   /**
@@ -151,7 +157,7 @@ export class ODataHelper {
     if (isNullOrUndefined(name) || isUndefined(length)) {
       return '';
     }
-    return `length(${name.toString()}) eq ${isNull(length) ? 'null' : `'${length}'`}`;
+    return `length(${name.toString()}) eq ${formatODataValue(length)}`;
   }
 
   /**
@@ -164,7 +170,7 @@ export class ODataHelper {
     if (isNullOrUndefined(name) || isUndefined(value)) {
       return '';
     }
-    return `indexof(${name.toString()}, ${isNull(value) ? 'null' : `'${value}'`}) eq ${isNull(length) ? 'null' : `'${length}'`}`;
+    return `indexof(${name.toString()}, ${formatODataValue(value)}) eq ${formatODataValue(length)}`;
   }
 
   /**
@@ -178,9 +184,7 @@ export class ODataHelper {
     if (isNullOrUndefined(name) || isUndefined(value)) {
       return '';
     }
-    return `replace(${name.toString()}, ${isNull(value) ? 'null' : `'${value}'`}, ${isNull(replaced) ? 'null' : `'${replaced}'`}) eq ${
-      isNullOrUndefined(value2) ? 'null' : `'${value2}'`
-    }`;
+    return `replace(${name.toString()}, ${formatODataValue(value)}, ${formatODataValue(replaced)}) eq ${formatODataValue(value2)}`;
   }
 
   /**
